@@ -59,12 +59,12 @@ const routes = [
             {
               path: 'ver/:codigoItem',
               name: 'ver-item',
-              component: () => ViewItemModal
+              component: ViewItemModal
             },
             {
               path: 'editar/:codigoItem',
               name: 'editar-item',
-              component: () => EditItemModal
+              component: EditItemModal
             }
           ]
       }

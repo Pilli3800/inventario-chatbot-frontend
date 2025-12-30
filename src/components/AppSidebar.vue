@@ -59,21 +59,26 @@ const onMenuClick = ({ key }) => {
 
 <template>
   <a-menu theme="dark" mode="inline" :openKeys="openKeys" @openChange="onOpenChange" @click="onMenuClick">
-    <template v-for="item in filteredMenu">
-      <!-- Submenu -->
-      <a-sub-menu v-if="item.children" :key="'submenu-' + item.key">
-        <template #title>{{ item.label }}</template>
+    <template v-for="item in filteredMenu" :key="item.key">
 
-        <a-menu-item v-for="child in item.children" :key="child.key">
-          {{ child.label }}
+      <template v-if="item.children">
+        <a-sub-menu :key="item.key">
+          <template #title>{{ item.label }}</template>
+
+          <a-menu-item v-for="child in item.children" :key="child.key">
+            {{ child.label }}
+          </a-menu-item>
+        </a-sub-menu>
+      </template>
+
+      <template v-else>
+        <a-menu-item :key="item.key">
+          {{ item.label }}
         </a-menu-item>
-      </a-sub-menu>
+      </template>
 
-      <!-- Item simple -->
-      <a-menu-item v-else :key="'item-' + item.key">
-        {{ item.label }}
-      </a-menu-item>
     </template>
-
   </a-menu>
+
+
 </template>

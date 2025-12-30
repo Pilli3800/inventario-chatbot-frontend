@@ -6,6 +6,9 @@ import { useAuthStore } from '@/stores/auth.store'
 import GestionUsuario from '@/views/GestionUsuario.vue'
 import ViewUserModal from '@/components/admin/ViewUserModal.vue'
 import EditUserModal from '@/components/admin/EditUserModal.vue'
+import GestionItems from '@/views/GestionItems.vue'
+import ViewItemModal from '@/components/logistica/ViewItemModal.vue'
+import EditItemModal from '@/components/logistica/EditItemModal.vue'
 
 
 const routes = [
@@ -45,6 +48,26 @@ const routes = [
               }
           ]
       },
+      {
+        path: 'logistica/items',
+        name: 'gestion-items',
+        component: GestionItems,
+          meta: {
+            roles: ['ROLE_LOGISTICA']
+          },
+            children: [
+            {
+              path: 'ver/:codigoItem',
+              name: 'ver-item',
+              component: () => ViewItemModal
+            },
+            {
+              path: 'editar/:codigoItem',
+              name: 'editar-item',
+              component: () => EditItemModal
+            }
+          ]
+      }
     ]
   }
 ]

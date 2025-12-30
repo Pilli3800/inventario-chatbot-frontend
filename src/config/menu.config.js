@@ -17,5 +17,18 @@ export const menuItems = [
         roles: ['ROLE_ADMINISTRACION']
       }
     ]
+  },
+  {
+    key: 'logistica',
+    label: 'Logística',
+    roles: ['ROLE_LOGISTICA'],
+    children: [
+      {
+        key: 'gestion-items',
+        label: 'Gestión de Inventario',
+        route: '/logistica/items',
+        roles: ['ROLE_LOGISTICA']
+      }
+    ]
   }
 ]

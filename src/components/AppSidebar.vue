@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
 import { menuItems } from '@/config/menu.config'
@@ -8,7 +8,15 @@ const router = useRouter()
 const authStore = useAuthStore()
 const emit = defineEmits(['navigate'])
 
+/* ===== CONTROL DE SUBMENÚS ===== */
+const openKeys = ref([])
 
+const onOpenChange = (keys) => {
+  // Solo mantener el último submenú abierto
+  openKeys.value = keys.slice(-1)
+}
+
+/* ===== RBAC ===== */
 const hasAccess = (item) => {
   if (!item.roles || item.roles.length === 0) {
     return true
@@ -29,6 +37,7 @@ const filteredMenu = computed(() => {
     .filter(Boolean)
 })
 
+/* ===== NAVEGACIÓN ===== */
 const onMenuClick = ({ key }) => {
   const findRoute = (items) => {
     for (const item of items) {
@@ -48,12 +57,11 @@ const onMenuClick = ({ key }) => {
 }
 </script>
 
-
 <template>
-  <a-menu theme="dark" mode="inline" @click="onMenuClick">
-    <template v-for="item in filteredMenu" :key="item.key">
+  <a-menu theme="dark" mode="inline" :openKeys="openKeys" @openChange="onOpenChange" @click="onMenuClick">
+    <template v-for="item in filteredMenu">
       <!-- Submenu -->
-      <a-sub-menu v-if="item.children">
+      <a-sub-menu v-if="item.children" :key="'submenu-' + item.key">
         <template #title>{{ item.label }}</template>
 
         <a-menu-item v-for="child in item.children" :key="child.key">
@@ -62,9 +70,10 @@ const onMenuClick = ({ key }) => {
       </a-sub-menu>
 
       <!-- Item simple -->
-      <a-menu-item v-else :key="item.key">
+      <a-menu-item v-else :key="'item-' + item.key">
         {{ item.label }}
       </a-menu-item>
     </template>
+
   </a-menu>
 </template>

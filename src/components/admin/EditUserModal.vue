@@ -18,7 +18,7 @@ const form = ref({
   dni: '',
   nombres: '',
   apellidos: '',
-  roles: []  // array de strings
+  roles: []
 })
 
 const roles = ref([])

@@ -8,6 +8,7 @@ import ItemTable from '@/components/logistica/ItemTable.vue'
 import CreateItemModal from '@/components/logistica/CreateItemModal.vue'
 import EditItemModal from '@/components/logistica/EditItemModal.vue'
 import ViewItemModal from '@/components/logistica/ViewItemModal.vue'
+import { DownloadOutlined } from '@ant-design/icons-vue';
 
 const router = useRouter()
 const route = useRoute()
@@ -28,8 +29,10 @@ const pagination = ref({
   total: 0
 })
 
+const activeFilters = ref({})
+
 /* Cargar items */
-const loadItems = async (filters = {}) => {
+const loadItems = async (filters = activeFilters.value) => {
   loading.value = true
 
   const cleanFilters = Object.fromEntries(
@@ -69,6 +72,7 @@ const onTableChange = (pager, filters, sorter) => {
 
 const onSearch = (filters) => {
   pagination.value.current = 1
+  activeFilters.value = { ...filters }
   loadItems(filters)
 }
 
@@ -127,6 +131,43 @@ const desactivarItem = async (codigoItem) => {
   loadItems()
 }
 
+/* Exportar */
+const exportExcel = async () => {
+  const cleanFilters = Object.fromEntries(
+    Object.entries(activeFilters.value).filter(
+      ([, v]) => v !== undefined && v !== null && v !== ''
+    )
+  )
+
+  if (cleanFilters.enabled === 'true') cleanFilters.enabled = true
+  if (cleanFilters.enabled === 'false') cleanFilters.enabled = false
+
+  const response = await itemService.exportExcel(cleanFilters)
+
+  const blob = new Blob([response.data], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  })
+
+  const url = globalThis.URL.createObjectURL(blob)
+
+  let filename = 'items.xlsx'
+  const disposition = response.headers['content-disposition']
+  if (disposition) {
+    const match = disposition.match(/filename="?(.+)"?/)
+    if (match?.[1]) filename = match[1]
+  }
+
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+
+  link.remove()
+  globalThis.URL.revokeObjectURL(url)
+}
+
+
 loadItems()
 </script>
 
@@ -137,6 +178,10 @@ loadItems()
     <div style="margin: 12px 0;">
       <a-button type="primary" @click="createOpen = true">
         + Nuevo Item
+      </a-button>
+
+      <a-button style="margin-left: 8px" @click="exportExcel">
+        <DownloadOutlined /> Exportar Excel
       </a-button>
     </div>
 

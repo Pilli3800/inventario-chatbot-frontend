@@ -45,5 +45,17 @@ export const itemService = {
     return axios.patch(`${API_URL}/${codigoItem}/desactivar`, null, {
       headers: { Authorization: authStore.token }
     })
+  },
+
+  async exportExcel(params) {
+    const authStore = useAuthStore()
+
+    return axios.get(`${API_URL}/export/excel`, {
+      params,
+      responseType: 'blob',
+      headers: {
+        Authorization: authStore.token
+      }
+    })
   }
 }

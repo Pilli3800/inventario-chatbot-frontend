@@ -8,6 +8,7 @@ import ResetPasswordModal from '@/components/admin/ResetPasswordModal.vue'
 import EditUserModal from '@/components/admin/EditUserModal.vue'
 import ViewUserModal from '@/components/admin/ViewUserModal.vue'
 import CreateUserModal from '@/components/admin/CreateUserModal.vue'
+import { DownloadOutlined } from '@ant-design/icons-vue';
 
 
 const users = ref([])
@@ -26,6 +27,8 @@ const pagination = ref({
   pageSize: 6,
   total: 0
 })
+
+const activeFilters = ref({})
 
 // VER
 const openView = (record) => {
@@ -72,7 +75,7 @@ watch(
 )
 
 // CARGAR USUARIOS
-const loadUsers = async (filters = {}) => {
+const loadUsers = async (filters = activeFilters.value) => {
   loading.value = true
 
   // Se limpia filtros vacios antes de enviarlos al servicio
@@ -105,7 +108,8 @@ const onTableChange = (pager) => {
 }
 
 const onSearch = (filters) => {
-  pagination.value.current = 1   // 👈 resetear paginación
+  pagination.value.current = 1   //resetear paginación
+  activeFilters.value = { ...filters }
   loadUsers(filters)
 }
 
@@ -119,6 +123,42 @@ const desactivarUser = async (identUsuario) => {
   loadUsers() // recarga tabla
 }
 
+/* Exportar */
+const exportExcel = async () => {
+  const cleanFilters = Object.fromEntries(
+    Object.entries(activeFilters.value).filter(
+      ([, v]) => v !== undefined && v !== null && v !== ''
+    )
+  )
+
+  if (cleanFilters.enabled === 'true') cleanFilters.enabled = true
+  if (cleanFilters.enabled === 'false') cleanFilters.enabled = false
+
+  const response = await adminUserService.exportExcel(cleanFilters)
+
+  const blob = new Blob([response.data], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  })
+
+  const url = globalThis.URL.createObjectURL(blob)
+
+  let filename = 'usuarios.xlsx'
+  const disposition = response.headers['content-disposition']
+  if (disposition) {
+    const match = disposition.match(/filename="?(.+)"?/)
+    if (match?.[1]) filename = match[1]
+  }
+
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+
+  link.remove()
+  globalThis.URL.revokeObjectURL(url)
+}
+
 loadUsers()
 </script>
 
@@ -128,6 +168,10 @@ loadUsers()
     <div style="margin: 12px 0;">
       <a-button type="primary" @click="createOpen = true">
         + Nuevo Usuario
+      </a-button>
+
+      <a-button style="margin-left: 8px" @click="exportExcel">
+        <DownloadOutlined /> Exportar Excel
       </a-button>
     </div>
 

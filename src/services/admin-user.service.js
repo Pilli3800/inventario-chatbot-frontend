@@ -58,9 +58,20 @@ export const adminUserService = {
   },
 
   async create(payload) {
-  const authStore = useAuthStore()
-  return axios.post('http://localhost:8080/api/admin/users', payload, {
+    const authStore = useAuthStore()
+    return axios.post('http://localhost:8080/api/admin/users', payload, {
+      headers: { Authorization: authStore.token }
+    })
+  },
+
+  async exportExcel(params) {
+    const authStore = useAuthStore()
+
+    return axios.get(`${API_URL}/export/excel`, {
+      params,
+      responseType: 'blob',
       headers: { Authorization: authStore.token }
     })
   }
+
 }

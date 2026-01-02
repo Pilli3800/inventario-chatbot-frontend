@@ -165,15 +165,15 @@ loadUsers()
 <template>
   <div>
     <h2>Gestión de Usuarios</h2>
-    <div style="margin: 12px 0;">
+    <a-space wrap style="margin: 24px 0;">
       <a-button type="primary" @click="createOpen = true">
         + Nuevo Usuario
       </a-button>
 
-      <a-button style="margin-left: 8px" @click="exportExcel">
+      <a-button @click="exportExcel">
         <DownloadOutlined /> Exportar Excel
       </a-button>
-    </div>
+    </a-space>
 
     <CreateUserModal :open="createOpen" @close="createOpen = false" @success="loadUsers()" />
 

@@ -1,14 +1,16 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { itemService } from '@/services/item.service'
-
+import { useAuthStore } from '@/stores/auth.store'
 import ItemFilters from '@/components/logistica/ItemFilters.vue'
 import ItemTable from '@/components/logistica/ItemTable.vue'
 import CreateItemModal from '@/components/logistica/CreateItemModal.vue'
 import EditItemModal from '@/components/logistica/EditItemModal.vue'
 import ViewItemModal from '@/components/logistica/ViewItemModal.vue'
 import { DownloadOutlined } from '@ant-design/icons-vue';
+import { adminItemService } from '@/services/admin-item.service'
+
 
 const router = useRouter()
 const route = useRoute()
@@ -30,6 +32,8 @@ const pagination = ref({
 })
 
 const activeFilters = ref({})
+
+const authStore = useAuthStore()
 
 /* Cargar items */
 const loadItems = async (filters = activeFilters.value) => {
@@ -167,6 +171,44 @@ const exportExcel = async () => {
   globalThis.URL.revokeObjectURL(url)
 }
 
+const exportExcelAuditoria = async () => {
+  const cleanFilters = Object.fromEntries(
+    Object.entries(activeFilters.value).filter(
+      ([, v]) => v !== undefined && v !== null && v !== ''
+    )
+  )
+
+  if (cleanFilters.enabled === 'true') cleanFilters.enabled = true
+  if (cleanFilters.enabled === 'false') cleanFilters.enabled = false
+
+  const response = await adminItemService.exportExcelAuditoria(cleanFilters)
+
+  const blob = new Blob([response.data], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  })
+
+  const url = globalThis.URL.createObjectURL(blob)
+
+  let filename = 'items_auditoria.xlsx'
+  const disposition = response.headers['content-disposition']
+  if (disposition) {
+    const match = disposition.match(/filename="?(.+)"?/)
+    if (match?.[1]) filename = match[1]
+  }
+
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+
+  link.remove()
+  globalThis.URL.revokeObjectURL(url)
+}
+
+const isAdmin = computed(() =>
+  authStore.hasRole('ROLE_ADMINISTRACION')
+)
 
 loadItems()
 </script>
@@ -175,15 +217,23 @@ loadItems()
   <div>
     <h2>Gestión de Inventario</h2>
 
-    <div style="margin: 12px 0;">
+    <a-space wrap style="margin: 24px 0;">
       <a-button type="primary" @click="createOpen = true">
         + Nuevo Item
       </a-button>
 
-      <a-button style="margin-left: 8px" @click="exportExcel">
+      <a-button @click="exportExcel">
         <DownloadOutlined /> Exportar Excel
       </a-button>
-    </div>
+
+      <!-- Exportar con auditoría (solo administrador) -->
+      <a-tooltip title="Incluye campos de auditoría (solo administración)" placement="top">
+        <a-button :disabled="!isAdmin" type="dashed" @click="exportExcelAuditoria">
+          <DownloadOutlined />
+          Exportar con auditoría
+        </a-button>
+      </a-tooltip>
+    </a-space>
 
     <CreateItemModal :open="createOpen" @close="createOpen = false" @success="loadItems()" />
 

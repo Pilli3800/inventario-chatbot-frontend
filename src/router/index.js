@@ -9,6 +9,8 @@ import EditUserModal from '@/components/admin/EditUserModal.vue'
 import GestionItems from '@/views/GestionItems.vue'
 import ViewItemModal from '@/components/logistica/ViewItemModal.vue'
 import EditItemModal from '@/components/logistica/EditItemModal.vue'
+import GestionSedes from '@/views/GestionSedes.vue'
+import EditSedeModal from '@/components/admin/EditSedeModal.vue'
 
 
 const routes = [
@@ -67,6 +69,19 @@ const routes = [
               component: EditItemModal
             }
           ]
+      },
+      {
+        path: 'admin/sedes',
+        name: 'gestion-sedes',
+        component: GestionSedes,
+        meta: { roles: ['ROLE_ADMINISTRACION'] },
+        children: [
+          {
+            path: 'editar/:codigoSede',
+            name: 'editar-sede',
+            component: EditSedeModal
+          }
+        ]
       }
     ]
   }

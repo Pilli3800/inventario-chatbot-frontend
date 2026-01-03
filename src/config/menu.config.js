@@ -15,6 +15,12 @@ export const menuItems = [
         label: 'Gestión de Usuarios',
         route: '/admin/usuarios',
         roles: ['ROLE_ADMINISTRACION']
+      },
+      {
+        key: 'gestion-sedes',
+        label: 'Gestión de Sedes',
+        route: '/admin/sedes',
+        roles: ['ROLE_ADMINISTRACION']
       }
     ]
   },

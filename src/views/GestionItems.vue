@@ -215,7 +215,7 @@ loadItems()
 
 <template>
   <div>
-    <h2>Gestión de Inventario</h2>
+    <h2>Gestión de Items</h2>
 
     <a-space wrap style="margin: 24px 0;">
       <a-button type="primary" @click="createOpen = true">

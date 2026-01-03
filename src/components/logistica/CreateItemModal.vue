@@ -21,7 +21,6 @@ const form = ref({
   tipo: '',
   descripcion: '',
   observaciones: '',
-  stockInicial: null
 })
 
 /* Validaciones */
@@ -34,10 +33,6 @@ const rules = {
   ],
   tipo: [
     { required: true, message: 'El tipo es obligatorio' }
-  ],
-  stockInicial: [
-    { required: true, message: 'El stock inicial es obligatorio' },
-    { type: 'number', min: 0, message: 'El stock debe ser mayor o igual a 0' }
   ]
 }
 
@@ -56,8 +51,7 @@ const resetForm = () => {
     nombre: '',
     tipo: '',
     descripcion: '',
-    observaciones: '',
-    stockInicial: null
+    observaciones: ''
   }
 }
 
@@ -124,10 +118,6 @@ const handleCancel = () => emit('close')
 
       <a-form-item label="Observaciones">
         <a-textarea v-model:value="form.observaciones" />
-      </a-form-item>
-
-      <a-form-item label="Stock Inicial" name="stockInicial">
-        <a-input-number v-model:value="form.stockInicial" :min="0" style="width: 100%" />
       </a-form-item>
 
       <!-- Errores de validación -->

@@ -31,7 +31,7 @@ export const menuItems = [
     children: [
       {
         key: 'gestion-items',
-        label: 'Gestión de Inventario',
+        label: 'Gestión de Items',
         route: '/logistica/items',
         roles: ['ROLE_LOGISTICA']
       }

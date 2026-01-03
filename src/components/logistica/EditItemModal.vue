@@ -21,8 +21,6 @@ const form = ref({
   tipo: '',
   descripcion: '',
   observaciones: '',
-  stockTotal: 0,
-  stockDisponible: 0,
   enabled: false
 })
 
@@ -40,8 +38,7 @@ const loadItem = async () => {
     tipo: item.tipo,
     descripcion: item.descripcion || '',
     observaciones: item.observaciones || '',
-    stockTotal: item.stockTotal,
-    stockDisponible: item.stockDisponible,
+
     enabled: item.enabled
   }
 
@@ -73,8 +70,6 @@ const submit = async () => {
       nombre: form.value.nombre,
       descripcion: form.value.descripcion,
       tipo: form.value.tipo,
-      stockTotal: form.value.stockTotal,
-      stockDisponible: form.value.stockDisponible,
       enabled: form.value.enabled,
       observaciones: form.value.observaciones
     })
@@ -131,14 +126,6 @@ const handleCancel = () => emit('close')
       </a-form-item>
 
       <!-- Campos de solo lectura -->
-      <a-form-item label="Stock Total">
-        <a-input-number v-model:value="form.stockTotal" disabled style="width:100%" />
-      </a-form-item>
-
-      <a-form-item label="Stock Disponible">
-        <a-input-number v-model:value="form.stockDisponible" disabled style="width:100%" />
-      </a-form-item>
-
       <a-form-item label="Activo">
         <a-switch v-model:checked="form.enabled" />
       </a-form-item>

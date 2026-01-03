@@ -17,8 +17,6 @@ const item = ref({
   tipo: '',
   descripcion: '',
   observaciones: '',
-  stockTotal: 0,
-  stockDisponible: 0,
   enabled: false
 })
 
@@ -35,8 +33,6 @@ const loadItem = async () => {
     tipo: content.tipo,
     descripcion: content.descripcion || '',
     observaciones: content.observaciones || '',
-    stockTotal: content.stockTotal,
-    stockDisponible: content.stockDisponible,
     enabled: content.enabled
   }
 
@@ -78,14 +74,6 @@ const handleClose = () => emit('close')
 
       <a-form-item label="Observaciones">
         <a-textarea :value="item.observaciones" disabled />
-      </a-form-item>
-
-      <a-form-item label="Stock Total">
-        <a-input :value="item.stockTotal" disabled />
-      </a-form-item>
-
-      <a-form-item label="Stock Disponible">
-        <a-input :value="item.stockDisponible" disabled />
       </a-form-item>
 
       <a-form-item label="Activo">

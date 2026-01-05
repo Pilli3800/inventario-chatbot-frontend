@@ -5,16 +5,6 @@ const API_URL = 'http://localhost:8080/api/admin/sedes'
 
 export const adminSedeService = {
 
-  async getSedes() {
-    const authStore = useAuthStore()
-
-    return axios.get(API_URL, {
-      headers: {
-        Authorization: authStore.token
-      }
-    })
-  },
-
   async getSede(codigoSede) {
     const authStore = useAuthStore()
 

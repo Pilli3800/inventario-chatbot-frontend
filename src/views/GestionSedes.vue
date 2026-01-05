@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { Modal, message } from 'ant-design-vue'
 import { adminSedeService } from '@/services/admin-sede.service'
+import { sedeService } from '@/services/sede.service'
 import EditSedeModal from '@/components/admin/EditSedeModal.vue'
 
 const sedes = ref([])
@@ -40,7 +41,7 @@ watch(
 const loadSedes = async () => {
   loading.value = true
   try {
-    const { data } = await adminSedeService.getSedes()
+    const { data } = await sedeService.getSedes()
     sedes.value = data.content
   } finally {
     loading.value = false

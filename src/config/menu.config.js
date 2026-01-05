@@ -34,6 +34,12 @@ export const menuItems = [
         label: 'Gestión de Items',
         route: '/logistica/items',
         roles: ['ROLE_LOGISTICA']
+      },
+      {
+        key: 'gestion-inventarios',
+        label: 'Gestión de Inventario',
+        route: '/logistica/inventarios',
+        roles: ['ROLE_LOGISTICA']
       }
     ]
   }

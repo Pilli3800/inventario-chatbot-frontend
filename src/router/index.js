@@ -1,24 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import LoginView from '@/views/LoginView.vue'
 import HomeView from '@/views/HomeView.vue'
 import MainLayout from '@/layouts/MainLayout.vue'
 import { useAuthStore } from '@/stores/auth.store'
-import GestionUsuario from '@/views/GestionUsuario.vue'
-import ViewUserModal from '@/components/admin/ViewUserModal.vue'
-import EditUserModal from '@/components/admin/EditUserModal.vue'
-import GestionItems from '@/views/GestionItems.vue'
-import ViewItemModal from '@/components/logistica/ViewItemModal.vue'
-import EditItemModal from '@/components/logistica/EditItemModal.vue'
-import GestionSedes from '@/views/GestionSedes.vue'
-import EditSedeModal from '@/components/admin/EditSedeModal.vue'
 
+import { authRoutes } from './auth.routes'
+import { adminRoutes } from './admin.routes'
+import { logisticaRoutes } from './logistica.routes'
 
 const routes = [
-  {
-    path: '/login',
-    name: 'login',
-    component: LoginView
-  },
+  ...authRoutes,
   {
     path: '/',
     component: MainLayout,
@@ -30,63 +20,11 @@ const routes = [
         name: 'home',
         component: HomeView
       },
-      {
-        path: 'admin/usuarios',
-        name: 'gestion-usuarios',
-        component: GestionUsuario,
-          meta: {
-            roles: ['ROLE_ADMINISTRACION']
-          },
-          children: [
-              {
-                path: 'ver/:identUsuario',
-                name: 'ver-usuario',
-                component: ViewUserModal
-              },
-              {
-                path: 'editar/:identUsuario',
-                name: 'editar-usuario',
-                component: EditUserModal
-              }
-          ]
-      },
-      {
-        path: 'logistica/items',
-        name: 'gestion-items',
-        component: GestionItems,
-          meta: {
-            roles: ['ROLE_LOGISTICA']
-          },
-            children: [
-            {
-              path: 'ver/:codigoItem',
-              name: 'ver-item',
-              component: ViewItemModal
-            },
-            {
-              path: 'editar/:codigoItem',
-              name: 'editar-item',
-              component: EditItemModal
-            }
-          ]
-      },
-      {
-        path: 'admin/sedes',
-        name: 'gestion-sedes',
-        component: GestionSedes,
-        meta: { roles: ['ROLE_ADMINISTRACION'] },
-        children: [
-          {
-            path: 'editar/:codigoSede',
-            name: 'editar-sede',
-            component: EditSedeModal
-          }
-        ]
-      }
+      ...adminRoutes,
+      ...logisticaRoutes
     ]
   }
 ]
-
 
 const router = createRouter({
   history: createWebHistory(),

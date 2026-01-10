@@ -21,6 +21,12 @@ export const menuItems = [
         label: 'Gestión de Sedes',
         route: '/admin/sedes',
         roles: ['ROLE_ADMINISTRACION']
+      },
+      {
+        key: 'gestion-cuadrillas',
+        label: 'Gestión de Cuadrillas',
+        route: '/admin/cuadrillas',
+        roles: ['ROLE_ADMINISTRACION']
       }
     ]
   },

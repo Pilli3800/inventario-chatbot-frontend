@@ -3,6 +3,9 @@ import ViewUserModal from '@/components/admin/ViewUserModal.vue'
 import EditUserModal from '@/components/admin/EditUserModal.vue'
 import GestionSedes from '@/views/GestionSedes.vue'
 import EditSedeModal from '@/components/admin/EditSedeModal.vue'
+import GestionCuadrillas from '@/views/GestionCuadrillas.vue'
+import ViewCuadrillaModal from '@/components/admin/cuadrillas/ViewCuadrillaModal.vue'
+import EditCuadrillaModal from '@/components/admin/cuadrillas/EditCuadrillaModal.vue'
 
 export const adminRoutes = [
   {
@@ -35,6 +38,24 @@ export const adminRoutes = [
         path: 'editar/:codigoSede',
         name: 'editar-sede',
         component: EditSedeModal
+      }
+    ]
+  },
+  {
+    path: 'admin/cuadrillas',
+    name: 'gestion-cuadrillas',
+    component: GestionCuadrillas,
+    meta: { roles: ['ROLE_ADMINISTRACION'] },
+    children: [
+      {
+        path: 'ver/:codigoCuadrilla',
+        name: 'ver-cuadrilla',
+        component: ViewCuadrillaModal
+      },
+      {
+        path: 'editar/:codigoCuadrilla',
+        name: 'editar-cuadrilla',
+        component: EditCuadrillaModal
       }
     ]
   }

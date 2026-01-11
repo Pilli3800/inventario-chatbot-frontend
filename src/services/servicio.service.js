@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { useAuthStore } from '@/stores/auth.store'
 
-const API_URL = 'http://localhost:8080/api/admin/servicios'
+const API_URL = 'http://localhost:8080/api/servicios'
 
 export const servicioService = {
   async search(params) {

@@ -27,6 +27,12 @@ export const menuItems = [
         label: 'Gestión de Cuadrillas',
         route: '/admin/cuadrillas',
         roles: ['ROLE_ADMINISTRACION', 'ROLE_GERENCIA']
+      },
+      {
+        key: 'gestion-servicios',
+        label: 'Gestión de Servicios',
+        route: '/admin/servicios',
+        roles: ['ROLE_ADMINISTRACION', 'ROLE_GERENCIA']
       }
     ]
   },

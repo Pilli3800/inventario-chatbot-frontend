@@ -6,6 +6,9 @@ import EditSedeModal from '@/components/admin/EditSedeModal.vue'
 import GestionCuadrillas from '@/views/GestionCuadrillas.vue'
 import ViewCuadrillaModal from '@/components/admin/cuadrillas/ViewCuadrillaModal.vue'
 import EditCuadrillaModal from '@/components/admin/cuadrillas/EditCuadrillaModal.vue'
+import GestionServicios from '@/views/GestionServicios.vue'
+import ViewServicioModal from '@/components/admin/servicios/ViewServicioModal.vue'
+import EditServicioModal from '@/components/admin/servicios/EditServicioModal.vue'
 
 export const adminRoutes = [
   {
@@ -56,6 +59,24 @@ export const adminRoutes = [
         path: 'editar/:codigoCuadrilla',
         name: 'editar-cuadrilla',
         component: EditCuadrillaModal
+      }
+    ]
+  },
+  {
+    path: 'admin/servicios',
+    name: 'gestion-servicios',
+    component: GestionServicios,
+    meta: { roles: ['ROLE_ADMINISTRACION', 'ROLE_GERENCIA'] },
+    children: [
+      {
+        path: 'ver/:codigoServicio',
+        name: 'ver-servicio',
+        component: ViewServicioModal
+      },
+      {
+        path: 'editar/:codigoServicio',
+        name: 'editar-servicio',
+        component: EditServicioModal
       }
     ]
   }

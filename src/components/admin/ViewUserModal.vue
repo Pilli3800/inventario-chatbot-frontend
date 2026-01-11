@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue'
-import { adminUserService } from '@/services/admin-user.service'
+import { userService } from '@/services/user.service'
 
 const props = defineProps({
   open: Boolean,
@@ -24,7 +24,7 @@ const loadUser = async () => {
   if (!props.identUsuario) return
   loading.value = true
 
-  const { data } = await adminUserService.get(props.identUsuario)
+  const { data } = await userService.get(props.identUsuario)
   const content = data.content
   user.value = {
     identUsuario: content.identUsuario,

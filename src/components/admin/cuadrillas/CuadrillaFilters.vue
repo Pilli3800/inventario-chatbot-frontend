@@ -1,6 +1,6 @@
 <script setup>
 import { reactive, ref } from 'vue'
-import { adminUserService } from '@/services/admin-user.service'
+import { userService } from '@/services/user.service'
 
 const emit = defineEmits(['search'])
 
@@ -24,7 +24,7 @@ const buscarJefes = async (texto) => {
   loadingJefes.value = true
 
   try {
-    const { data } = await adminUserService.search({
+    const { data } = await userService.search({
       rol: 'JEFE_CUADRILLA',
       identUsuario: texto,
       enabled: true,

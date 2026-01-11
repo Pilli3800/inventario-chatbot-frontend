@@ -45,7 +45,7 @@ export const adminRoutes = [
     path: 'admin/cuadrillas',
     name: 'gestion-cuadrillas',
     component: GestionCuadrillas,
-    meta: { roles: ['ROLE_ADMINISTRACION'] },
+    meta: { roles: ['ROLE_ADMINISTRACION', 'ROLE_GERENCIA'] },
     children: [
       {
         path: 'ver/:codigoCuadrilla',

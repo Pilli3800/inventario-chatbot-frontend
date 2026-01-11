@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { jwtDecode } from 'jwt-decode'
 import { authService } from '@/services/auth.service'
+import { PERMISSIONS } from '@/config/permissions'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -12,12 +13,22 @@ export const useAuthStore = defineStore('auth', {
 
   getters: {
     isAuthenticated: (state) => !!state.token,
+
     hasRole: (state) => {
       return (role) => state.roles.includes(role)
     },
+
     isExpired: (state) => {
       return state.exp ? Date.now() > state.exp : true
-}
+    },
+
+    hasPermission: (state) => {
+      return (permission) => {
+        return state.roles.some(role =>
+          PERMISSIONS[role]?.[permission] === true
+        )
+      }
+    }
   },
 
   actions: {
@@ -40,14 +51,17 @@ export const useAuthStore = defineStore('auth', {
     },
 
     logout() {
-        this.token = null
-        this.ident = null
-        this.roles = []
-        localStorage.removeItem('token')
-      },
-      async login(credentials) {
-    const token = await authService.login(credentials)
-    this.setToken(token)
+      this.token = null
+      this.ident = null
+      this.roles = []
+      this.exp = null
+      localStorage.removeItem('token')
+    },
+
+    async login(credentials) {
+      const token = await authService.login(credentials)
+      this.setToken(token)
+    }
   }
-  }
+
 })

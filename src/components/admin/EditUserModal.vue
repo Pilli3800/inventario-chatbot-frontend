@@ -3,6 +3,7 @@ import { ref, watch, computed, createVNode } from 'vue'
 import { Modal, message } from 'ant-design-vue'
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
 import { adminUserService } from '@/services/admin-user.service'
+import { userService } from '@/services/user.service'
 
 const props = defineProps({
   open: Boolean,
@@ -34,7 +35,7 @@ const loadUser = async () => {
   if (!props.identUsuario) return
   loading.value = true
 
-  const { data } = await adminUserService.get(props.identUsuario)
+  const { data } = await userService.get(props.identUsuario)
   const user = data.content
 
   form.value = {

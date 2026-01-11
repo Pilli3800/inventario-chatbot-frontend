@@ -8,7 +8,7 @@ export const menuItems = [
   {
     key: 'administracion',
     label: 'Administración',
-    roles: ['ROLE_ADMINISTRACION'],
+    roles: ['ROLE_ADMINISTRACION', 'ROLE_GERENCIA'],
     children: [
       {
         key: 'gestion-usuarios',
@@ -26,7 +26,7 @@ export const menuItems = [
         key: 'gestion-cuadrillas',
         label: 'Gestión de Cuadrillas',
         route: '/admin/cuadrillas',
-        roles: ['ROLE_ADMINISTRACION']
+        roles: ['ROLE_ADMINISTRACION', 'ROLE_GERENCIA']
       }
     ]
   },

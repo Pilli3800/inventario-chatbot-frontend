@@ -1,19 +1,17 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { DownloadOutlined } from '@ant-design/icons-vue'
 import { cuadrillaService } from '@/services/cuadrilla.service'
 import { adminCuadrillaService } from '@/services/admin-cuadrilla.service'
-import { useAuthStore } from '@/stores/auth.store'
 import { useRouter, useRoute } from 'vue-router'
-
+import { usePermissions } from '@/composables/usePermissions'
 import CuadrillaFilters from '@/components/admin/cuadrillas/CuadrillaFilters.vue'
 import CuadrillaTable from '@/components/admin/cuadrillas/CuadrillaTable.vue'
 import CreateCuadrillaModal from '@/components/admin/cuadrillas/CreateCuadrillaModal.vue'
 import EditCuadrillaModal from '@/components/admin/cuadrillas/EditCuadrillaModal.vue'
 import ViewCuadrillaModal from '@/components/admin/cuadrillas/ViewCuadrillaModal.vue'
 
-/* ================= STATE ================= */
-const authStore = useAuthStore()
+/* Estados */
 const router = useRouter()
 const route = useRoute()
 
@@ -35,11 +33,16 @@ const pagination = ref({
 
 const activeFilters = ref({})
 
-const isAdmin = computed(() =>
-  authStore.hasRole('ROLE_ADMINISTRACION')
-)
+/* Permisos */
+const {
+  canCreate,
+  canEdit,
+  canToggle,
+  canView,
+  canReport
+} = usePermissions()
 
-/* ================= LOAD ================= */
+/* Load */
 const loadCuadrillas = async (filters = activeFilters.value) => {
   loading.value = true
 
@@ -63,7 +66,7 @@ const loadCuadrillas = async (filters = activeFilters.value) => {
   loading.value = false
 }
 
-/* ================= TABLE ================= */
+/* Tabla */
 const onTableChange = (pager, filters, sorter) => {
   pagination.value.current = pager.current
   pagination.value.pageSize = pager.pageSize
@@ -77,14 +80,14 @@ const onTableChange = (pager, filters, sorter) => {
   loadCuadrillas({ sort })
 }
 
-/* ================= FILTERS ================= */
+/* Filtros */
 const onSearch = (filters) => {
   pagination.value.current = 1
   activeFilters.value = { ...filters }
   loadCuadrillas(filters)
 }
 
-/* ================= ROUTED MODALS ================= */
+/* Modals Ruteados */
 const openView = (record) => {
   router.push({
     name: 'ver-cuadrilla',
@@ -99,7 +102,7 @@ const openEdit = (record) => {
   })
 }
 
-/* ================= WATCH ROUTE ================= */
+/* Watch Rutas */
 watch(
   () => route.name,
   (name) => {
@@ -128,7 +131,7 @@ watch(
   { immediate: true }
 )
 
-/* ================= ACTIONS ================= */
+/* Acciones */
 const activar = async (codigo) => {
   await adminCuadrillaService.activar(codigo)
   loadCuadrillas()
@@ -139,7 +142,7 @@ const desactivar = async (codigo) => {
   loadCuadrillas()
 }
 
-/* ================= EXPORT ================= */
+/* Exportar reportes */
 const exportExcel = async () => {
   const cleanFilters = Object.fromEntries(
     Object.entries(activeFilters.value).filter(
@@ -157,10 +160,17 @@ const exportExcel = async () => {
   })
 
   const url = globalThis.URL.createObjectURL(blob)
-  const link = document.createElement('a')
 
+  let filename = 'cuadrillas.xlsx'
+  const disposition = response.headers['content-disposition']
+  if (disposition) {
+    const match = disposition.match(/filename="?(.+)"?/)
+    if (match?.[1]) filename = match[1]
+  }
+
+  const link = document.createElement('a')
   link.href = url
-  link.download = 'cuadrillas.xlsx'
+  link.download = filename
   document.body.appendChild(link)
   link.click()
 
@@ -185,10 +195,17 @@ const exportExcelAuditoria = async () => {
   })
 
   const url = globalThis.URL.createObjectURL(blob)
-  const link = document.createElement('a')
 
+  let filename = 'cuadrillas_auditoria.xlsx'
+  const disposition = response.headers['content-disposition']
+  if (disposition) {
+    const match = disposition.match(/filename="?(.+)"?/)
+    if (match?.[1]) filename = match[1]
+  }
+
+  const link = document.createElement('a')
   link.href = url
-  link.download = 'cuadrillas_auditoria.xlsx'
+  link.download = filename
   document.body.appendChild(link)
   link.click()
 
@@ -196,7 +213,7 @@ const exportExcelAuditoria = async () => {
   globalThis.URL.revokeObjectURL(url)
 }
 
-/* ================= INIT ================= */
+/* Carga inicial */
 loadCuadrillas()
 </script>
 
@@ -205,22 +222,22 @@ loadCuadrillas()
     <h2>Gestión de Cuadrillas</h2>
 
     <a-space wrap style="margin: 24px 0;">
-      <a-button type="primary" @click="createOpen = true">
+      <a-button type="primary" v-if="canCreate" @click="createOpen = true">
         + Nueva Cuadrilla
       </a-button>
 
-      <a-button @click="exportExcel">
+      <a-button @click="exportExcel" v-if="canReport">
         <DownloadOutlined /> Exportar Excel
       </a-button>
 
       <a-tooltip title="Incluye campos de auditoría (solo administración)" placement="top">
-        <a-button :disabled="!isAdmin" type="dashed" @click="exportExcelAuditoria">
+        <a-button v-if="canReport" type="dashed" @click="exportExcelAuditoria">
           <DownloadOutlined /> Exportar con auditoría
         </a-button>
       </a-tooltip>
     </a-space>
 
-    <!-- MODALS -->
+    <!-- Modals -->
     <CreateCuadrillaModal :open="createOpen" @close="createOpen = false" @success="loadCuadrillas()" />
 
     <EditCuadrillaModal :open="editOpen" :codigoCuadrilla="editCodigo"
@@ -229,10 +246,10 @@ loadCuadrillas()
     <ViewCuadrillaModal :open="viewOpen" :codigoCuadrilla="viewCodigo"
       @close="router.push({ name: 'gestion-cuadrillas' })" />
 
-    <!-- FILTERS -->
+    <!-- Filtros -->
     <CuadrillaFilters @search="onSearch" />
 
-    <!-- TABLE -->
+    <!-- Tabla -->
     <CuadrillaTable :data="cuadrillas" :loading="loading" :pagination="pagination" @change="onTableChange">
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'actions'">
@@ -241,21 +258,21 @@ loadCuadrillas()
 
             <template #overlay>
               <a-menu>
-                <a-menu-item v-if="!record.enabled" @click="activar(record.codigoCuadrilla)">
+                <a-menu-item v-if="!record.enabled && canToggle" @click="activar(record.codigoCuadrilla)">
                   Activar
                 </a-menu-item>
 
-                <a-menu-item v-if="record.enabled" danger @click="desactivar(record.codigoCuadrilla)">
+                <a-menu-item v-if="record.enabled && canToggle" danger @click="desactivar(record.codigoCuadrilla)">
                   Desactivar
                 </a-menu-item>
 
                 <a-menu-divider />
 
-                <a-menu-item @click="openView(record)">
+                <a-menu-item v-if="canView" @click="openView(record)">
                   Ver
                 </a-menu-item>
 
-                <a-menu-item @click="openEdit(record)">
+                <a-menu-item v-if="canEdit" @click="openEdit(record)">
                   Editar
                 </a-menu-item>
               </a-menu>

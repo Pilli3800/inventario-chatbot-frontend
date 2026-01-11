@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { userService } from '@/services/user.service'
 import { adminUserService } from '@/services/admin-user.service'
 import UserFilters from '@/components/admin/UserFilters.vue'
 import UserTable from '@/components/admin/UserTable.vue'
@@ -88,7 +89,7 @@ const loadUsers = async (filters = activeFilters.value) => {
   if (cleanFilters.enabled === "true") cleanFilters.enabled = true
   if (cleanFilters.enabled === "false") cleanFilters.enabled = false
 
-  const { data } = await adminUserService.search({
+  const { data } = await userService.search({
     ...cleanFilters,
     page: pagination.value.current - 1,
     size: pagination.value.pageSize

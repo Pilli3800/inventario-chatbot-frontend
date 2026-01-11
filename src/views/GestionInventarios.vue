@@ -181,7 +181,7 @@ const downloadBlob = (response, defaultName) => {
 
       <!-- Exportar con auditoría (solo admin) -->
       <a-tooltip title="Incluye campos de auditoría (solo administración)" placement="top">
-        <a-button type="dashed" :disabled="!isAdmin || !sedeSeleccionada" @click="exportExcelAuditoria" v-if="canAudit">
+        <a-button type="dashed" v-if="canAudit" :disabled="!sedeSeleccionada" @click="exportExcelAuditoria">
           <DownloadOutlined />
           Exportar con auditoría
         </a-button>

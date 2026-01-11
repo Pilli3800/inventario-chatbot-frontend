@@ -12,13 +12,14 @@ import CreateInventarioModal from '@/components/logistica/CreateInventarioModal.
 
 import { inventarioSedeService } from '@/services/inventario-sede.service'
 import { adminInventarioSedeService } from '@/services/admin-inventario-sede.service'
-import { useAuthStore } from '@/stores/auth.store'
+import { usePermissions } from '@/composables/usePermissions'
 
-/* AUTH */
-const authStore = useAuthStore()
-const isAdmin = computed(() =>
-  authStore.hasRole('ROLE_ADMINISTRACION')
-)
+/* Permisos */
+const {
+  canCreate,
+  canReport,
+  canAudit
+} = usePermissions()
 
 /* DATA */
 const inventarios = ref([])
@@ -169,18 +170,18 @@ const downloadBlob = (response, defaultName) => {
 
     <!-- BOTONES -->
     <a-space wrap style="margin: 24px 0;">
-      <a-button type="primary" @click="createOpen = true">
+      <a-button type="primary" v-if="canCreate" @click="createOpen = true">
         + Asignar Item a Sede
       </a-button>
 
-      <a-button :disabled="!sedeSeleccionada" @click="exportExcel">
+      <a-button :disabled="!sedeSeleccionada" v-if="canReport" @click="exportExcel">
         <DownloadOutlined />
         Exportar Excel
       </a-button>
 
       <!-- Exportar con auditoría (solo admin) -->
       <a-tooltip title="Incluye campos de auditoría (solo administración)" placement="top">
-        <a-button type="dashed" :disabled="!isAdmin || !sedeSeleccionada" @click="exportExcelAuditoria">
+        <a-button type="dashed" :disabled="!isAdmin || !sedeSeleccionada" @click="exportExcelAuditoria" v-if="canAudit">
           <DownloadOutlined />
           Exportar con auditoría
         </a-button>
@@ -206,7 +207,7 @@ const downloadBlob = (response, defaultName) => {
 
             <template #overlay>
               <a-menu>
-                <a-menu-item danger @click="eliminarAsignacion(record)">
+                <a-menu-item v-if="cantDelete" @click="eliminarAsignacion(record)">
                   Eliminar
                 </a-menu-item>
               </a-menu>

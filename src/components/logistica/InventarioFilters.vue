@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, computed } from 'vue'
 import { sedeService } from '@/services/sede.service'
 
 const emit = defineEmits(['search'])
@@ -11,6 +11,8 @@ const filters = reactive({
   tipoItem: '',
   conStock: undefined
 })
+
+const sedeSeleccionada = computed(() => !!filters.sedeCodigo)
 
 const sedes = ref([])
 const loadingSedes = ref(false)
@@ -54,14 +56,14 @@ onMounted(loadSedes)
         <!-- Nombre Item -->
         <a-col :md="6">
           <a-form-item label="Nombre Item">
-            <a-input v-model:value="filters.nombreItem" allow-clear />
+            <a-input v-model:value="filters.nombreItem" allow-clear :disabled="!sedeSeleccionada" />
           </a-form-item>
         </a-col>
 
         <!-- Código Item -->
         <a-col :md="6">
           <a-form-item label="Código Item">
-            <a-input v-model:value="filters.codigoItem" allow-clear />
+            <a-input v-model:value="filters.codigoItem" allow-clear :disabled="!sedeSeleccionada" />
           </a-form-item>
         </a-col>
 
@@ -69,7 +71,7 @@ onMounted(loadSedes)
         <a-col :md="6">
           <a-form-item label="Tipo">
             <a-select v-model:value="filters.tipoItem" allow-clear placeholder="Todos" style="width: 100%"
-              :dropdownMatchSelectWidth="false">
+              :dropdownMatchSelectWidth="false" :disabled="!sedeSeleccionada">
               <a-select-option value="MATERIAL">MATERIAL</a-select-option>
               <a-select-option value="HERRAMIENTA">HERRAMIENTA</a-select-option>
               <a-select-option value="EQUIPO">EQUIPO</a-select-option>
@@ -80,7 +82,7 @@ onMounted(loadSedes)
         <!-- Con stock -->
         <a-col :md="6">
           <a-form-item label="Con stock">
-            <a-select v-model:value="filters.conStock" allow-clear>
+            <a-select v-model:value="filters.conStock" allow-clear :disabled="!sedeSeleccionada">
               <a-select-option :value="true">Sí</a-select-option>
               <a-select-option :value="false">No</a-select-option>
             </a-select>
@@ -90,10 +92,10 @@ onMounted(loadSedes)
         <!-- Botones -->
         <a-col :md="6">
           <a-form-item label=" ">
-            <a-button type="primary" @click="onSearch">
+            <a-button type="primary" @click="onSearch" :disabled="!sedeSeleccionada">
               Buscar
             </a-button>
-            <a-button style="margin-left: 8px" @click="onReset">
+            <a-button style="margin-left: 8px" @click="onReset" :disabled="!sedeSeleccionada">
               Limpiar
             </a-button>
           </a-form-item>

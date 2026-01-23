@@ -25,7 +25,7 @@ const route = useRoute()
 
 const pagination = ref({
   current: 1,
-  pageSize: 6,
+  pageSize: 10,
   total: 0
 })
 

@@ -1,0 +1,52 @@
+import axios from 'axios'
+import { useAuthStore } from '@/stores/auth.store'
+
+const API_INVENTARIO_URL = 'http://localhost:8080/api/movimientos'
+const API_HISTORICO_URL  = 'http://localhost:8080/api/movimientos/historico'
+
+export const movimientosService = {
+
+  /* Historico - buscar movimientos */
+  async search(params) {
+    const authStore = useAuthStore()
+    return axios.get(API_HISTORICO_URL, {
+      params,
+      headers: {
+        Authorization: authStore.token
+      }
+    })
+  },
+
+  /* Registrar movimiento */
+  async create(payload) {
+    const authStore = useAuthStore()
+    return axios.post(API_INVENTARIO_URL, payload, {
+      headers: {
+        Authorization: authStore.token
+      }
+    })
+  },
+
+  /* Ver detalle de movimiento */
+  async getById(id) {
+    const authStore = useAuthStore()
+    return axios.get(`${API_HISTORICO_URL}/${id}`, {
+      headers: {
+        Authorization: authStore.token
+      }
+    })
+  },
+
+  /* Exportar Excel */
+  async exportExcel(params) {
+    const authStore = useAuthStore()
+    return axios.get(`${API_HISTORICO_URL}/export/excel`, {
+      params,
+      responseType: 'blob',
+      headers: {
+        Authorization: authStore.token
+      }
+    })
+  }
+
+}

@@ -12,7 +12,7 @@ const columns = [
   { title: 'Nombres', dataIndex: 'nombres' },
   { title: 'Apellidos', dataIndex: 'apellidos' },
   { title: 'Email', dataIndex: 'email' },
-  { title: 'Estado',dataIndex: 'enabled'},
+  { title: 'Estado', dataIndex: 'enabled' },
   { title: '', dataIndex: 'actions', fixed: 'right', width: 1 }
 ]
 
@@ -22,18 +22,11 @@ const handleChange = (pagination) => {
 </script>
 
 <template>
-  <a-table
-    :columns="columns"
-    :data-source="data"
-    :loading="loading"
-    :scroll="{ x: 'max-content'}"
-    row-key="id"
+  <a-table :columns="columns" :data-source="data" :loading="loading" :scroll="{ x: 'max-content', y: 360 }" row-key="id"
     :pagination="{
       ...pagination,
       showTotal: (total, range) => `${range[0]}–${range[1]} de ${total} usuarios`,
-    }"
-    @change="handleChange"
-  >
+    }" @change="handleChange">
     <template #bodyCell="slotProps">
       <!-- Pasamos el slot del padre -->
       <slot name="bodyCell" v-bind="slotProps" />
@@ -55,4 +48,3 @@ const handleChange = (pagination) => {
     </template>
   </a-table>
 </template>
-

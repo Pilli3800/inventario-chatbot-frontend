@@ -23,29 +23,19 @@ const handleLogout = () => {
 
 <template>
   <a-layout style="min-height: 100vh">
-    <!-- Header SIEMPRE visible -->
+    <!-- Header visible -->
     <a-layout-header class="app-header">
-      <AppNavbar
-        @toggle-sidebar="toggleSidebar"
-        @logout="handleLogout"
-      />
+      <AppNavbar @toggle-sidebar="toggleSidebar" @logout="handleLogout" />
     </a-layout-header>
 
     <a-layout>
-      <!-- Sidebar overlay (debajo del header) -->
-      <a-layout-sider
-        class="app-sider"
-        :collapsed="collapsed"
-        :trigger="null"
-        collapsed-width="0"
-        width="260"
-      >
+      <!-- Sidebar (debajo del header) -->
+      <a-layout-sider class="app-sider" :collapsed="collapsed" :trigger="null" collapsed-width="0" width="260">
         <AppSidebar @navigate="collapsed = true" />
       </a-layout-sider>
 
       <!-- Content -->
-      <a-layout-content class="app-content"
-      style="overflow: auto; height: calc(100vh - 64px)">
+      <a-layout-content class="app-content">
         <router-view />
       </a-layout-content>
     </a-layout>
@@ -53,7 +43,7 @@ const handleLogout = () => {
 </template>
 
 <style scoped>
-/* HEADER siempre arriba */
+/* Header */
 .app-header {
   position: sticky;
   top: 0;
@@ -62,18 +52,21 @@ const handleLogout = () => {
   padding: 0 16px;
 }
 
-/* SIDEBAR overlay pero debajo del header */
+/* Sidebar */
 .app-sider {
   position: fixed;
-  top: 64px; /* altura del header de AntD */
+  top: 64px;
+  /* altura del header de AntD */
   left: 0;
   height: calc(100vh - 64px);
   z-index: 1000;
 }
 
-/* CONTENIDO */
+/* Content */
 .app-content {
   margin: 16px;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 </style>
-

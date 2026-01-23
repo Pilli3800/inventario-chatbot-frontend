@@ -12,14 +12,18 @@ export function usePermissions() {
   const canView   = computed(() => authStore.hasPermission('view'))
   const canReport = computed(() => authStore.hasPermission('report'))
   const canAudit  = computed(() => authStore.hasPermission('audit'))
+  const canViewList = computed(() => authStore.hasPermission('viewList'))
+  const canCreateMovimiento = computed(() => authStore.hasPermission('createMovimiento'))
 
   return {
     canCreate,
+    canCreateMovimiento,
     canEdit,
     canDelete,
     canToggle,
     canView,
     canReport,
-    canAudit
+    canAudit,
+    canViewList
   }
 }

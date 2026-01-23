@@ -2,6 +2,7 @@ import GestionItems from '@/views/GestionItems.vue'
 import ViewItemModal from '@/components/logistica/ViewItemModal.vue'
 import EditItemModal from '@/components/logistica/EditItemModal.vue'
 import GestionInventarios from '@/views/GestionInventarios.vue'
+import GestionMovimientos from '@/views/GestionMovimientos.vue'
 
 export const logisticaRoutes = [
   {
@@ -31,5 +32,25 @@ export const logisticaRoutes = [
     meta: {
       roles: ['ROLE_LOGISTICA']
     }
+  },
+  {
+    path: 'logistica/movimientos',
+    name: 'gestion-movimientos',
+    component: GestionMovimientos,
+    meta: {
+      roles: ['ROLE_LOGISTICA', 'ROLE_ADMINISTRACION', 'ROLE_JEFE_CUADRILLA', 'ROLE_GERENCIA']
+    },
+    children: [
+      {
+        path: 'ver/:idMovimiento',
+        name: 'ver-movimiento',
+        component: ViewItemModal
+      },
+      {
+        path: 'editar/:idMovimiento',
+        name: 'editar-movimiento',
+        component: EditItemModal
+      }
+    ]
   }
 ]

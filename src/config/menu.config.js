@@ -1,13 +1,22 @@
+import {
+  HomeOutlined,
+  SettingOutlined,
+  DeploymentUnitOutlined,
+  RobotOutlined
+} from '@ant-design/icons-vue'
+
 export const menuItems = [
   {
     key: 'home',
     label: 'Inicio',
+    icon: HomeOutlined,
     route: '/home',
     roles: [] // vacío = todos los roles
   },
   {
     key: 'administracion',
     label: 'Administración',
+    icon: SettingOutlined,
     roles: ['ROLE_ADMINISTRACION', 'ROLE_GERENCIA'],
     children: [
       {
@@ -39,7 +48,8 @@ export const menuItems = [
   {
     key: 'logistica',
     label: 'Logística',
-    roles: ['ROLE_LOGISTICA'],
+    icon: DeploymentUnitOutlined,
+    roles: ['ROLE_LOGISTICA', 'ROLE_ADMINISTRACION','ROLE_JEFE_CUADRILLA', 'ROLE_GERENCIA'],
     children: [
       {
         key: 'gestion-items',
@@ -52,7 +62,26 @@ export const menuItems = [
         label: 'Gestión de Inventario',
         route: '/logistica/inventarios',
         roles: ['ROLE_LOGISTICA']
+      },
+      {
+        key: 'gestion-movimientos',
+        label: 'Gestión de Movimientos',
+        route: '/logistica/movimientos',
+        roles: ['ROLE_LOGISTICA', 'ROLE_ADMINISTRACION', 'ROLE_JEFE_CUADRILLA', 'ROLE_GERENCIA']
       }
     ]
-  }
+  },
+  {
+  key: 'ia',
+  label: 'Asistente IA',
+  icon: RobotOutlined,
+  children: [
+    {
+      key: 'chat',
+      label: 'Chat Inteligente',
+      route: '/ia/chat',
+      roles: []
+    }
+  ]
+}
 ]

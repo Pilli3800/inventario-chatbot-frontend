@@ -8,15 +8,15 @@ const router = useRouter()
 const authStore = useAuthStore()
 const emit = defineEmits(['navigate'])
 
-/* ===== CONTROL DE SUBMENÚS ===== */
+/* Control de submenus */
 const openKeys = ref([])
 
 const onOpenChange = (keys) => {
-  // Solo mantener el último submenú abierto
+  // Solo mantener el ultimo abierto
   openKeys.value = keys.slice(-1)
 }
 
-/* ===== RBAC ===== */
+/* Control de Acceso Basado en Roles (RBAC) */
 const hasAccess = (item) => {
   if (!item.roles || item.roles.length === 0) {
     return true
@@ -37,7 +37,7 @@ const filteredMenu = computed(() => {
     .filter(Boolean)
 })
 
-/* ===== NAVEGACIÓN ===== */
+/* Navegación */
 const onMenuClick = ({ key }) => {
   const findRoute = (items) => {
     for (const item of items) {
@@ -63,7 +63,12 @@ const onMenuClick = ({ key }) => {
 
       <template v-if="item.children">
         <a-sub-menu :key="item.key">
-          <template #title>{{ item.label }}</template>
+          <template #title>
+            <a-space>
+              <component v-if="item.icon" :is="item.icon" />
+              <span>{{ item.label }}</span>
+            </a-space>
+          </template>
 
           <a-menu-item v-for="child in item.children" :key="child.key">
             {{ child.label }}
@@ -79,6 +84,5 @@ const onMenuClick = ({ key }) => {
 
     </template>
   </a-menu>
-
 
 </template>

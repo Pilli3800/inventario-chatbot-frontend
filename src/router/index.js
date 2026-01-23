@@ -6,6 +6,7 @@ import { useAuthStore } from '@/stores/auth.store'
 import { authRoutes } from './auth.routes'
 import { adminRoutes } from './admin.routes'
 import { logisticaRoutes } from './logistica.routes'
+import { iaRoutes } from './ia.routes'
 
 const routes = [
   ...authRoutes,
@@ -21,7 +22,8 @@ const routes = [
         component: HomeView
       },
       ...adminRoutes,
-      ...logisticaRoutes
+      ...logisticaRoutes,
+      ...iaRoutes
     ]
   }
 ]

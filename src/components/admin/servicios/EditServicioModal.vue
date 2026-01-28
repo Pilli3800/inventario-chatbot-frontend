@@ -1,8 +1,8 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { message } from 'ant-design-vue'
+import { adminServicioService } from '@/services/admin-servicio.service'
 import { servicioService } from '@/services/servicio.service'
-
 const props = defineProps({
   open: Boolean,
   codigoServicio: String
@@ -39,7 +39,7 @@ watch(
 )
 
 const submit = async () => {
-  await servicioService.update(props.codigoServicio, form.value)
+  await adminServicioService.update(props.codigoServicio, form.value)
   message.success('Servicio actualizado')
   emit('success')
   emit('close')

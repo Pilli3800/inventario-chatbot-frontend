@@ -11,10 +11,8 @@ import EditUserModal from '@/components/admin/EditUserModal.vue'
 import ViewUserModal from '@/components/admin/ViewUserModal.vue'
 import CreateUserModal from '@/components/admin/CreateUserModal.vue'
 import { DownloadOutlined } from '@ant-design/icons-vue';
+import { useTableData } from '@/composables/useTableData'
 
-
-const users = ref([])
-const loading = ref(false)
 const resetOpen = ref(false)
 const userResetIdent = ref(null)
 const viewOpen = ref(false)
@@ -24,18 +22,24 @@ const createOpen = ref(false)
 const router = useRouter()
 const route = useRoute()
 
-const pagination = ref({
-  current: 1,
-  pageSize: 10,
-  total: 0
+const {
+  data: users,
+  loading,
+  pagination,
+  sorter,
+  filters,
+  load: loadUsers,
+  onTableChange,
+  onSearch
+} = useTableData({
+  service: userService.search,
+  defaultSort: {
+    field: 'identUsuario',
+    order: 'ascend'
+  },
+  pageSize: 10
 })
 
-const activeFilters = ref({})
-
-const defaultSort = ref({
-  field: 'identUsuario',
-  order: 'ascend'
-})
 
 // VER
 const openView = (record) => {
@@ -81,66 +85,6 @@ watch(
   { immediate: true }
 )
 
-// CARGAR USUARIOS
-const loadUsers = async (filters = activeFilters.value) => {
-  loading.value = true
-
-  // Se limpia filtros vacios antes de enviarlos al servicio
-  const cleanFilters = Object.fromEntries(
-    Object.entries(filters).filter(
-      ([, value]) => value !== undefined && value !== null && value !== ''
-    )
-  )
-
-  if (cleanFilters.enabled === "true") cleanFilters.enabled = true
-  if (cleanFilters.enabled === "false") cleanFilters.enabled = false
-
-  // Sort default
-  if (!cleanFilters.sort && defaultSort.value) {
-    cleanFilters.sort =
-      `${defaultSort.value.field},${defaultSort.value.order === 'ascend' ? 'asc' : 'desc'}`
-  }
-
-  const { data } = await userService.search({
-    ...cleanFilters,
-    page: pagination.value.current - 1,
-    size: pagination.value.pageSize
-  })
-
-  users.value = data.content
-  pagination.value.total = data.totalElements
-
-  loading.value = false
-}
-
-const onTableChange = (pager, filters, sorter) => {
-  pagination.value.current = pager.current
-  pagination.value.pageSize = pager.pageSize
-
-  if (sorter?.field && sorter?.order) {
-    defaultSort.value = sorter
-  } else {
-    defaultSort.value = null
-  }
-
-  let sort = null
-  if (defaultSort.value) {
-    const dir = defaultSort.value.order === 'ascend' ? 'asc' : 'desc'
-    sort = `${defaultSort.value.field},${dir}`
-  }
-
-  loadUsers({
-    ...activeFilters.value,
-    sort
-  })
-}
-
-const onSearch = (filters) => {
-  pagination.value.current = 1   //resetear paginación
-  activeFilters.value = { ...filters }
-  loadUsers(filters)
-}
-
 const activarUser = async (identUsuario) => {
   await adminUserService.activar(identUsuario)
   loadUsers() // recarga tabla
@@ -154,7 +98,7 @@ const desactivarUser = async (identUsuario) => {
 /* Exportar */
 const exportExcel = async () => {
   const cleanFilters = Object.fromEntries(
-    Object.entries(activeFilters.value).filter(
+    Object.entries(filters.value).filter(
       ([, v]) => v !== undefined && v !== null && v !== ''
     )
   )
@@ -207,7 +151,7 @@ loadUsers()
 
     <UserFilters @search="onSearch" />
 
-    <UserTable :data="users" :loading="loading" :pagination="pagination" :sorter="defaultSort" @change="onTableChange">
+    <UserTable :data="users" :loading="loading" :pagination="pagination" :sorter="sorter" @change="onTableChange">
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'actions'">
           <a-dropdown>

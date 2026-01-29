@@ -1,3 +1,4 @@
+<!-- GestionUsuario.vue -->
 <script setup>
 import { ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
@@ -30,6 +31,11 @@ const pagination = ref({
 })
 
 const activeFilters = ref({})
+
+const defaultSort = ref({
+  field: 'identUsuario',
+  order: 'ascend'
+})
 
 // VER
 const openView = (record) => {
@@ -89,6 +95,12 @@ const loadUsers = async (filters = activeFilters.value) => {
   if (cleanFilters.enabled === "true") cleanFilters.enabled = true
   if (cleanFilters.enabled === "false") cleanFilters.enabled = false
 
+  // Sort default
+  if (!cleanFilters.sort && defaultSort.value) {
+    cleanFilters.sort =
+      `${defaultSort.value.field},${defaultSort.value.order === 'ascend' ? 'asc' : 'desc'}`
+  }
+
   const { data } = await userService.search({
     ...cleanFilters,
     page: pagination.value.current - 1,
@@ -101,11 +113,26 @@ const loadUsers = async (filters = activeFilters.value) => {
   loading.value = false
 }
 
-const onTableChange = (pager) => {
+const onTableChange = (pager, filters, sorter) => {
   pagination.value.current = pager.current
   pagination.value.pageSize = pager.pageSize
 
-  loadUsers()
+  if (sorter?.field && sorter?.order) {
+    defaultSort.value = sorter
+  } else {
+    defaultSort.value = null
+  }
+
+  let sort = null
+  if (defaultSort.value) {
+    const dir = defaultSort.value.order === 'ascend' ? 'asc' : 'desc'
+    sort = `${defaultSort.value.field},${dir}`
+  }
+
+  loadUsers({
+    ...activeFilters.value,
+    sort
+  })
 }
 
 const onSearch = (filters) => {
@@ -180,7 +207,7 @@ loadUsers()
 
     <UserFilters @search="onSearch" />
 
-    <UserTable :data="users" :loading="loading" :pagination="pagination" @change="onTableChange">
+    <UserTable :data="users" :loading="loading" :pagination="pagination" :sorter="defaultSort" @change="onTableChange">
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'actions'">
           <a-dropdown>

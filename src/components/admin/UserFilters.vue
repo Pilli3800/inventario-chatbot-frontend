@@ -1,3 +1,4 @@
+<!-- UserFilters.vue -->
 <script setup>
 import { reactive } from 'vue'
 
@@ -30,25 +31,25 @@ const onReset = () => {
 
         <a-col :xs="24" :sm="12" :md="8">
           <a-form-item label="Nombres">
-            <a-input v-model:value="filters.nombres" allow-clear />
+            <a-input v-model:value="filters.nombres" allow-clear placeholder="Buscar por nombres" />
           </a-form-item>
         </a-col>
 
         <a-col :xs="24" :sm="12" :md="8">
           <a-form-item label="Apellidos">
-            <a-input v-model:value="filters.apellidos" allow-clear />
+            <a-input v-model:value="filters.apellidos" allow-clear placeholder="Buscar por apellidos" />
           </a-form-item>
         </a-col>
 
         <a-col :xs="24" :sm="12" :md="8">
           <a-form-item label="Email">
-            <a-input v-model:value="filters.email" allow-clear />
+            <a-input v-model:value="filters.email" allow-clear placeholder="Buscar por email" />
           </a-form-item>
         </a-col>
 
         <a-col :xs="24" :sm="12" :md="8">
           <a-form-item label="Usuario">
-            <a-input v-model:value="filters.identUsuario" allow-clear />
+            <a-input v-model:value="filters.identUsuario" allow-clear placeholder="Buscar por usuario" />
           </a-form-item>
         </a-col>
 

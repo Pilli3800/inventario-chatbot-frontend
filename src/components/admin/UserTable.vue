@@ -1,23 +1,58 @@
+<!-- UserTable.vue -->
 <script setup>
-defineProps({
+import { computed } from 'vue'
+const props = defineProps({
   data: Array,
   loading: Boolean,
-  pagination: Object
+  pagination: Object,
+  sorter: Object
 })
 
 const emit = defineEmits(['change'])
 
-const columns = [
-  { title: 'Usuario', dataIndex: 'identUsuario' },
-  { title: 'Nombres', dataIndex: 'nombres' },
-  { title: 'Apellidos', dataIndex: 'apellidos' },
-  { title: 'Email', dataIndex: 'email' },
+const columns = computed(() => [
+  {
+    title: 'Usuario',
+    dataIndex: 'identUsuario',
+    sorter: true,
+    sortOrder:
+      props.sorter?.field === 'identUsuario'
+        ? props.sorter.order
+        : null
+  },
+  {
+    title: 'Nombres',
+    dataIndex: 'nombres',
+    sorter: true,
+    sortOrder:
+      props.sorter?.field === 'nombres'
+        ? props.sorter.order
+        : null
+  },
+  {
+    title: 'Apellidos',
+    dataIndex: 'apellidos',
+    sorter: true,
+    sortOrder:
+      props.sorter?.field === 'apellidos'
+        ? props.sorter.order
+        : null
+  },
+  {
+    title: 'Email',
+    dataIndex: 'email',
+    sorter: true,
+    sortOrder:
+      props.sorter?.field === 'email'
+        ? props.sorter.order
+        : null
+  },
   { title: 'Estado', dataIndex: 'enabled' },
   { title: '', dataIndex: 'actions', fixed: 'right', width: 1 }
-]
+])
 
-const handleChange = (pagination) => {
-  emit('change', pagination)
+const handleChange = (pagination, filters, sorter) => {
+  emit('change', pagination, filters, sorter)
 }
 </script>
 
@@ -31,20 +66,26 @@ const handleChange = (pagination) => {
       <!-- Pasamos el slot del padre -->
       <slot name="bodyCell" v-bind="slotProps" />
 
-      <!-- Mantienes tus condiciones por defecto -->
-      <template v-if="slotProps.column.dataIndex === 'enabled'">
+      <!-- Columnas -->
+      <!-- Usuario en negrita -->
+      <template v-if="slotProps.column.dataIndex === 'identUsuario'">
+        <strong>{{ slotProps.record.identUsuario }}</strong>
+      </template>
+
+      <!-- Estado -->
+      <template v-else-if="slotProps.column.dataIndex === 'enabled'">
         <a-tag :color="slotProps.record.enabled ? 'green' : 'red'">
           {{ slotProps.record.enabled ? 'Activo' : 'Inactivo' }}
         </a-tag>
       </template>
 
+      <!-- Email -->
       <template v-else-if="slotProps.column.dataIndex === 'email'">
         <a-typography-text copyable>
           {{ slotProps.record.email }}
         </a-typography-text>
       </template>
 
-      <!-- YA NO agregues menú aquí -->
     </template>
   </a-table>
 </template>

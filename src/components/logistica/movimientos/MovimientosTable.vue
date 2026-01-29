@@ -1,20 +1,41 @@
+<!-- MovimientosTable.vue -->
 <script setup>
 import { formatDateTime } from '@/utils/date'
+import { computed } from 'vue'
 
-defineProps({
+const props = defineProps({
   data: Array,
   loading: Boolean,
-  pagination: Object
+  pagination: Object,
+  sorter: Object
 })
 
 const emit = defineEmits(['change'])
 
-const columns = [
-  { title: 'Fecha', dataIndex: 'fechaMovimiento', width: 180, sorter: true },
+const columns = computed(() => [
+  {
+    title: 'Fecha',
+    dataIndex: 'fechaMovimiento',
+    width: 180,
+    sorter: true,
+    sortOrder:
+      props.sorter?.field === 'fechaMovimiento'
+        ? props.sorter.order
+        : null
+  },
   { title: 'Tipo', dataIndex: 'tipoMovimiento', width: 120 },
   { title: 'Código Item', dataIndex: 'codigoItem', width: 120 },
   { title: 'Nombre Item', dataIndex: 'nombreItem', width: 200 },
-  { title: 'Cantidad', dataIndex: 'cantidad', width: 100, sorter: true },
+  {
+    title: 'Cantidad',
+    dataIndex: 'cantidad',
+    width: 100,
+    sorter: true,
+    sortOrder:
+      props.sorter?.field === 'cantidad'
+        ? props.sorter.order
+        : null
+  },
   { title: 'Sede Origen', dataIndex: 'sedeOrigen', width: 120 },
   { title: 'Sede Destino', dataIndex: 'sedeDestino', width: 120 },
   { title: 'Cuadrilla', dataIndex: 'codigoCuadrilla', width: 120 },
@@ -31,7 +52,7 @@ const columns = [
     ellipsis: true
   }
 
-]
+])
 
 const handleChange = (pagination, filters, sorter) => {
   emit('change', pagination, filters, sorter)

@@ -1,3 +1,4 @@
+<!-- GestionMovimientos.vue -->
 <script setup>
 import { ref, watch } from 'vue'
 import { DownloadOutlined } from '@ant-design/icons-vue'
@@ -34,6 +35,11 @@ const pagination = ref({
 
 const activeFilters = ref({})
 
+const defaultSort = ref({
+  field: 'fechaMovimiento',
+  order: 'descend'
+})
+
 /* Permisos */
 const {
   canCreateMovimiento,
@@ -51,6 +57,12 @@ const loadMovimientos = async (filters = activeFilters.value) => {
     )
   )
 
+  // Sort default
+  if (!cleanFilters.sort && defaultSort.value) {
+    const dir = defaultSort.value.order === 'ascend' ? 'asc' : 'desc'
+    cleanFilters.sort = `${defaultSort.value.field},${dir}`
+  }
+
   const { data } = await movimientosService.search({
     ...cleanFilters,
     page: pagination.value.current - 1,
@@ -67,10 +79,16 @@ const onTableChange = (pager, filters, sorter) => {
   pagination.value.current = pager.current
   pagination.value.pageSize = pager.pageSize
 
-  let sort
   if (sorter?.field && sorter?.order) {
-    const dir = sorter.order === 'ascend' ? 'asc' : 'desc'
-    sort = `${sorter.field},${dir}`
+    defaultSort.value = sorter
+  } else {
+    defaultSort.value = null
+  }
+
+  let sort = null
+  if (defaultSort.value) {
+    const dir = defaultSort.value.order === 'ascend' ? 'asc' : 'desc'
+    sort = `${defaultSort.value.field},${dir}`
   }
 
   loadMovimientos({
@@ -171,7 +189,13 @@ loadMovimientos()
 
     <!-- Tabla -->
     <div class="movimientos-wrapper">
-      <MovimientosTable :data="movimientos" :loading="loading" :pagination="pagination" @change="onTableChange">
+      <MovimientosTable
+        :data="movimientos"
+        :loading="loading"
+        :pagination="pagination"
+        :sorter="defaultSort"
+        @change="onTableChange"
+      >
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'actions'">
             <a-dropdown trigger="click">

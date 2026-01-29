@@ -57,7 +57,7 @@ const handleClose = () => emit('close')
   <a-modal :open="open" title="Detalle del Usuario" ok-text="Cerrar" :cancelButtonProps="{ style: { display: 'none' } }"
     @ok="handleClose" @cancel="handleClose">
     <a-form layout="vertical">
-      <a-form-item label="Ident Usuario">
+      <a-form-item label="Identificador del usuario">
         <a-input :value="user.identUsuario" disabled />
       </a-form-item>
 

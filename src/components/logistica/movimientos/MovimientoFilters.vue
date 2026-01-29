@@ -1,3 +1,4 @@
+<!-- MovimientoFilters.vue -->
 <script setup>
 import { reactive, ref, onMounted, computed } from 'vue'
 import { sedeService } from '@/services/sede.service'

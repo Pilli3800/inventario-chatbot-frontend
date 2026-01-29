@@ -1,3 +1,4 @@
+<!-- ViewMovimientoModal.vue -->
 <script setup>
 import { ref, watch } from 'vue'
 import { movimientosService } from '@/services/movimientos.service'

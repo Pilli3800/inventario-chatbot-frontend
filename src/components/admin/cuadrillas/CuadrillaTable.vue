@@ -1,3 +1,4 @@
+<!-- CuadrillaTable.vue -->
 <script setup>
 defineProps({
   data: Array,

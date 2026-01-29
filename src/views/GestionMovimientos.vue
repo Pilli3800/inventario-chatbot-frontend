@@ -4,7 +4,7 @@ import { ref, watch } from 'vue'
 import { DownloadOutlined } from '@ant-design/icons-vue'
 import { useRouter, useRoute } from 'vue-router'
 import { usePermissions } from '@/composables/usePermissions'
-
+import { useTableData } from '@/composables/useTableData'
 import MovimientoFilters from '@/components/logistica/movimientos/MovimientoFilters.vue'
 import MovimientosTable from '@/components/logistica/movimientos/MovimientosTable.vue'
 import CreateMovimientoModal from '@/components/logistica/movimientos/CreateMovimientoModal.vue'
@@ -16,28 +16,28 @@ import { movimientosService } from '@/services/movimientos.service'
 const router = useRouter()
 const route = useRoute()
 
-/* Estados */
-const movimientos = ref([])
-const loading = ref(false)
-
 const createOpen = ref(false)
 const viewOpen = ref(false)
 
 const viewId = ref(null)
 
-const pagination = ref({
-  current: 1,
-  pageSize: 10,
-  total: 0,
-  showTotal: (total, range) =>
-    `${range[0]}–${range[1]} de ${total} movimientos`
-})
-
-const activeFilters = ref({})
-
-const defaultSort = ref({
-  field: 'fechaMovimiento',
-  order: 'descend'
+/* Tabla y filtros */
+const {
+  data: movimientos,
+  loading,
+  pagination,
+  sorter,
+  filters,
+  load: loadMovimientos,
+  onTableChange,
+  onSearch
+} = useTableData({
+  service: movimientosService.search,
+  defaultSort: {
+    field: 'fechaMovimiento',
+    order: 'descend'
+  },
+  pageSize: 10
 })
 
 /* Permisos */
@@ -46,63 +46,6 @@ const {
   canView,
   canReport
 } = usePermissions()
-
-/* Load */
-const loadMovimientos = async (filters = activeFilters.value) => {
-  loading.value = true
-
-  const cleanFilters = Object.fromEntries(
-    Object.entries(filters).filter(
-      ([, v]) => v !== undefined && v !== null && v !== ''
-    )
-  )
-
-  // Sort default
-  if (!cleanFilters.sort && defaultSort.value) {
-    const dir = defaultSort.value.order === 'ascend' ? 'asc' : 'desc'
-    cleanFilters.sort = `${defaultSort.value.field},${dir}`
-  }
-
-  const { data } = await movimientosService.search({
-    ...cleanFilters,
-    page: pagination.value.current - 1,
-    size: pagination.value.pageSize
-  })
-
-  movimientos.value = data.content
-  pagination.value.total = data.totalElements
-  loading.value = false
-}
-
-/* Tabla */
-const onTableChange = (pager, filters, sorter) => {
-  pagination.value.current = pager.current
-  pagination.value.pageSize = pager.pageSize
-
-  if (sorter?.field && sorter?.order) {
-    defaultSort.value = sorter
-  } else {
-    defaultSort.value = null
-  }
-
-  let sort = null
-  if (defaultSort.value) {
-    const dir = defaultSort.value.order === 'ascend' ? 'asc' : 'desc'
-    sort = `${defaultSort.value.field},${dir}`
-  }
-
-  loadMovimientos({
-    ...activeFilters.value,
-    sort
-  })
-}
-
-/* Filtros */
-const onSearch = (filters) => {
-  pagination.value.current = 1
-  activeFilters.value = { ...filters }
-  loadMovimientos(filters)
-}
 
 /* Modals ruteados */
 const openView = (record) => {
@@ -130,7 +73,7 @@ watch(
 /* Exportar */
 const exportExcel = async () => {
   const cleanFilters = Object.fromEntries(
-    Object.entries(activeFilters.value).filter(
+    Object.entries(filters.value).filter(
       ([, v]) => v !== undefined && v !== null && v !== ''
     )
   )
@@ -193,7 +136,7 @@ loadMovimientos()
         :data="movimientos"
         :loading="loading"
         :pagination="pagination"
-        :sorter="defaultSort"
+        :sorter="sorter"
         @change="onTableChange"
       >
         <template #bodyCell="{ column, record }">

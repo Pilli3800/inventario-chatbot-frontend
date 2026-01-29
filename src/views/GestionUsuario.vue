@@ -12,6 +12,7 @@ import ViewUserModal from '@/components/admin/ViewUserModal.vue'
 import CreateUserModal from '@/components/admin/CreateUserModal.vue'
 import { DownloadOutlined } from '@ant-design/icons-vue';
 import { useTableData } from '@/composables/useTableData'
+import { useAuthStore } from '@/stores/auth.store'
 
 const resetOpen = ref(false)
 const userResetIdent = ref(null)
@@ -21,6 +22,8 @@ const createOpen = ref(false)
 
 const router = useRouter()
 const route = useRoute()
+
+const authStore = useAuthStore()
 
 const {
   data: users,
@@ -39,7 +42,6 @@ const {
   },
   pageSize: 10
 })
-
 
 // VER
 const openView = (record) => {
@@ -131,6 +133,11 @@ const exportExcel = async () => {
   globalThis.URL.revokeObjectURL(url)
 }
 
+// util: si es el usuario actual
+const isSelf = (record) => {
+  return record.identUsuario === authStore.ident
+}
+
 loadUsers()
 </script>
 
@@ -165,9 +172,18 @@ loadUsers()
                 </a-menu-item>
 
                 <!-- Mostrar Desactivar si está activo -->
-                <a-menu-item v-if="record.enabled" danger @click="desactivarUser(record.identUsuario)">
+                <a-tooltip v-if="record.enabled && isSelf(record)" title="No puedes desactivarte a ti mismo">
+                  <span>
+                    <a-menu-item disabled danger>
+                      Desactivar
+                    </a-menu-item>
+                  </span>
+                </a-tooltip>
+
+                <a-menu-item v-else-if="record.enabled" danger @click="desactivarUser(record.identUsuario)">
                   Desactivar
                 </a-menu-item>
+
 
                 <a-menu-divider />
 

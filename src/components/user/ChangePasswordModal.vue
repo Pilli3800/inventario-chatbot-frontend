@@ -137,16 +137,16 @@ const resetForm = () => {
         style="margin-bottom: 12px" />
 
       <a-form-item label="Contraseña actual">
-        <a-input-password v-model:value="actualPassword" minlength="8" maxlength="20" allow-clear />
+        <a-input-password v-model:value="actualPassword" :minlength="8" :maxlength="20" allow-clear />
       </a-form-item>
 
       <a-form-item label="Confirmar contraseña actual">
-        <a-input-password v-model:value="confirmActualPassword" minlength="8" maxlength="20" allow-clear />
+        <a-input-password v-model:value="confirmActualPassword" :minlength="8" :maxlength="20" allow-clear />
       </a-form-item>
 
       <a-form-item label="Nueva contraseña">
         <a-input-password v-model:value="nuevaPassword" placeholder="Ingrese la nueva contraseña"
-          autocomplete="new-password" minlength="8" maxlength="20" allow-clear />
+          autocomplete="new-password" :minlength="8" :maxlength="20" allow-clear />
       </a-form-item>
 
       <div v-if="passwordStrengthInfo" class="password-strength">

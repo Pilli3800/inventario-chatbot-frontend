@@ -1,3 +1,4 @@
+// src/stores/auth.store.js
 import { defineStore } from 'pinia'
 import { jwtDecode } from 'jwt-decode'
 import { authService } from '@/services/auth.service'

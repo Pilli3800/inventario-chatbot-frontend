@@ -129,7 +129,7 @@ const resetForm = () => {
 
 <template>
   <a-modal title="Cambiar contraseña" ok-text="Cambiar" cancel-text="Cancelar" :okButtonProps="{ disabled: isDisabled }"
-    @ok="confirmChange" @cancel="handleCancel">
+    @ok="confirmChange" @cancel="handleCancel" :zIndex="1300">
     <a-form layout="vertical">
 
       <a-alert type="info" show-icon

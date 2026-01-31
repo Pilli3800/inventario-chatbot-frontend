@@ -21,6 +21,7 @@ const props = defineProps({
 marked.setOptions({ breaks: true })
 
 /* Estado */
+const inputKey = ref(0)
 const messages = ref([
   {
     role: 'assistant',
@@ -49,6 +50,8 @@ const sendMessage = async () => {
   })
 
   inputMessage.value = ''
+  inputMessage.value = ''
+  inputKey.value++
   loading.value = true
   typing.value = true
 
@@ -139,7 +142,7 @@ const scrollToBottom = async () => {
 
     <!-- Input-->
     <div style="display:flex; gap:8px">
-      <a-input v-model:value="inputMessage" :placeholder="loading
+      <a-input :key="inputKey" v-model:value="inputMessage" :placeholder="loading
         ? 'El asistente está respondiendo…'
         : 'Ej: dime 5 items activos'" @pressEnter="sendMessage" :disabled="loading" allow-clear />
       <a-button type="primary" :loading="loading" :disabled="!inputMessage.trim()" @click="sendMessage">

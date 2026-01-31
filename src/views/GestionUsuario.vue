@@ -1,6 +1,6 @@
 <!-- GestionUsuario.vue -->
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { userService } from '@/services/user.service'
 import { adminUserService } from '@/services/admin-user.service'
@@ -97,6 +97,33 @@ const desactivarUser = async (identUsuario) => {
   loadUsers() // recarga tabla
 }
 
+/* Estadísticas */
+const totalUsuarios = computed(() => users.value.length)
+
+const totalAdministracion = computed(() =>
+  users.value.filter(u => u.roles?.includes('ADMINISTRACION')).length
+)
+
+const totalLogistica = computed(() =>
+  users.value.filter(u => u.roles?.includes('LOGISTICA')).length
+)
+
+const totalGerencia = computed(() =>
+  users.value.filter(u => u.roles?.includes('GERENCIA')).length
+)
+
+const totalJefeCuadrilla = computed(() =>
+  users.value.filter(u => u.roles?.includes('JEFE_CUADRILLA')).length
+)
+
+const totalActivos = computed(() =>
+  users.value.filter(u => u.enabled).length
+)
+
+const totalInactivos = computed(() =>
+  users.value.filter(u => !u.enabled).length
+)
+
 /* Exportar */
 const exportExcel = async () => {
   const cleanFilters = Object.fromEntries(
@@ -144,6 +171,56 @@ loadUsers()
 <template>
   <div>
     <h2>Gestión de Usuarios</h2>
+
+    <a-collapse ghost default-active-key="stats">
+      <a-collapse-panel key="stats" header="Resumen de usuarios">
+        <a-row :gutter="[16, 16]">
+          <a-col :xs="24" :sm="12" :md="8" :lg="4">
+            <a-card size="small">
+              <a-statistic title="👥 Total usuarios" :value="totalUsuarios" />
+            </a-card>
+          </a-col>
+
+          <a-col :xs="24" :sm="12" :md="8" :lg="4">
+            <a-card size="small">
+              <a-statistic title="🧑‍💼 Administración" :value="totalAdministracion" />
+            </a-card>
+          </a-col>
+
+          <a-col :xs="24" :sm="12" :md="8" :lg="4">
+            <a-card size="small">
+              <a-statistic title="📦 Logística" :value="totalLogistica" />
+            </a-card>
+          </a-col>
+
+          <a-col :xs="24" :sm="12" :md="8" :lg="4">
+            <a-card size="small">
+              <a-statistic title="📊 Gerencia" :value="totalGerencia" />
+            </a-card>
+          </a-col>
+
+          <a-col :xs="24" :sm="12" :md="8" :lg="4">
+            <a-card size="small">
+              <a-statistic title="🛠️ Jefe cuadrilla" :value="totalJefeCuadrilla" />
+            </a-card>
+          </a-col>
+
+          <a-col :xs="24" :sm="12" :md="8" :lg="4">
+            <a-card size="small">
+              <a-statistic title="🟢 Activos" :value="totalActivos" :value-style="{ color: '#52c41a' }" />
+            </a-card>
+          </a-col>
+
+          <a-col :xs="24" :sm="12" :md="8" :lg="4">
+            <a-card size="small">
+              <a-statistic title="🔴 Inactivos" :value="totalInactivos" :value-style="{ color: '#ff4d4f' }" />
+            </a-card>
+          </a-col>
+        </a-row>
+      </a-collapse-panel>
+    </a-collapse>
+
+
     <a-space wrap style="margin: 24px 0;">
       <a-button type="primary" @click="createOpen = true">
         + Nuevo Usuario

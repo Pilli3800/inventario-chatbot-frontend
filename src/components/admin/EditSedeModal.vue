@@ -93,12 +93,20 @@ const handleCancel = () => emit('close')
         <a-input v-model:value="form.codigo" disabled />
       </a-form-item>
 
-      <a-form-item label="Nombre">
-        <a-input v-model:value="form.nombre" />
+      <a-form-item label="Nombre" required :validate-status="!form.nombre.trim() ? 'error' : ''"
+        :help="!form.nombre.trim() ? 'El nombre es obligatorio' : ''">
+        <a-input v-model:value="form.nombre" placeholder="Nombre de la sede" allow-clear />
       </a-form-item>
 
-      <a-form-item label="Descripción">
-        <a-textarea v-model:value="form.descripcion" :rows="3" />
+      <a-form-item label="Descripción"
+        extra="Máx. 255 caracteres - Incluye datos como la dirección, horarios u otra información relevante" required
+        :validate-status="!form.descripcion.trim() ? 'error' : ''"
+        :help="!form.descripcion.trim() ? 'La descripción es obligatoria' : ''">
+        <a-textarea v-model:value="form.descripcion" :auto-size="{ minRows: 3, maxRows: 5 }" maxlength="255" show-count
+          placeholder="Descripción de la sede" />
+        <a-button type="link" size="small" @click="form.descripcion = ''" style="padding: 0; margin-top: 4px">
+          Limpiar descripción
+        </a-button>
       </a-form-item>
 
       <a-alert v-if="errorMsg" type="error" :message="errorMsg" show-icon style="margin-top: 4px" />

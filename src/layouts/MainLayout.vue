@@ -44,11 +44,7 @@ const handleLogout = () => {
   <a-layout style="min-height: 100vh" :class="{ 'chat-open': chatOpen, 'sidebar-open': !collapsed }">
     <!-- Header visible -->
     <a-layout-header class="app-header">
-      <AppNavbar
-        @toggle-sidebar="toggleSidebar"
-        @logout="handleLogout"
-        @go-home="goHome"
-      />
+      <AppNavbar @toggle-sidebar="toggleSidebar" @logout="handleLogout" @go-home="goHome" />
     </a-layout-header>
 
     <a-layout>
@@ -104,6 +100,7 @@ const handleLogout = () => {
   height: calc(100vh - 64px);
   overflow-y: auto;
   overflow-x: hidden;
+  padding-bottom: 20px;
 }
 
 .chat-float-btn {
@@ -115,7 +112,8 @@ const handleLogout = () => {
 
 .sidebar-mask {
   position: fixed;
-  top: 64px; /* deja libre el header */
+  top: 64px;
+  /* deja libre el header */
   left: 0;
   right: 0;
   bottom: 0;

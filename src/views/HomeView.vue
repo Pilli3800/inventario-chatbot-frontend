@@ -8,7 +8,6 @@ const router = useRouter()
 const route = useRoute()
 
 const userName = computed(() => authStore.ident)
-const roles = computed(() => authStore.roles || [])
 
 const openPasswordModal = () => {
   router.push({ query: { ...route.query, modal: 'password' } })

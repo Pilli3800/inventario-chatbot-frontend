@@ -104,13 +104,17 @@ body {
   align-items: center;
   justify-content: center;
   background: #f5f7fa;
+  padding: 16px;
+  box-sizing: border-box;
 }
 
 .login-card {
-  width: 420px;
+  width: 100%;
+  max-width: 420px;
   padding: 24px 28px;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
 }
 
 .login-header {

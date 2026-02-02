@@ -1,7 +1,7 @@
 <!-- MainLayout.vue -->
 <script setup>
-import { ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
 
 import AppNavbar from '@/components/AppNavbar.vue'
@@ -9,11 +9,15 @@ import AppSidebar from '@/components/AppSidebar.vue'
 
 import ChatIA from '@/components/chat/ChatIA.vue'
 import { MessageOutlined } from '@ant-design/icons-vue'
+import ChangePasswordModal from '@/components/user/ChangePasswordModal.vue'
+import ProfileModal from '@/components/user/ProfileModal.vue'
 
 const chatOpen = ref(false)
 const collapsed = ref(true)
+const isMobile = ref(false)
 
 const authStore = useAuthStore()
+const route = useRoute()
 const router = useRouter()
 
 const toggleSidebar = () => {
@@ -38,13 +42,48 @@ const handleLogout = () => {
   authStore.logout()
   router.push('/login')
 }
+
+const updateIsMobile = () => {
+  if (typeof window !== 'undefined') {
+    isMobile.value = window.innerWidth < 480
+  }
+}
+
+onMounted(() => {
+  updateIsMobile()
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', updateIsMobile)
+  }
+})
+
+onBeforeUnmount(() => {
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('resize', updateIsMobile)
+  }
+})
+
+const openModal = (modal) => {
+  router.push({ query: { ...route.query, modal } })
+}
+
+const closeModal = () => {
+  const rest = { ...route.query }
+  delete rest.modal
+  router.push({ query: rest })
+}
 </script>
 
 <template>
   <a-layout style="min-height: 100vh" :class="{ 'chat-open': chatOpen, 'sidebar-open': !collapsed }">
     <!-- Header visible -->
     <a-layout-header class="app-header">
-      <AppNavbar @toggle-sidebar="toggleSidebar" @logout="handleLogout" @go-home="goHome" />
+      <AppNavbar
+        @toggle-sidebar="toggleSidebar"
+        @logout="handleLogout"
+        @go-home="goHome"
+        @open-password="openModal('password')"
+        @open-profile="openModal('profile')"
+      />
     </a-layout-header>
 
     <a-layout>
@@ -66,12 +105,30 @@ const handleLogout = () => {
     <MessageOutlined />
   </a-button>
 
-  <a-drawer title="Asistente Inteligente" placement="right" width="420" :open="chatOpen" @close="chatOpen = false"
+  <a-drawer title="Asistente Inteligente" placement="right" :width="isMobile ? '90vw' : 420" :open="chatOpen" @close="chatOpen = false"
     :mask="true">
     <div class="chat-drawer-container">
       <ChatIA />
     </div>
   </a-drawer>
+
+  <!-- Modales globales controlados por query param (?modal=...) -->
+  <Teleport to="body">
+    <ChangePasswordModal
+      v-if="route.query.modal === 'password'"
+      :open="true"
+      @close="closeModal"
+      @success="closeModal"
+    />
+  </Teleport>
+
+  <Teleport to="body">
+    <ProfileModal
+      v-if="route.query.modal === 'profile'"
+      :open="true"
+      @close="closeModal"
+    />
+  </Teleport>
 </template>
 
 <style scoped>

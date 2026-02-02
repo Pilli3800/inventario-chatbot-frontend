@@ -1,15 +1,18 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
-import ChangePasswordModal from '@/components/user/ChangePasswordModal.vue'
 
 const authStore = useAuthStore()
+const router = useRouter()
+const route = useRoute()
 
 const userName = computed(() => authStore.ident)
 const roles = computed(() => authStore.roles || [])
 
-//Modal de cambio de contraseña
-const openChangePassword = ref(false)
+const openPasswordModal = () => {
+  router.push({ query: { ...route.query, modal: 'password' } })
+}
 </script>
 
 <template>
@@ -36,13 +39,9 @@ const openChangePassword = ref(false)
 
       <a-divider style="margin: 12px 0;" />
 
-      <a-button block style="white-space: normal; height: auto;" @click="openChangePassword = true">
+      <a-button block style="white-space: normal; height: auto;" @click="openPasswordModal">
         🔒 Cambiar mi contraseña
       </a-button>
     </a-card>
-
-    <!-- Modal -->
-    <ChangePasswordModal :open="openChangePassword" @close="openChangePassword = false"
-      @success="openChangePassword = false" />
   </div>
 </template>

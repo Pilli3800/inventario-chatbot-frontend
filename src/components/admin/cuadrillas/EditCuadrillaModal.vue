@@ -1,3 +1,4 @@
+<!-- EditCuadrillaModal.vue -->
 <script setup>
 import { ref, watch, computed, createVNode } from 'vue'
 import { Modal, message } from 'ant-design-vue'
@@ -14,7 +15,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'success'])
 
-/* === FORM === */
+/* Estados */
 const loading = ref(false)
 const errorMsg = ref(null)
 
@@ -24,7 +25,7 @@ const form = ref({
   codigoServicio: undefined
 })
 
-/* === SERVICIOS (TODOS ACTIVOS) === */
+/* Servicios activos */
 const servicios = ref([])
 const loadingServicios = ref(false)
 
@@ -35,7 +36,7 @@ const loadServicios = async () => {
   loadingServicios.value = false
 }
 
-/* === JEFES (AUTOCOMPLETE REMOTO) === */
+/* Jefes Autocomplete */
 const jefesCuadrilla = ref([])
 const loadingJefes = ref(false)
 
@@ -61,7 +62,7 @@ const buscarJefes = async (texto) => {
   }
 }
 
-/* === CARGAR CUADRILLA === */
+/* Cargar Cuadrilla */
 const loadCuadrilla = async () => {
   if (!props.codigoCuadrilla) return
   loading.value = true
@@ -78,7 +79,7 @@ const loadCuadrilla = async () => {
   loading.value = false
 }
 
-/* === WATCH === */
+/* Watch */
 watch(
   () => [props.open, props.codigoCuadrilla],
   ([open, codigo]) => {
@@ -91,12 +92,12 @@ watch(
   { immediate: true }
 )
 
-/* === VALIDACIÓN === */
+/* Validacion */
 const isDisabled = computed(
   () => !form.value.codigoUsuario || !form.value.codigoServicio
 )
 
-/* === GUARDAR === */
+/* Guardar */
 const submit = async () => {
   try {
     await adminCuadrillaService.update(props.codigoCuadrilla, {
@@ -131,15 +132,19 @@ const handleCancel = () => emit('close')
 
     <a-form layout="vertical" :loading="loading">
 
-      <!-- CÓDIGO (SOLO LECTURA) -->
+      <a-alert type="info" show-icon style="margin-bottom: 16px"
+        description="Toda cuadrilla debe contar obligatoriamente con un jefe responsable asignado." />
+
+
+      <!-- Codigo (solo lectura) -->
       <a-form-item label="Código">
         <a-input :value="form.codigoCuadrilla" disabled />
       </a-form-item>
 
-      <!-- JEFE (AUTOCOMPLETE) -->
-      <a-form-item label="Jefe de Cuadrilla">
-        <a-select v-model:value="form.codigoUsuario" show-search placeholder="Escriba usuario o nombre"
-          :filter-option="false" :loading="loadingJefes" @search="buscarJefes" allow-clear>
+      <!-- Jefe Cuadrilla (Autocomplete) -->
+      <a-form-item label="Jefe de Cuadrilla" required>
+        <a-select v-model:value="form.codigoUsuario" show-search placeholder="Codigo de usuario" :filter-option="false"
+          :loading="loadingJefes" @search="buscarJefes" allow-clear>
 
           <a-select-option v-for="u in jefesCuadrilla" :key="u.identUsuario" :value="u.identUsuario">
             {{ u.identUsuario }} - {{ u.nombres }} {{ u.apellidos }}
@@ -148,8 +153,8 @@ const handleCancel = () => emit('close')
         </a-select>
       </a-form-item>
 
-      <!-- SERVICIO (SELECT NORMAL) -->
-      <a-form-item label="Servicio">
+      <!-- Servicio (Select normal) -->
+      <a-form-item label="Servicio" required>
         <a-select v-model:value="form.codigoServicio" placeholder="Seleccione servicio" :loading="loadingServicios"
           allow-clear>
 
@@ -160,7 +165,7 @@ const handleCancel = () => emit('close')
         </a-select>
       </a-form-item>
 
-      <!-- ERRORES -->
+      <!-- Errores -->
       <a-alert v-if="errorMsg" type="error" show-icon style="margin-top: 8px" :message="errorMsg" />
 
     </a-form>

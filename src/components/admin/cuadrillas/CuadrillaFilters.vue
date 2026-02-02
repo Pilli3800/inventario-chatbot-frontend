@@ -1,17 +1,18 @@
+<!-- CuadrillaFilters.vue -->
 <script setup>
 import { reactive, ref } from 'vue'
 import { userService } from '@/services/user.service'
 
 const emit = defineEmits(['search'])
 
-/* === FILTROS === */
+/* Filtros*/
 const filters = reactive({
   codigoCuadrilla: '',
   identUsuarioJefe: undefined,
   enabled: undefined
 })
 
-/* === JEFES (AUTOCOMPLETE REMOTO) === */
+/* Jefes (Autocomplete) */
 const jefesCuadrilla = ref([])
 const loadingJefes = ref(false)
 
@@ -38,7 +39,7 @@ const buscarJefes = async (texto) => {
   }
 }
 
-/* === ACCIONES === */
+/* Acciones */
 const onSearch = () => {
   emit('search', { ...filters })
 }
@@ -57,14 +58,14 @@ const onReset = () => {
     <a-form layout="vertical">
       <a-row :gutter="16">
 
-        <!-- CÓDIGO -->
+        <!-- Codigo -->
         <a-col :md="8">
           <a-form-item label="Código">
             <a-input v-model:value="filters.codigoCuadrilla" allow-clear placeholder="Código de Cuadrilla" />
           </a-form-item>
         </a-col>
 
-        <!-- JEFE (AUTOCOMPLETE REMOTO) -->
+        <!-- Jefe (Autocomplete) -->
         <a-col :md="8">
           <a-form-item label="Jefe de Cuadrilla">
             <a-select v-model:value="filters.identUsuarioJefe" show-search placeholder="Código de Usuario"
@@ -79,7 +80,7 @@ const onReset = () => {
           </a-form-item>
         </a-col>
 
-        <!-- ESTADO -->
+        <!-- Estado -->
         <a-col :md="8">
           <a-form-item label="Estado">
             <a-select v-model:value="filters.enabled" allow-clear placeholder="Todos">
@@ -91,7 +92,7 @@ const onReset = () => {
           </a-form-item>
         </a-col>
 
-        <!-- BOTONES -->
+        <!-- Botones -->
         <a-col :md="8">
           <a-form-item label=" ">
             <a-button type="primary" @click="onSearch">

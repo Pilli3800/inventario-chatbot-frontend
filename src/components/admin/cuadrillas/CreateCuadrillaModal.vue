@@ -1,10 +1,11 @@
+<!-- CreateCuadrillaModal.vue -->
 <script setup>
 import { ref, watch, createVNode } from 'vue'
 import { Modal, message } from 'ant-design-vue'
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
 import { adminCuadrillaService } from '@/services/admin-cuadrilla.service'
 import { servicioService } from '@/services/servicio.service'
-import { adminUserService } from '@/services/admin-user.service'
+import { userService } from '@/services/user.service'
 
 const props = defineProps({ open: Boolean })
 const emit = defineEmits(['close', 'success'])
@@ -50,7 +51,7 @@ const buscarJefes = async (texto) => {
   loadingJefes.value = true
 
   try {
-    const { data } = await adminUserService.search({
+    const { data } = await userService.search({
       rol: 'JEFE_CUADRILLA',
       identUsuario: texto,
       enabled: true,
@@ -115,15 +116,19 @@ const confirmSave = () => {
 
     <a-form layout="vertical" :model="form" :rules="rules" ref="formRef">
 
+      <!-- Aviso informativo -->
+      <a-alert type="info" show-icon style="margin-bottom: 16px"
+        description="Toda cuadrilla debe contar obligatoriamente con un jefe responsable asignado." />
+
       <!-- Código -->
       <a-form-item label="Código" name="codigoCuadrilla">
-        <a-input v-model:value="form.codigoCuadrilla" />
+        <a-input v-model:value="form.codigoCuadrilla" allow-clear :maxLength="20" placeholder="Ej: CUAD001" />
       </a-form-item>
 
       <!-- Jefe (Autocomplete) -->
       <a-form-item label="Jefe de Cuadrilla" name="codigoUsuario">
-        <a-select v-model:value="form.codigoUsuario" show-search placeholder="Escriba usuario o nombre"
-          :filter-option="false" :loading="loadingJefes" @search="buscarJefes" allow-clear>
+        <a-select v-model:value="form.codigoUsuario" show-search placeholder="Codigo de usuario" :filter-option="false"
+          :loading="loadingJefes" @search="buscarJefes" allow-clear :maxLength="20">
 
           <a-select-option v-for="u in jefesCuadrilla" :key="u.identUsuario" :value="u.identUsuario">
 

@@ -21,13 +21,6 @@ const openPasswordModal = () => {
 
     <p>Iniciaste sesión correctamente.</p>
 
-    <div v-if="roles.length">
-      <p><strong>Roles:</strong></p>
-      <ul>
-        <li v-for="r in roles" :key="r">{{ r }}</li>
-      </ul>
-    </div>
-
     <a-divider />
 
     <!-- CONFIGURACIÓN -->

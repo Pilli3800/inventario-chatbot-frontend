@@ -283,14 +283,14 @@ onMounted(() => {
         <!-- FECHA DESDE -->
         <a-col :md="3">
           <a-form-item label="Desde">
-            <a-date-picker v-model:value="filters.fechaInicio" style="width: 100%" />
+            <a-date-picker v-model:value="filters.fechaInicio" style="width: 100%" placeholder="Selecciona fecha" />
           </a-form-item>
         </a-col>
 
         <!-- FECHA HASTA -->
         <a-col :md="3">
           <a-form-item label="Hasta">
-            <a-date-picker v-model:value="filters.fechaFin" style="width: 100%" />
+            <a-date-picker v-model:value="filters.fechaFin" style="width: 100%" placeholder="Selecciona fecha" />
           </a-form-item>
         </a-col>
 

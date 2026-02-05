@@ -1,7 +1,7 @@
 <!-- GestionMovimientos.vue -->
 <script setup>
-import { ref, watch } from 'vue'
-import { DownloadOutlined } from '@ant-design/icons-vue'
+import { ref, watch, computed } from 'vue'
+import { DownloadOutlined, EllipsisOutlined } from '@ant-design/icons-vue'
 import { useRouter, useRoute } from 'vue-router'
 import { usePermissions } from '@/composables/usePermissions'
 import { useTableData } from '@/composables/useTableData'
@@ -39,6 +39,18 @@ const {
   },
   pageSize: 10
 })
+
+const paginationConfig = computed(() => ({
+  ...pagination.value,
+  showTotal: (total, range) => `${range[0]}–${range[1]} de ${total} movimientos`,
+  showQuickJumper: true,
+  showSizeChanger: true,
+  locale: {
+    jump_to: 'Ir a',
+    page: 'página',
+    items_per_page: ' / página'
+  }
+}))
 
 /* Permisos */
 const {
@@ -135,14 +147,16 @@ loadMovimientos()
       <MovimientosTable
         :data="movimientos"
         :loading="loading"
-        :pagination="pagination"
+        :pagination="paginationConfig"
         :sorter="sorter"
         @change="onTableChange"
       >
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'actions'">
             <a-dropdown trigger="click">
-              <a-button type="text">⋮</a-button>
+              <a-button type="text">
+                <EllipsisOutlined />
+              </a-button>
               <template #overlay>
                 <a-menu>
                   <a-menu-item v-if="canView" @click="openView(record)">

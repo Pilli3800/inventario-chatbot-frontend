@@ -47,7 +47,7 @@ const columns = computed(() => [
     dataIndex: 'actions',
     key: 'actions',
     fixed: 'right',
-    width: 60,
+    width: 72,
     align: 'center',
     ellipsis: true
   }

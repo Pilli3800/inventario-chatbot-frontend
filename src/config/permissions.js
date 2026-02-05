@@ -6,6 +6,7 @@ export const PERMISSIONS = {
     delete: false,
     toggle: true,
     view: true,
+    viewItemHistory: true,
     report: true,
     audit: true
   },
@@ -17,6 +18,7 @@ export const PERMISSIONS = {
     delete: true,
     toggle: true,
     view: true,
+    viewItemHistory: true,
     report: true,
     audit: false
   },
@@ -27,6 +29,7 @@ export const PERMISSIONS = {
     edit: false,
     toggle: false,
     view: true,
+    viewItemHistory: true,
     report: true,
     audit: true
   },
@@ -37,6 +40,7 @@ export const PERMISSIONS = {
     edit: false,
     toggle: false,
     view: true,
+    viewItemHistory: false,
     report: false,
     audit: false
   },

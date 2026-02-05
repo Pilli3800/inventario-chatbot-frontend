@@ -8,8 +8,10 @@ import ItemTable from '@/components/logistica/ItemTable.vue'
 import CreateItemModal from '@/components/logistica/CreateItemModal.vue'
 import EditItemModal from '@/components/logistica/EditItemModal.vue'
 import ViewItemModal from '@/components/logistica/ViewItemModal.vue'
-import { DownloadOutlined } from '@ant-design/icons-vue';
+import ItemHistorialModal from '@/components/logistica/ItemHistorialModal.vue'
+import { DownloadOutlined, EllipsisOutlined } from '@ant-design/icons-vue';
 import { adminItemService } from '@/services/admin-item.service'
+import { usePermissions } from '@/composables/usePermissions'
 
 
 const router = useRouter()
@@ -21,9 +23,11 @@ const loading = ref(false)
 const createOpen = ref(false)
 const viewOpen = ref(false)
 const editOpen = ref(false)
+const historialOpen = ref(false)
 
 const viewCodigo = ref(null)
 const editCodigo = ref(null)
+const historialCodigo = ref(null)
 
 const pagination = ref({
   current: 1,
@@ -34,6 +38,7 @@ const pagination = ref({
 const activeFilters = ref({})
 
 const authStore = useAuthStore()
+const { canViewItemHistory } = usePermissions()
 
 /* Cargar items */
 const loadItems = async (filters = activeFilters.value) => {
@@ -97,6 +102,28 @@ watch(
     } else {
       viewOpen.value = false
       viewCodigo.value = null
+    }
+  },
+  { immediate: true }
+)
+
+/* Historial */
+const openHistorial = (record) => {
+  router.push({
+    name: 'historial-item',
+    params: { codigoItem: record.codigoItem }
+  })
+}
+
+watch(
+  () => route.name,
+  (name) => {
+    if (name === 'historial-item') {
+      historialCodigo.value = route.params.codigoItem
+      historialOpen.value = true
+    } else {
+      historialOpen.value = false
+      historialCodigo.value = null
     }
   },
   { immediate: true }
@@ -243,7 +270,9 @@ loadItems()
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'actions'">
           <a-dropdown trigger="click">
-            <a-button type="text">⋮</a-button>
+            <a-button type="text">
+              <EllipsisOutlined />
+            </a-button>
 
             <template #overlay>
               <a-menu>
@@ -264,6 +293,10 @@ loadItems()
                 <a-menu-item @click="openEdit(record)">
                   Editar
                 </a-menu-item>
+
+                <a-menu-item v-if="canViewItemHistory" @click="openHistorial(record)">
+                  Ver historial
+                </a-menu-item>
               </a-menu>
             </template>
           </a-dropdown>
@@ -275,6 +308,9 @@ loadItems()
       @success="loadItems()" />
 
     <ViewItemModal :open="viewOpen" :codigoItem="viewCodigo" @close="router.push({ name: 'gestion-items' })" />
+
+    <ItemHistorialModal :open="historialOpen" :codigoItem="historialCodigo"
+      @close="router.push({ name: 'gestion-items' })" />
 
     <router-view />
   </div>

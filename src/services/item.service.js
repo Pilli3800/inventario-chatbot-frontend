@@ -57,5 +57,12 @@ export const itemService = {
         Authorization: authStore.token
       }
     })
+  },
+
+  async historial(codigoItem) {
+    const authStore = useAuthStore()
+    return axios.get(`${API_URL}/${codigoItem}/historial`, {
+      headers: { Authorization: authStore.token }
+    })
   }
 }

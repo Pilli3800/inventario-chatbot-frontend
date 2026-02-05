@@ -1,6 +1,6 @@
 <!-- MovimientoFilters.vue -->
 <script setup>
-import { reactive, ref, onMounted, computed } from 'vue'
+import { reactive, ref, onMounted, computed, watch } from 'vue'
 import { sedeService } from '@/services/sede.service'
 import { userService } from '@/services/user.service'
 import { usePermissions } from '@/composables/usePermissions'
@@ -9,6 +9,11 @@ import { servicioService } from '@/services/servicio.service'
 import { itemService } from '@/services/item.service'
 import dayjs from 'dayjs'
 import { useAuthStore } from '@/stores/auth.store'
+
+const props = defineProps({
+  initialCodigoItem: String,
+  lockItem: Boolean
+})
 
 const emit = defineEmits(['search'])
 const { canAudit } = usePermissions()
@@ -130,7 +135,9 @@ const onSearch = () => {
 
 const onReset = () => {
   filters.tipoMovimiento = undefined
-  filters.codigoItem = undefined
+  filters.codigoItem = props.lockItem && props.initialCodigoItem
+    ? props.initialCodigoItem
+    : undefined
   filters.sedeOrigen = undefined
   filters.sedeDestino = undefined
   filters.usuario = undefined
@@ -190,6 +197,18 @@ const buscarServicios = async (texto) => {
 onMounted(() => {
   loadSedes()
 })
+
+watch(
+  () => props.initialCodigoItem,
+  (codigoItem) => {
+    if (codigoItem) {
+      filters.codigoItem = codigoItem
+    } else if (!props.lockItem) {
+      filters.codigoItem = undefined
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
@@ -212,6 +231,7 @@ onMounted(() => {
         <a-col :md="6">
           <a-form-item label="Item">
             <a-select v-model:value="filters.codigoItem" show-search allow-clear placeholder="Buscar código de item"
+              :disabled="props.lockItem"
               :filter-option="false" :loading="loadingItems" @search="buscarItems">
               <a-select-option v-for="item in items" :key="item.codigoItem" :value="item.codigoItem">
                 {{ item.codigoItem }} - {{ item.nombre }}

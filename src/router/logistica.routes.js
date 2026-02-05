@@ -1,6 +1,7 @@
 import GestionItems from '@/views/GestionItems.vue'
 import ViewItemModal from '@/components/logistica/ViewItemModal.vue'
 import EditItemModal from '@/components/logistica/EditItemModal.vue'
+import ItemHistorialModal from '@/components/logistica/ItemHistorialModal.vue'
 import GestionInventarios from '@/views/GestionInventarios.vue'
 import GestionMovimientos from '@/views/GestionMovimientos.vue'
 
@@ -22,6 +23,11 @@ export const logisticaRoutes = [
         path: 'editar/:codigoItem',
         name: 'editar-item',
         component: EditItemModal
+      },
+      {
+        path: 'historial/:codigoItem',
+        name: 'historial-item',
+        component: ItemHistorialModal
       }
     ]
   },

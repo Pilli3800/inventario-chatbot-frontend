@@ -14,6 +14,7 @@ export function usePermissions() {
   const canAudit  = computed(() => authStore.hasPermission('audit'))
   const canViewList = computed(() => authStore.hasPermission('viewList'))
   const canCreateMovimiento = computed(() => authStore.hasPermission('createMovimiento'))
+  const canViewItemHistory = computed(() => authStore.hasPermission('viewItemHistory'))
 
   return {
     canCreate,
@@ -22,6 +23,7 @@ export function usePermissions() {
     canDelete,
     canToggle,
     canView,
+    canViewItemHistory,
     canReport,
     canAudit,
     canViewList

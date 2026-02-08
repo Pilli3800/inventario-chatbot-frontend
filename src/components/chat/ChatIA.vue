@@ -1,5 +1,6 @@
 <script setup>
 import { ref, nextTick } from 'vue'
+import 'animate.css'
 import { chatbotService } from '@/services/chatbot.service'
 import { marked } from 'marked'
 import {
@@ -20,34 +21,62 @@ const props = defineProps({
 /* Configuracion de Markdown(libreria) */
 marked.setOptions({ breaks: true })
 
+/* Configuracion */
+const COOLDOWN_SECONDS = 3
+
 /* Estado */
 const inputKey = ref(0)
+const messageId = ref(0)
+const createMessage = (role, content) => ({
+  id: ++messageId.value,
+  role,
+  content
+})
+
 const messages = ref([
-  {
-    role: 'assistant',
-    content: 'Hola 👋 Soy tu asistente de inventario. ¿En qué puedo ayudarte?'
-  }
+  createMessage('assistant', 'Hola 👋 Soy tu asistente de inventario. ¿En qué puedo ayudarte?')
 ])
 
 const inputMessage = ref('')
 const loading = ref(false)
 const typing = ref(false)
+const cooldownActive = ref(false)
+const cooldownTimer = ref(null)
+const cooldownInterval = ref(null)
+const cooldownSecondsLeft = ref(0)
 const chatContainer = ref(null)
 const welcomeOpen = ref(props.showWelcome)
 
 /*  Metodos  */
+const startCooldown = () => {
+  if (cooldownTimer.value) clearTimeout(cooldownTimer.value)
+  if (cooldownInterval.value) clearInterval(cooldownInterval.value)
+
+  cooldownActive.value = true
+  cooldownSecondsLeft.value = COOLDOWN_SECONDS
+
+  cooldownInterval.value = setInterval(() => {
+    cooldownSecondsLeft.value = Math.max(0, cooldownSecondsLeft.value - 1)
+    if (cooldownSecondsLeft.value === 0 && cooldownInterval.value) {
+      clearInterval(cooldownInterval.value)
+      cooldownInterval.value = null
+    }
+  }, 1000)
+
+  cooldownTimer.value = setTimeout(() => {
+    cooldownActive.value = false
+    cooldownTimer.value = null
+  }, COOLDOWN_SECONDS * 1000)
+}
 const sendMessage = async () => {
-  if (!inputMessage.value.trim() || loading.value) return
+  if (!inputMessage.value.trim() || loading.value || cooldownActive.value) return
 
   welcomeOpen.value = false
 
   const userMessage = inputMessage.value
 
   // Mensaje del usuario
-  messages.value.push({
-    role: 'user',
-    content: userMessage
-  })
+  messages.value.push(createMessage('user', userMessage))
 
   inputMessage.value = ''
   inputMessage.value = ''
@@ -57,10 +86,10 @@ const sendMessage = async () => {
 
   await scrollToBottom()
 
-  const thinkingMessage = {
-    role: 'assistant',
-    content: THINKING_TEXTS[Math.floor(Math.random() * THINKING_TEXTS.length)]
-  }
+  const thinkingMessage = createMessage(
+    'assistant',
+    THINKING_TEXTS[Math.floor(Math.random() * THINKING_TEXTS.length)]
+  )
 
   messages.value.push(thinkingMessage)
   await scrollToBottom()
@@ -68,9 +97,9 @@ const sendMessage = async () => {
   try {
     const { data } = await chatbotService.sendMessage(userMessage)
 
-    thinkingMessage.content = typeof data === 'string'
-      ? data
-      : JSON.stringify(data, null, 2)
+    thinkingMessage.content = typeof data.content === 'string'
+      ? data.content
+      : JSON.stringify(data.content, null, 2)
 
   } catch (e) {
     console.error('Chat IA error:', e)
@@ -81,6 +110,8 @@ const sendMessage = async () => {
     loading.value = false
     typing.value = false
     await scrollToBottom()
+
+    startCooldown()
   }
 }
 
@@ -103,9 +134,17 @@ const scrollToBottom = async () => {
   }">
     <!-- Mensajes -->
     <div ref="chatContainer" style="flex:1; overflow-y:auto; padding-right:8px">
-      <a-list :data-source="messages" :split="false">
+      <a-list :data-source="messages" :split="false" :row-key="item => item.id">
         <template #renderItem="{ item }">
-          <a-list-item :style="{ justifyContent: item.role === 'user' ? 'flex-end' : 'flex-start' }">
+          <a-list-item :key="item.id" :style="{
+            justifyContent: item.role === 'user' ? 'flex-end' : 'flex-start',
+            '--animate-duration': '0.22s',
+            animationTimingFunction: 'ease-out'
+          }" :class="[
+            item.role === 'user' ? 'is-user' : 'is-bot',
+            'animate__animated',
+            'animate__fadeInUp'
+          ]">
             <a-space direction="horizontal" :class="item.role === 'user' ? 'chat-row-reverse' : 'chat-row'">
               <a-avatar :style="{
                 backgroundColor: item.role === 'user' ? '#1677ff' : '#52c41a'
@@ -125,8 +164,8 @@ const scrollToBottom = async () => {
           </a-list-item>
         </template>
 
-        <a-list-item v-if="typing">
-          <a-space>
+        <a-list-item v-if="typing" class="animate__animated animate__fadeIn animate__infinite typing-fade"
+          :style="{ '--animate-duration': '0.6s' }"><a-space>
             <a-avatar style="background-color:#52c41a">
               <RobotOutlined />
             </a-avatar>
@@ -144,10 +183,15 @@ const scrollToBottom = async () => {
     <div style="display:flex; gap:8px">
       <a-input :key="inputKey" v-model:value="inputMessage" :placeholder="loading
         ? 'El asistente está respondiendo…'
-        : 'Ej: dime 5 items activos'" @pressEnter="sendMessage" :disabled="loading" allow-clear />
-      <a-button type="primary" :loading="loading" :disabled="!inputMessage.trim()" @click="sendMessage">
-        <SendOutlined />
-      </a-button>
+        : (cooldownActive
+          ? `Espera ${cooldownSecondsLeft}s para enviar otro mensaje…`
+          : 'Ej: dime 5 items activos')" @pressEnter="sendMessage" :disabled="loading || cooldownActive" allow-clear />
+      <a-tooltip :title="cooldownActive ? `Espera ${cooldownSecondsLeft}s para volver a enviar` : 'Enviar mensaje'">
+        <a-button type="primary" :loading="loading" :disabled="!inputMessage.trim() || cooldownActive"
+          @click="sendMessage">
+          <SendOutlined />
+        </a-button>
+      </a-tooltip>
     </div>
 
     <!-- Modal de Bienvenida -->
@@ -178,4 +222,13 @@ const scrollToBottom = async () => {
   display: flex;
   flex-direction: row-reverse;
 }
+
+.typing-fade {
+  animation-direction: alternate;
+}
 </style>
+
+
+
+
+

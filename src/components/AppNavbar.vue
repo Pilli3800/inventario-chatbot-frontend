@@ -24,7 +24,7 @@ const handleMenuClick = ({ key }) => {
       </router-link>
     </div>
 
-    <a-dropdown placement="bottomRight" :trigger="['click']" :z-index="1000">
+    <a-dropdown placement="bottomRight" :trigger="['click']" :z-index="1500">
       <a-button type="text" style="padding: 6px 10px; height: auto;">
         <UserOutlined style="color: #1677ff; font-size: 16px;" />
         <span style="margin-left: 8px; color: #1677ff; font-weight: 600;">{{ userName }}</span>

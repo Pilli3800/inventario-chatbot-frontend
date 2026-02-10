@@ -7,6 +7,7 @@ import { authRoutes } from './auth.routes'
 import { adminRoutes } from './admin.routes'
 import { logisticaRoutes } from './logistica.routes'
 import { iaRoutes } from './ia.routes'
+import { solicitudesRoutes } from './solicitudes.routes'
 
 const routes = [
   ...authRoutes,
@@ -23,6 +24,7 @@ const routes = [
       },
       ...adminRoutes,
       ...logisticaRoutes,
+      ...solicitudesRoutes,
       ...iaRoutes
     ]
   }

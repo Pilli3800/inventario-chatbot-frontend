@@ -45,7 +45,6 @@ const handleChange = (pagination, filters, sorter) => {
 
 
       <!-- Jefe de cuadrilla -->
-      <!-- Jefe de cuadrilla -->
       <template v-if="slotProps.column.dataIndex === 'jefeCuadrillaUsuario'">
         <div style="line-height: 1.2; cursor: help">
           <a-typography-text>

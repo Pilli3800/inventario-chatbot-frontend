@@ -14,11 +14,15 @@ export function usePermissions() {
   const canAudit  = computed(() => authStore.hasPermission('audit'))
   const canViewList = computed(() => authStore.hasPermission('viewList'))
   const canCreateMovimiento = computed(() => authStore.hasPermission('createMovimiento'))
+  const canCreateSolicitud = computed(() => authStore.hasPermission('createSolicitud'))
+  const canManageSolicitudes = computed(() => authStore.hasPermission('manageSolicitudes'))
   const canViewItemHistory = computed(() => authStore.hasPermission('viewItemHistory'))
 
   return {
     canCreate,
     canCreateMovimiento,
+    canCreateSolicitud,
+    canManageSolicitudes,
     canEdit,
     canDelete,
     canToggle,

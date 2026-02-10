@@ -2,7 +2,8 @@ import {
   HomeOutlined,
   SettingOutlined,
   DeploymentUnitOutlined,
-  RobotOutlined
+  RobotOutlined,
+  FileTextOutlined
 } from '@ant-design/icons-vue'
 
 export const menuItems = [
@@ -67,6 +68,20 @@ export const menuItems = [
         key: 'gestion-movimientos',
         label: 'Gestión de Movimientos',
         route: '/logistica/movimientos',
+        roles: ['ROLE_LOGISTICA', 'ROLE_ADMINISTRACION', 'ROLE_JEFE_CUADRILLA', 'ROLE_GERENCIA']
+      }
+    ]
+  },
+  {
+    key: 'solicitudes',
+    label: 'Solicitudes',
+    icon: FileTextOutlined,
+    roles: ['ROLE_LOGISTICA', 'ROLE_ADMINISTRACION', 'ROLE_JEFE_CUADRILLA', 'ROLE_GERENCIA'],
+    children: [
+      {
+        key: 'solicitudes-retiro',
+        label: 'Retiro',
+        route: '/solicitudes/retiro',
         roles: ['ROLE_LOGISTICA', 'ROLE_ADMINISTRACION', 'ROLE_JEFE_CUADRILLA', 'ROLE_GERENCIA']
       }
     ]

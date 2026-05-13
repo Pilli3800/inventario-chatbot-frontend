@@ -53,19 +53,37 @@ export const menuItems = [
     roles: ['ROLE_LOGISTICA', 'ROLE_ADMINISTRACION','ROLE_JEFE_CUADRILLA', 'ROLE_GERENCIA'],
     children: [
       {
+        key: 'gestion-proveedores',
+        label: 'Gestion de Proveedores',
+        route: '/logistica/proveedores',
+        roles: ['ROLE_LOGISTICA', 'ROLE_ADMINISTRACION', 'ROLE_GERENCIA']
+      },
+      {
+        key: 'gestion-facturas-compra',
+        label: 'Gestion de Facturas',
+        route: '/logistica/facturas-compra',
+        roles: ['ROLE_LOGISTICA', 'ROLE_ADMINISTRACION', 'ROLE_GERENCIA']
+      },
+      {
         key: 'gestion-items',
         label: 'Gestión de Items',
         route: '/logistica/items',
-        roles: ['ROLE_LOGISTICA']
+        roles: ['ROLE_LOGISTICA', 'ROLE_ADMINISTRACION']
       },
       {
         key: 'gestion-inventarios',
         label: 'Gestión de Inventario',
         route: '/logistica/inventarios',
-        roles: ['ROLE_LOGISTICA']
+        roles: ['ROLE_LOGISTICA', 'ROLE_ADMINISTRACION']
       },
-      {
-        key: 'gestion-movimientos',
+        {
+          key: 'gestion-inventario-servicio',
+          label: 'Gestion de Inventario Servicio',
+          route: '/logistica/inventarios-servicio',
+          roles: ['ROLE_LOGISTICA', 'ROLE_ADMINISTRACION']
+        },
+        {
+          key: 'gestion-movimientos',
         label: 'Gestión de Movimientos',
         route: '/logistica/movimientos',
         roles: ['ROLE_LOGISTICA', 'ROLE_ADMINISTRACION', 'ROLE_JEFE_CUADRILLA', 'ROLE_GERENCIA']

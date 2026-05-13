@@ -67,6 +67,10 @@ const openView = (record) => {
   })
 }
 
+const closeView = () => {
+  router.push({ name: 'gestion-movimientos' })
+}
+
 /* Watch rutas */
 watch(
   () => route.name,
@@ -121,7 +125,7 @@ loadMovimientos()
 
 <template>
   <div>
-    <h2>Gestión de Movimientos</h2>
+    <h2>Gestión de Movimientos - Kardex</h2>
 
     <a-space wrap style="margin: 24px 0;">
       <a-button type="primary" v-if="canCreateMovimiento" @click="createOpen = true">
@@ -137,20 +141,15 @@ loadMovimientos()
     <CreateMovimientoModal v-if="canCreateMovimiento" :open="createOpen" @close="createOpen = false"
       @success="loadMovimientos()" />
 
-    <ViewMovimientoModal :open="viewOpen" :idMovimiento="viewId" @close="router.back()" />
+    <ViewMovimientoModal :open="viewOpen" :idMovimiento="viewId" @close="closeView" />
 
     <!-- Filtros -->
     <MovimientoFilters @search="onSearch" />
 
     <!-- Tabla -->
     <div class="movimientos-wrapper">
-      <MovimientosTable
-        :data="movimientos"
-        :loading="loading"
-        :pagination="paginationConfig"
-        :sorter="sorter"
-        @change="onTableChange"
-      >
+      <MovimientosTable :data="movimientos" :loading="loading" :pagination="paginationConfig" :sorter="sorter"
+        @change="onTableChange">
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'actions'">
             <a-dropdown trigger="click">

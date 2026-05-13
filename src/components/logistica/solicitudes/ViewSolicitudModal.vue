@@ -1,7 +1,9 @@
 <!-- ViewSolicitudModal.vue -->
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
+import { message } from 'ant-design-vue'
 import { solicitudItemsService } from '@/services/solicitud-items.service'
+import { valeSalidaService } from '@/services/vale-salida.service'
 import { formatDateTime } from '@/utils/date'
 
 const props = defineProps({
@@ -13,7 +15,34 @@ const emit = defineEmits(['close'])
 
 const loading = ref(false)
 const solicitud = ref(null)
+const valeSalida = ref(null)
+const loadingValeSalida = ref(false)
+const loadingValePdf = ref(false)
+const valeSalidaError = ref('')
 const activeKeys = ref(['timeline'])
+
+const isSolicitudEntregada = computed(() => solicitud.value?.estado === 'ENTREGADO')
+
+const getErrorMessage = (err, fallback) => {
+  const responseData = err?.response?.data?.content ?? err?.response?.data
+  if (Array.isArray(responseData)) return responseData[0] || fallback
+  if (typeof responseData === 'string') return responseData || fallback
+  return fallback
+}
+
+const loadValeSalidaPorSolicitud = async (solicitudId) => {
+  loadingValeSalida.value = true
+  valeSalidaError.value = ''
+  try {
+    const { data } = await valeSalidaService.getBySolicitudId(solicitudId)
+    valeSalida.value = data?.content ?? data
+  } catch (err) {
+    valeSalida.value = null
+    valeSalidaError.value = getErrorMessage(err, 'No se pudo cargar el vale de salida')
+  } finally {
+    loadingValeSalida.value = false
+  }
+}
 
 const loadSolicitud = async () => {
   if (!props.idSolicitud) return
@@ -22,7 +51,14 @@ const loadSolicitud = async () => {
   loading.value = true
   try {
     const { data } = await solicitudItemsService.getById(id)
-    solicitud.value = data?.content ?? data
+    const record = data?.content ?? data
+    solicitud.value = record
+
+    valeSalida.value = null
+    valeSalidaError.value = ''
+    if (record?.estado === 'ENTREGADO') {
+      await loadValeSalidaPorSolicitud(id)
+    }
   } finally {
     loading.value = false
   }
@@ -67,6 +103,46 @@ const getSedeOrigen = (record) =>
   record?.sedeOrigenCodigo ||
   record?.sedeOrigen?.codigo ||
   record?.sedeOrigen
+
+const downloadBlobResponse = (response, fallbackName) => {
+  const blob = response?.data instanceof Blob
+    ? response.data
+    : new Blob([response.data], { type: 'application/pdf' })
+
+  const url = globalThis.URL.createObjectURL(blob)
+  let filename = fallbackName
+  const disposition = response.headers?.['content-disposition']
+  if (disposition) {
+    const match = disposition.match(/filename="?(.+)"?/)
+    if (match?.[1]) filename = match[1]
+  }
+
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  globalThis.URL.revokeObjectURL(url)
+}
+
+const descargarValeSalidaPdf = async () => {
+  const valeId = valeSalida.value?.id
+  if (!valeId) {
+    message.warning('No hay vale de salida disponible para descargar')
+    return
+  }
+
+  loadingValePdf.value = true
+  try {
+    const response = await valeSalidaService.descargarPdf(valeId)
+    downloadBlobResponse(response, `vale_salida_${valeSalida.value?.numeroVale || valeId}.pdf`)
+  } catch (err) {
+    message.error(getErrorMessage(err, 'No se pudo descargar el vale de salida'))
+  } finally {
+    loadingValePdf.value = false
+  }
+}
 
 const detalleColumns = [
   { title: 'Codigo Item', dataIndex: 'codigoItem' },
@@ -249,6 +325,31 @@ const handleClose = () => emit('close')
             <a-textarea :value="solicitud.observacionesEntrega || '—'" disabled auto-size />
           </a-form-item>
         </a-collapse-panel>
+        <a-collapse-panel v-if="isSolicitudEntregada" key="vale-salida">
+          <template #header>
+            <span style="font-weight: 600;">4. Vale de salida</span>
+          </template>
+
+          <a-spin :spinning="loadingValeSalida">
+            <template v-if="valeSalida">
+              <a-form-item label="Numero de vale">
+                <a-input :value="valeSalida.numeroVale || '-'" disabled />
+              </a-form-item>
+
+              <a-form-item label="Fecha de generacion">
+                <a-input :value="valeSalida.fechaGeneracion ? formatDateTime(valeSalida.fechaGeneracion) : '-'" disabled />
+              </a-form-item>
+
+              <a-form-item label="Acciones">
+                <a-button type="primary" :loading="loadingValePdf" @click="descargarValeSalidaPdf">
+                  Descargar vale de salida (PDF)
+                </a-button>
+              </a-form-item>
+            </template>
+
+            <a-alert v-else type="warning" show-icon :message="valeSalidaError || 'No hay vale de salida disponible.'" />
+          </a-spin>
+        </a-collapse-panel>
       </a-collapse>
     </a-form>
   </a-modal>
@@ -259,3 +360,4 @@ const handleClose = () => emit('close')
   border-left-color: #1890ff;
 }
 </style>
+

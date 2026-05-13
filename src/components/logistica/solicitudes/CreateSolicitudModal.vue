@@ -4,9 +4,9 @@ import { ref, computed, watch } from 'vue'
 import { message } from 'ant-design-vue'
 
 import { solicitudItemsService } from '@/services/solicitud-items.service'
-import { sedeService } from '@/services/sede.service'
 import { cuadrillaService } from '@/services/cuadrilla.service'
 import { itemService } from '@/services/item.service'
+import { sedeService } from '@/services/sede.service'
 import { useAuthStore } from '@/stores/auth.store'
 
 const props = defineProps({
@@ -94,20 +94,20 @@ const loadCuadrillasJefe = async () => {
 const items = ref([])
 const loadingItems = ref(false)
 
-const buscarItems = async (texto) => {
-  if (!texto || texto.length < 2) {
-    items.value = []
-    return
-  }
-
+const buscarItems = async (texto = '') => {
   loadingItems.value = true
   try {
-    const { data } = await itemService.search({
-      codigoItem: texto,
+    const params = {
       enabled: true,
       page: 0,
-      size: 5
-    })
+      size: 20
+    }
+
+    if (texto?.trim()) {
+      params.codigoItem = texto.trim()
+    }
+
+    const { data } = await itemService.search(params)
     items.value = data.content
   } finally {
     loadingItems.value = false
@@ -143,8 +143,9 @@ const canSubmit = computed(() => {
 watch(() => props.open, (open) => {
   if (open) {
     resetForm()
-    items.value = []
+    sedes.value = []
     cuadrillas.value = []
+    buscarItems()
     loadSedes()
     loadCuadrillasJefe()
   }
@@ -177,6 +178,15 @@ const submit = async () => {
   <a-modal title="Nueva Solicitud de Items" :open="open" @cancel="$emit('close')" @ok="submit"
     :ok-button-props="{ disabled: !canSubmit }" destroyOnClose>
     <a-form layout="vertical">
+      <a-form-item label="Sede Origen" required>
+        <a-select v-model:value="form.sedeOrigenCodigo" allow-clear placeholder="Seleccione sede"
+          :loading="loadingSedes">
+          <a-select-option v-for="s in sedes" :key="s.codigo" :value="s.codigo">
+            {{ s.codigo }} - {{ s.nombre }}
+          </a-select-option>
+        </a-select>
+      </a-form-item>
+
       <a-form-item label="Cuadrilla" required>
         <a-select v-model:value="form.codigoCuadrilla" show-search allow-clear placeholder="Buscar cuadrilla"
           :filter-option="false" :loading="loadingCuadrillas" @search="buscarCuadrillas">
@@ -185,17 +195,13 @@ const submit = async () => {
               <span>{{ c.codigoCuadrilla }}</span>
               <br />
               <span style="color: #888; font-size: 12px;">
-                {{ c.jefeCuadrillaNombresyApellidos || '—' }}
+                {{ c.jefeCuadrillaNombresyApellidos || '-' }}
+              </span>
+              <br />
+              <span style="color: #888; font-size: 12px;">
+                {{ c.codigoServicio }} - {{ c.nombreServicio || '-' }}
               </span>
             </div>
-          </a-select-option>
-        </a-select>
-      </a-form-item>
-
-      <a-form-item label="Sede Origen" required>
-        <a-select v-model:value="form.sedeOrigenCodigo" allow-clear :loading="loadingSedes">
-          <a-select-option v-for="s in sedes" :key="s.codigo" :value="s.codigo">
-            {{ s.codigo }} - {{ s.nombre }}
           </a-select-option>
         </a-select>
       </a-form-item>
@@ -211,7 +217,8 @@ const submit = async () => {
           <a-col :span="14">
             <a-form-item :label="`Item #${index + 1}`" required>
               <a-select v-model:value="detalle.codigoItem" show-search allow-clear placeholder="Buscar item"
-                :filter-option="false" :loading="loadingItems" @search="buscarItems">
+                :filter-option="false" :loading="loadingItems" @search="buscarItems"
+                @focus="!items.length && buscarItems()">
                 <a-select-option v-for="item in items" :key="item.codigoItem" :value="item.codigoItem">
                   {{ item.codigoItem }} - {{ item.nombre }} ({{ item.tipo }})
                 </a-select-option>

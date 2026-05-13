@@ -131,7 +131,6 @@ onMounted(() => buscarCuadrillas(''))
   <a-card size="small" style="margin-bottom: 16px">
     <a-form layout="vertical">
       <a-row :gutter="16">
-        <!-- ESTADO -->
         <a-col :md="6">
           <a-form-item label="Estado">
             <a-select v-model:value="filters.estado" allow-clear placeholder="Todos">
@@ -143,7 +142,6 @@ onMounted(() => buscarCuadrillas(''))
           </a-form-item>
         </a-col>
 
-        <!-- SEDE ORIGEN -->
         <a-col :md="6">
           <a-form-item label="Sede Origen">
             <a-select v-model:value="filters.sedeOrigenCodigo" allow-clear placeholder="Seleccione sede"
@@ -155,7 +153,6 @@ onMounted(() => buscarCuadrillas(''))
           </a-form-item>
         </a-col>
 
-        <!-- CUADRILLA -->
         <a-col :md="6">
           <a-form-item label="Cuadrilla">
             <a-select v-model:value="filters.codigoCuadrilla" show-search allow-clear placeholder="Buscar cuadrilla"
@@ -165,7 +162,11 @@ onMounted(() => buscarCuadrillas(''))
                   <span>{{ c.codigoCuadrilla }}</span>
                   <br />
                   <span style="color: #888; font-size: 12px;">
-                    {{ c.jefeCuadrillaNombresyApellidos || '—' }}
+                    {{ c.jefeCuadrillaNombresyApellidos || '-' }}
+                  </span>
+                  <br />
+                  <span style="color: #888; font-size: 12px;">
+                    {{ c.codigoServicio }} - {{ c.nombreServicio || '-' }}
                   </span>
                 </div>
               </a-select-option>
@@ -173,7 +174,6 @@ onMounted(() => buscarCuadrillas(''))
           </a-form-item>
         </a-col>
 
-        <!-- SOLICITANTE -->
         <a-col :md="6">
           <a-form-item label="Solicitante">
             <a-select v-model:value="filters.identUsuario" show-search allow-clear placeholder="Buscar solicitante"
@@ -185,21 +185,18 @@ onMounted(() => buscarCuadrillas(''))
           </a-form-item>
         </a-col>
 
-        <!-- FECHA DESDE -->
         <a-col :md="3">
           <a-form-item label="Desde">
             <a-date-picker v-model:value="filters.fechaInicio" style="width: 100%" placeholder="Selecciona fecha" />
           </a-form-item>
         </a-col>
 
-        <!-- FECHA HASTA -->
         <a-col :md="3">
           <a-form-item label="Hasta">
             <a-date-picker v-model:value="filters.fechaFin" style="width: 100%" placeholder="Selecciona fecha" />
           </a-form-item>
         </a-col>
 
-        <!-- BOTONES -->
         <a-col :md="6">
           <a-form-item label=" ">
             <a-button type="primary" @click="onSearch">

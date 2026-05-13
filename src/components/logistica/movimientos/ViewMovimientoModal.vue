@@ -30,7 +30,8 @@ watch(
   () => [props.open, props.idMovimiento],
   ([open, id]) => {
     if (open && id) loadMovimiento()
-  }
+  },
+  { immediate: true }
 )
 
 const handleClose = () => emit('close')

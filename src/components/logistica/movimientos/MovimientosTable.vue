@@ -12,6 +12,10 @@ const props = defineProps({
 
 const emit = defineEmits(['change'])
 
+const TIPOS_ENTRADA = ['COMPRA', 'ENTRADA']
+const TIPOS_SALIDA = ['SALIDA', 'SALIDA_CUADRILLA']
+const TIPOS_INTERNOS = ['DEVOLUCION', 'TRANSFERENCIA', 'TRANSFERENCIA_SERVICIO', 'RETORNO_A_SEDE']
+
 const columns = computed(() => [
   {
     title: 'Fecha',
@@ -23,7 +27,7 @@ const columns = computed(() => [
         ? props.sorter.order
         : null
   },
-  { title: 'Tipo', dataIndex: 'tipoMovimiento', width: 120 },
+  { title: 'Tipo', dataIndex: 'tipoMovimiento', width: 190 },
   { title: 'Código Item', dataIndex: 'codigoItem', width: 120 },
   { title: 'Nombre Item', dataIndex: 'nombreItem', width: 200 },
   {
@@ -57,6 +61,16 @@ const columns = computed(() => [
 const handleChange = (pagination, filters, sorter) => {
   emit('change', pagination, filters, sorter)
 }
+
+const getTipoColor = (tipo) => {
+  if (TIPOS_ENTRADA.includes(tipo)) return 'green'
+  if (TIPOS_SALIDA.includes(tipo)) return 'volcano'
+  if (TIPOS_INTERNOS.includes(tipo)) return 'blue'
+  return 'default'
+}
+
+const formatTipo = (tipo) =>
+  String(tipo ?? '').replaceAll('_', ' ')
 </script>
 
 <template>
@@ -68,14 +82,11 @@ const handleChange = (pagination, filters, sorter) => {
       </template>
 
       <template v-else-if="column.dataIndex === 'tipoMovimiento'">
-        <a-tag :color="{
-          ENTRADA: 'green',
-          SALIDA: 'volcano',
-          TRANSFERENCIA: 'blue',
-          DEVOLUCION: 'gold'
-        }[record.tipoMovimiento]">
-          {{ record.tipoMovimiento }}
-        </a-tag>
+        <a-tooltip :title="formatTipo(record.tipoMovimiento)">
+          <a-tag :color="getTipoColor(record.tipoMovimiento)">
+            {{ formatTipo(record.tipoMovimiento) }}
+          </a-tag>
+        </a-tooltip>
       </template>
 
 

@@ -47,11 +47,20 @@ const tiposPermitidos = computed(() => {
     authStore.hasRole('ROLE_GERENCIA') ||
     authStore.hasRole('ROLE_LOGISTICA') || authStore.hasRole('ROLE_ADMINISTRACION')
   ) {
-    return ['ENTRADA', 'SALIDA', 'TRANSFERENCIA', 'DEVOLUCION']
+    return [
+      'COMPRA',
+      'ENTRADA',
+      'SALIDA',
+      'SALIDA_CUADRILLA',
+      'DEVOLUCION',
+      'TRANSFERENCIA',
+      'TRANSFERENCIA_SERVICIO',
+      'RETORNO_A_SEDE'
+    ]
   }
 
   if (authStore.hasRole('ROLE_JEFE_CUADRILLA')) {
-    return ['SALIDA', 'DEVOLUCION']
+    return ['DEVOLUCION']
   }
 
   return []

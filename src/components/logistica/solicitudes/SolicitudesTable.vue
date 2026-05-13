@@ -92,7 +92,7 @@ const getSedeOrigen = (record) =>
 
 <template>
   <a-table :columns="columns" :data-source="data" :loading="loading" row-key="id" :pagination="pagination"
-    table-layout="fixed" :scroll="{ y: '350px', x: '100%' }" @change="handleChange">
+    table-layout="fixed" :scroll="{ y: '320px', x: '100%' }" @change="handleChange">
     <template #bodyCell="{ column, record }">
       <template v-if="column.dataIndex === 'fcCreacion'">
         {{ formatDateTime(getFechaSolicitud(record)) }}

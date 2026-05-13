@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia'
 import { jwtDecode } from 'jwt-decode'
 import { authService } from '@/services/auth.service'
+import { chatbotService } from '@/services/chatbot.service'
 import { PERMISSIONS } from '@/config/permissions'
 
 export const useAuthStore = defineStore('auth', {
@@ -57,6 +58,7 @@ export const useAuthStore = defineStore('auth', {
       this.roles = []
       this.exp = null
       localStorage.removeItem('token')
+      chatbotService.clearSession()
     },
 
     async login(credentials) {

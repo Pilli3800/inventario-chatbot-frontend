@@ -1,5 +1,6 @@
 import {
   HomeOutlined,
+  DashboardOutlined,
   SettingOutlined,
   DeploymentUnitOutlined,
   RobotOutlined,
@@ -13,6 +14,13 @@ export const menuItems = [
     icon: HomeOutlined,
     route: '/home',
     roles: [] // vacío = todos los roles
+  },
+  {
+    key: 'dashboard',
+    label: 'Dashboard',
+    icon: DashboardOutlined,
+    route: '/dashboard',
+    roles: ['ROLE_ADMINISTRACION', 'ROLE_LOGISTICA', 'ROLE_GERENCIA']
   },
   {
     key: 'administracion',

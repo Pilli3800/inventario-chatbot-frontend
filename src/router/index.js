@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
+import DashboardView from '@/views/DashboardView.vue'
 import MainLayout from '@/layouts/MainLayout.vue'
 import { useAuthStore } from '@/stores/auth.store'
 
@@ -21,6 +22,14 @@ const routes = [
         path: 'home',
         name: 'home',
         component: HomeView
+      },
+      {
+        path: 'dashboard',
+        name: 'dashboard',
+        component: DashboardView,
+        meta: {
+          roles: ['ROLE_ADMINISTRACION', 'ROLE_LOGISTICA', 'ROLE_GERENCIA']
+        }
       },
       ...adminRoutes,
       ...logisticaRoutes,

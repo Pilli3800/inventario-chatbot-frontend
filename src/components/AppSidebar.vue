@@ -78,7 +78,8 @@ const onMenuClick = ({ key }) => {
 
       <template v-else>
         <a-menu-item :key="item.key">
-          {{ item.label }}
+          <component v-if="item.icon" :is="item.icon" />
+          <span>{{ item.label }}</span>
         </a-menu-item>
       </template>
 

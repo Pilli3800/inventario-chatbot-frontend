@@ -17,6 +17,7 @@ import { usePermissions } from '@/composables/usePermissions'
 /* Permisos */
 const {
   canCreate,
+  canDelete,
   canReport,
   canAudit
 } = usePermissions()
@@ -207,7 +208,7 @@ const downloadBlob = (response, defaultName) => {
 
             <template #overlay>
               <a-menu>
-                <a-menu-item v-if="cantDelete" @click="eliminarAsignacion(record)">
+                <a-menu-item v-if="canDelete" @click="eliminarAsignacion(record)">
                   Eliminar
                 </a-menu-item>
               </a-menu>

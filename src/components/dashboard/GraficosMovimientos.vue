@@ -89,10 +89,22 @@ const opcionBarras = computed(() => ({
       type: 'bar',
       barWidth: 42,
       data: [
-        props.resumen.entradas,
-        props.resumen.salidas,
-        props.resumen.devoluciones,
-        props.resumen.internos
+        {
+          value: props.resumen.entradas,
+          itemStyle: { color: colores.entradas }
+        },
+        {
+          value: props.resumen.salidas,
+          itemStyle: { color: colores.salidas }
+        },
+        {
+          value: props.resumen.devoluciones,
+          itemStyle: { color: colores.devoluciones }
+        },
+        {
+          value: props.resumen.internos,
+          itemStyle: { color: colores.internos }
+        }
       ],
       itemStyle: {
         borderRadius: [6, 6, 0, 0]

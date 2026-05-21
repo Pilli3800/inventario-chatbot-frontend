@@ -37,6 +37,28 @@ export const movimientosService = {
     })
   },
 
+  /* Items con mayor cantidad de movimientos */
+  async getItemsMasMovidos(params) {
+    const authStore = useAuthStore()
+    return axios.get(`${API_HISTORICO_URL}/items-mas-movidos`, {
+      params,
+      headers: {
+        Authorization: authStore.token
+      }
+    })
+  },
+
+  /* Items con mayor stock movido */
+  async getStockMovido(params) {
+    const authStore = useAuthStore()
+    return axios.get(`${API_HISTORICO_URL}/stock-movido`, {
+      params,
+      headers: {
+        Authorization: authStore.token
+      }
+    })
+  },
+
   /* Exportar Excel */
   async exportExcel(params) {
     const authStore = useAuthStore()

@@ -11,6 +11,7 @@ import {
   TransactionOutlined
 } from '@ant-design/icons-vue'
 import GraficosMovimientos from '@/components/dashboard/GraficosMovimientos.vue'
+import TablasItemsMovidos from '@/components/dashboard/TablasItemsMovidos.vue'
 import { movimientosService } from '@/services/movimientos.service'
 
 const TIPOS_ENTRADA = ['COMPRA', 'ENTRADA']
@@ -19,7 +20,10 @@ const TIPOS_DEVOLUCION = ['DEVOLUCION']
 const TIPOS_INTERNO = ['TRANSFERENCIA', 'TRANSFERENCIA_SERVICIO', 'RETORNO_A_SEDE']
 
 const loading = ref(false)
+const loadingItems = ref(false)
 const movimientos = ref([])
+const itemsMasMovidos = ref([])
+const stockMovido = ref([])
 
 const filtros = reactive({
   fechaInicio: dayjs().subtract(30, 'day'),
@@ -114,17 +118,21 @@ const tarjetas = computed(() => [
   }
 ])
 
+const getFiltrosFecha = () => ({
+  fechaDesde: filtros.fechaInicio
+    ? dayjs(filtros.fechaInicio).format('YYYY-MM-DD')
+    : undefined,
+  fechaHasta: filtros.fechaFin
+    ? dayjs(filtros.fechaFin).format('YYYY-MM-DD')
+    : undefined
+})
+
 const cargarDashboard = async () => {
   loading.value = true
 
   try {
     const params = {
-      fechaDesde: filtros.fechaInicio
-        ? dayjs(filtros.fechaInicio).format('YYYY-MM-DD')
-        : undefined,
-      fechaHasta: filtros.fechaFin
-        ? dayjs(filtros.fechaFin).format('YYYY-MM-DD')
-        : undefined,
+      ...getFiltrosFecha(),
       page: 0,
       size: 1000,
       sort: 'fechaMovimiento,asc'
@@ -137,13 +145,44 @@ const cargarDashboard = async () => {
   }
 }
 
+const cargarItemsMovidos = async () => {
+  loadingItems.value = true
+
+  try {
+    const params = getFiltrosFecha()
+
+    try {
+      const { data } = await movimientosService.getItemsMasMovidos(params)
+      itemsMasMovidos.value = (data || []).slice(0, 10)
+    } catch {
+      itemsMasMovidos.value = []
+    }
+
+    try {
+      const { data } = await movimientosService.getStockMovido(params)
+      stockMovido.value = (data || [])
+        .sort((a, b) => b.totalMovido - a.totalMovido)
+        .slice(0, 10)
+    } catch {
+      stockMovido.value = []
+    }
+  } finally {
+    loadingItems.value = false
+  }
+}
+
+const cargarDatos = () => {
+  cargarDashboard()
+  cargarItemsMovidos()
+}
+
 const limpiarFiltros = () => {
   filtros.fechaInicio = dayjs().subtract(30, 'day')
   filtros.fechaFin = dayjs()
-  cargarDashboard()
+  cargarDatos()
 }
 
-cargarDashboard()
+cargarDatos()
 </script>
 
 <template>
@@ -160,7 +199,7 @@ cargarDashboard()
             <a-space class="filtros-space" wrap>
               <a-date-picker v-model:value="filtros.fechaInicio" class="filtro-fecha" placeholder="Desde" />
               <a-date-picker v-model:value="filtros.fechaFin" class="filtro-fecha" placeholder="Hasta" />
-              <a-button type="primary" :loading="loading" @click="cargarDashboard">
+              <a-button type="primary" :loading="loading || loadingItems" @click="cargarDatos">
                 <SearchOutlined />
                 Buscar
               </a-button>
@@ -191,6 +230,12 @@ cargarDashboard()
     </a-row>
 
     <GraficosMovimientos :resumen="resumen" :series-por-fecha="seriesPorFecha" :loading="loading" />
+
+    <TablasItemsMovidos
+      :items-mas-movidos="itemsMasMovidos"
+      :stock-movido="stockMovido"
+      :loading="loadingItems"
+    />
   </div>
 </template>
 

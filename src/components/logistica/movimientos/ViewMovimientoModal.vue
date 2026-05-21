@@ -14,16 +14,38 @@ const emit = defineEmits(['close'])
 const loading = ref(false)
 const movimiento = ref(null)
 
+const EMPTY_VALUE = '-'
+
+const formatItem = (movimiento) => {
+  const codigo = movimiento?.codigoItem
+  const nombre = movimiento?.nombreItem
+
+  if (codigo && nombre) return `${codigo} - ${nombre}`
+  return codigo || nombre || EMPTY_VALUE
+}
+
+const formatServicio = (servicio) => {
+  if (!servicio) return EMPTY_VALUE
+
+  const codigo = servicio.codigo
+  const nombre = servicio.nombre
+
+  if (codigo && nombre) return `${codigo} - ${nombre}`
+  return codigo || nombre || EMPTY_VALUE
+}
+
 const loadMovimiento = async () => {
   if (!props.idMovimiento) return
 
   const id = Number(props.idMovimiento)
   loading.value = true
 
-  const { data } = await movimientosService.getById(id)
-  movimiento.value = data
-
-  loading.value = false
+  try {
+    const { data } = await movimientosService.getById(id)
+    movimiento.value = data
+  } finally {
+    loading.value = false
+  }
 }
 
 watch(
@@ -47,39 +69,39 @@ const handleClose = () => emit('close')
       </a-form-item>
 
       <a-form-item label="Tipo de Movimiento">
-        <a-input :value="movimiento.tipoMovimiento" disabled />
+        <a-input :value="movimiento.tipoMovimiento || EMPTY_VALUE" disabled />
       </a-form-item>
 
       <a-form-item label="Item">
-        <a-input :value="`${movimiento.codigoItem} - ${movimiento.nombreItem}`" disabled />
+        <a-input :value="formatItem(movimiento)" disabled />
       </a-form-item>
 
       <a-form-item label="Cantidad">
-        <a-input :value="movimiento.cantidad" disabled />
+        <a-input :value="movimiento.cantidad ?? EMPTY_VALUE" disabled />
       </a-form-item>
 
       <a-form-item label="Sede Origen">
-        <a-input :value="movimiento.sedeOrigen || '—'" disabled />
+        <a-input :value="movimiento.sedeOrigen || EMPTY_VALUE" disabled />
       </a-form-item>
 
       <a-form-item label="Sede Destino">
-        <a-input :value="movimiento.sedeDestino || '—'" disabled />
+        <a-input :value="movimiento.sedeDestino || EMPTY_VALUE" disabled />
       </a-form-item>
 
       <a-form-item label="Cuadrilla">
-        <a-input :value="movimiento.codigoCuadrilla || '—'" disabled />
+        <a-input :value="movimiento.codigoCuadrilla || EMPTY_VALUE" disabled />
       </a-form-item>
 
       <a-form-item label="Servicio">
-        <a-input :value="movimiento.servicio.codigo + ' - ' + movimiento.servicio.nombre || '—'" disabled />
+        <a-input :value="formatServicio(movimiento.servicio)" disabled />
       </a-form-item>
 
       <a-form-item label="Usuario">
-        <a-input :value="movimiento.usuario" disabled />
+        <a-input :value="movimiento.usuario || EMPTY_VALUE" disabled />
       </a-form-item>
 
       <a-form-item label="Observaciones">
-        <a-textarea :value="movimiento.observaciones || '—'" disabled auto-size />
+        <a-textarea :value="movimiento.observaciones || EMPTY_VALUE" disabled auto-size />
       </a-form-item>
 
     </a-form>

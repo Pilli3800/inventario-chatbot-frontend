@@ -5,12 +5,15 @@ import ItemHistorialModal from '@/components/logistica/ItemHistorialModal.vue'
 import GestionInventarios from '@/views/GestionInventarios.vue'
 import GestionInventarioServicio from '@/views/GestionInventarioServicio.vue'
 import GestionMovimientos from '@/views/GestionMovimientos.vue'
+import GestionConteoFisico from '@/views/GestionConteoFisico.vue'
+import GestionReportesDiscrepancia from '@/views/GestionReportesDiscrepancia.vue'
 import GestionProveedores from '@/views/GestionProveedores.vue'
 import GestionFacturasCompra from '@/views/GestionFacturasCompra.vue'
 import ViewProveedorModal from '@/components/logistica/proveedores/ViewProveedorModal.vue'
 import EditProveedorModal from '@/components/logistica/proveedores/EditProveedorModal.vue'
 import ViewFacturaCompraModal from '@/components/logistica/facturas/ViewFacturaCompraModal.vue'
 import ViewMovimientoModal from '@/components/logistica/movimientos/ViewMovimientoModal.vue'
+import ViewConteoFisicoModal from '@/components/logistica/conteo-fisico/ViewConteoFisicoModal.vue'
 
 export const logisticaRoutes = [
   {
@@ -88,6 +91,29 @@ export const logisticaRoutes = [
     meta: {
       roles: ['ROLE_LOGISTICA', 'ROLE_ADMINISTRACION']
     }
+  },
+  {
+    path: 'logistica/conteo-fisico',
+    name: 'gestion-conteo-fisico',
+    component: GestionConteoFisico,
+    meta: {
+      roles: ['ROLE_LOGISTICA', 'ROLE_ADMINISTRACION']
+    }
+  },
+  {
+    path: 'logistica/reportes-discrepancia',
+    name: 'reportes-discrepancia',
+    component: GestionReportesDiscrepancia,
+    meta: {
+      roles: ['ROLE_LOGISTICA', 'ROLE_ADMINISTRACION', 'ROLE_GERENCIA']
+    },
+    children: [
+      {
+        path: 'ver/:idConteo',
+        name: 'ver-reporte-discrepancia',
+        component: ViewConteoFisicoModal
+      }
+    ]
   },
   {
     path: 'logistica/movimientos',

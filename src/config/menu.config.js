@@ -91,6 +91,18 @@ export const menuItems = [
           roles: ['ROLE_LOGISTICA', 'ROLE_ADMINISTRACION']
         },
         {
+          key: 'gestion-conteo-fisico',
+          label: 'Conteo Fisico',
+          route: '/logistica/conteo-fisico',
+          roles: ['ROLE_LOGISTICA', 'ROLE_ADMINISTRACION']
+        },
+        {
+          key: 'reportes-discrepancia',
+          label: 'Reportes de Discrepancia',
+          route: '/logistica/reportes-discrepancia',
+          roles: ['ROLE_LOGISTICA', 'ROLE_ADMINISTRACION', 'ROLE_GERENCIA']
+        },
+        {
           key: 'gestion-movimientos',
         label: 'Gestión de Movimientos',
         route: '/logistica/movimientos',

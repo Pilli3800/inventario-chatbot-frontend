@@ -25,7 +25,30 @@ const routes = [
       },
       {
         path: 'dashboard',
-        name: 'dashboard',
+        redirect: '/dashboard/solicitudes',
+        meta: {
+          roles: ['ROLE_ADMINISTRACION', 'ROLE_LOGISTICA', 'ROLE_GERENCIA']
+        }
+      },
+      {
+        path: 'dashboard/solicitudes',
+        name: 'dashboard-solicitudes',
+        component: DashboardView,
+        meta: {
+          roles: ['ROLE_ADMINISTRACION', 'ROLE_LOGISTICA', 'ROLE_GERENCIA']
+        }
+      },
+      {
+        path: 'dashboard/movimientos',
+        name: 'dashboard-movimientos',
+        component: DashboardView,
+        meta: {
+          roles: ['ROLE_ADMINISTRACION', 'ROLE_LOGISTICA', 'ROLE_GERENCIA']
+        }
+      },
+      {
+        path: 'dashboard/asistente-ia',
+        name: 'dashboard-asistente-ia',
         component: DashboardView,
         meta: {
           roles: ['ROLE_ADMINISTRACION', 'ROLE_LOGISTICA', 'ROLE_GERENCIA']

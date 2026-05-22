@@ -1,5 +1,6 @@
 <script setup>
 import { computed, reactive, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import {
   BarChartOutlined,
@@ -27,6 +28,9 @@ import { movimientosService } from '@/services/movimientos.service'
 import { solicitudItemsService } from '@/services/solicitud-items.service'
 import { chatbotService } from '@/services/chatbot.service'
 
+const route = useRoute()
+const router = useRouter()
+
 const loading = ref(false)
 const loadingMovimientos = ref(false)
 const loadingIA = ref(false)
@@ -41,6 +45,25 @@ const filtros = reactive({
   fechaInicio: dayjs().subtract(30, 'day'),
   fechaFin: dayjs()
 })
+
+const tabRoutes = {
+  solicitudes: '/dashboard/solicitudes',
+  movimientos: '/dashboard/movimientos',
+  ia: '/dashboard/asistente-ia'
+}
+
+const activeTab = computed(() => {
+  if (route.path === tabRoutes.movimientos) return 'movimientos'
+  if (route.path === tabRoutes.ia) return 'ia'
+  return 'solicitudes'
+})
+
+const onTabChange = (key) => {
+  const path = tabRoutes[key]
+  if (path && route.path !== path) {
+    router.push(path)
+  }
+}
 
 const resumenSolicitudes = computed(() => solicitudDashboard.value || {
   total: 0,
@@ -383,7 +406,7 @@ cargarDatos()
       </a-row>
     </a-card>
 
-    <a-tabs>
+    <a-tabs :active-key="activeTab" @change="onTabChange">
       <a-tab-pane key="solicitudes" tab="Solicitudes">
         <div class="tab-content">
         <a-row :gutter="[16, 16]" class="resumen-grid">

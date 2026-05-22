@@ -1,12 +1,52 @@
 ﻿<script setup>
 import { computed } from 'vue'
-import { MenuOutlined, UserOutlined, DownOutlined } from '@ant-design/icons-vue'
+import {
+  BarChartOutlined,
+  DeploymentUnitOutlined,
+  DownOutlined,
+  MenuOutlined,
+  SettingOutlined,
+  TeamOutlined,
+  UserOutlined
+} from '@ant-design/icons-vue'
 import { useAuthStore } from '@/stores/auth.store'
 
 const emit = defineEmits(['toggle-sidebar', 'logout', 'go-home', 'open-password', 'open-profile'])
 
 const authStore = useAuthStore()
 const userName = computed(() => authStore.ident || 'Usuario')
+
+const roleConfig = {
+  ROLE_ADMINISTRACION: {
+    label: 'Administracion',
+    color: 'blue',
+    icon: SettingOutlined
+  },
+  ROLE_LOGISTICA: {
+    label: 'Logistica',
+    color: 'green',
+    icon: DeploymentUnitOutlined
+  },
+  ROLE_GERENCIA: {
+    label: 'Gerencia',
+    color: 'purple',
+    icon: BarChartOutlined
+  },
+  ROLE_JEFE_CUADRILLA: {
+    label: 'Jefe cuadrilla',
+    color: 'orange',
+    icon: TeamOutlined
+  }
+}
+
+const userRoles = computed(() =>
+  authStore.roles.map(role => ({
+    value: role,
+    label: roleConfig[role]?.label || role.replace(/^ROLE_/, '').replace(/_/g, ' '),
+    color: roleConfig[role]?.color || 'default',
+    icon: roleConfig[role]?.icon || UserOutlined
+  }))
+)
 
 const handleMenuClick = ({ key }) => {
   if (key === 'open-profile') emit('open-profile')
@@ -31,7 +71,16 @@ const handleMenuClick = ({ key }) => {
         <DownOutlined style="margin-left: 6px; font-size: 12px; color: #8c8c8c;" />
       </a-button>
       <template #overlay>
-        <a-menu @click="handleMenuClick">
+        <a-menu class="user-menu" @click="handleMenuClick">
+          <div class="user-menu-header">
+            <a-space v-if="userRoles.length" wrap size="small" class="user-role-list">
+              <a-tag v-for="role in userRoles" :key="role.value" :color="role.color" class="user-role-tag">
+                <component :is="role.icon" />
+                <span>{{ role.label }}</span>
+              </a-tag>
+            </a-space>
+          </div>
+          <a-menu-divider />
           <a-menu-item key="open-profile">👤 Perfil</a-menu-item>
           <a-menu-item key="open-password">🔒 Cambiar contraseña</a-menu-item>
           <a-menu-divider />
@@ -43,3 +92,24 @@ const handleMenuClick = ({ key }) => {
     </a-dropdown>
   </div>
 </template>
+
+<style scoped>
+.user-menu {
+  min-width: 230px;
+}
+
+.user-menu-header {
+  padding: 8px 12px 6px;
+}
+
+.user-role-list {
+  max-width: 260px;
+}
+
+.user-role-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-inline-end: 0;
+}
+</style>

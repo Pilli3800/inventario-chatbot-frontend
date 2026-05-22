@@ -39,6 +39,16 @@ export const chatbotService = {
     })
   },
 
+  async getDashboard(params) {
+    const authStore = useAuthStore()
+    return axios.get(`${API_URL}/dashboard`, {
+      params,
+      headers: {
+        Authorization: authStore.token
+      }
+    })
+  },
+
   async deleteSession() {
     const authStore = useAuthStore()
     const sessionId = localStorage.getItem('sessionId')

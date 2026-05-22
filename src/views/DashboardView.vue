@@ -8,24 +8,32 @@ import {
   ExportOutlined,
   InboxOutlined,
   ImportOutlined,
+  MessageOutlined,
+  RobotOutlined,
   ReloadOutlined,
   SearchOutlined,
   StopOutlined,
   SwapOutlined,
   TransactionOutlined,
-  UndoOutlined
+  UndoOutlined,
+  UserOutlined
 } from '@ant-design/icons-vue'
+import GraficosIADashboard from '@/components/dashboard/GraficosIADashboard.vue'
 import GraficosMovimientos from '@/components/dashboard/GraficosMovimientos.vue'
 import GraficosSolicitudes from '@/components/dashboard/GraficosSolicitudes.vue'
 import TablasItemsMovidos from '@/components/dashboard/TablasItemsMovidos.vue'
+import TablasIADashboard from '@/components/dashboard/TablasIADashboard.vue'
 import { movimientosService } from '@/services/movimientos.service'
 import { solicitudItemsService } from '@/services/solicitud-items.service'
+import { chatbotService } from '@/services/chatbot.service'
 
 const loading = ref(false)
 const loadingMovimientos = ref(false)
+const loadingIA = ref(false)
 const loadingItems = ref(false)
 const solicitudDashboard = ref(null)
 const movimientoDashboard = ref(null)
+const iaDashboard = ref(null)
 const itemsMasMovidos = ref([])
 const stockMovido = ref([])
 
@@ -60,6 +68,22 @@ const resumenMovimientos = computed(() => movimientoDashboard.value || {
   transferencia: 0,
   transferenciaServicio: 0,
   retornoASede: 0
+})
+
+const resumenIA = computed(() => iaDashboard.value || {
+  totalConsultas: 0,
+  consultasExitosas: 0,
+  consultasFallidas: 0,
+  totalSesiones: 0,
+  usuariosQueUsaronIA: 0,
+  totalUsuariosActivos: 0,
+  porcentajeUsuariosQueUsaronIA: 0,
+  promedioConsultasPorSesion: 0,
+  consultasHoy: 0,
+  consultasUltimos7Dias: 0,
+  consultasUltimos30Dias: 0,
+  porFecha: [],
+  topUsuarios: []
 })
 
 const seriesMovimientosPorFecha = computed(() =>
@@ -177,6 +201,66 @@ const tarjetasMovimientos = computed(() => [
   }
 ])
 
+const tarjetasIA = computed(() => [
+  {
+    titulo: 'Consultas',
+    valor: resumenIA.value.totalConsultas,
+    detalle: 'Total de mensajes enviados al asistente.',
+    color: '#0f172a',
+    icono: MessageOutlined
+  },
+  {
+    titulo: 'Exitosas',
+    valor: resumenIA.value.consultasExitosas,
+    detalle: 'Consultas respondidas correctamente.',
+    color: '#16a34a',
+    icono: CheckCircleOutlined
+  },
+  {
+    titulo: 'Fallidas',
+    valor: resumenIA.value.consultasFallidas,
+    detalle: 'Consultas con error.',
+    color: '#dc2626',
+    icono: StopOutlined
+  },
+  {
+    titulo: 'Sesiones',
+    valor: resumenIA.value.totalSesiones,
+    detalle: 'Sesiones distintas usadas.',
+    color: '#2563eb',
+    icono: RobotOutlined
+  },
+  {
+    titulo: 'Usuarios IA',
+    valor: resumenIA.value.usuariosQueUsaronIA,
+    detalle: 'Usuarios distintos que usaron el asistente.',
+    color: '#7c3aed',
+    icono: UserOutlined
+  },
+  {
+    titulo: 'Adopcion',
+    valor: resumenIA.value.porcentajeUsuariosQueUsaronIA,
+    detalle: 'Porcentaje de usuarios activos que usaron IA.',
+    color: '#f59e0b',
+    icono: TransactionOutlined,
+    suffix: '%'
+  },
+  {
+    titulo: 'Prom. sesion',
+    valor: resumenIA.value.promedioConsultasPorSesion,
+    detalle: 'Promedio de consultas por sesion.',
+    color: '#64748b',
+    icono: BarChartOutlined
+  },
+  {
+    titulo: 'Hoy',
+    valor: resumenIA.value.consultasHoy,
+    detalle: 'Consultas realizadas hoy.',
+    color: '#0ea5e9',
+    icono: ClockCircleOutlined
+  }
+])
+
 const getFiltrosFecha = () => ({
   fechaDesde: filtros.fechaInicio
     ? dayjs(filtros.fechaInicio).format('YYYY-MM-DD')
@@ -218,6 +302,17 @@ const cargarMovimientos = async () => {
   }
 }
 
+const cargarDashboardIA = async () => {
+  loadingIA.value = true
+
+  try {
+    const { data } = await chatbotService.getDashboard(getFiltrosFecha())
+    iaDashboard.value = data?.content ?? data?.data ?? data
+  } finally {
+    loadingIA.value = false
+  }
+}
+
 const cargarItemsMovidos = async () => {
   loadingItems.value = true
 
@@ -247,6 +342,7 @@ const cargarItemsMovidos = async () => {
 const cargarDatos = () => {
   cargarDashboard()
   cargarMovimientos()
+  cargarDashboardIA()
   cargarItemsMovidos()
 }
 
@@ -273,7 +369,7 @@ cargarDatos()
             <a-space class="filtros-space" wrap>
               <a-date-picker v-model:value="filtros.fechaInicio" class="filtro-fecha" placeholder="Desde" />
               <a-date-picker v-model:value="filtros.fechaFin" class="filtro-fecha" placeholder="Hasta" />
-              <a-button type="primary" :loading="loading || loadingMovimientos || loadingItems" @click="cargarDatos">
+              <a-button type="primary" :loading="loading || loadingMovimientos || loadingIA || loadingItems" @click="cargarDatos">
                 <SearchOutlined />
                 Buscar
               </a-button>
@@ -347,6 +443,33 @@ cargarDatos()
           :stock-movido="stockMovido"
           :loading="loadingItems"
           modo="movimientos"
+        />
+        </div>
+      </a-tab-pane>
+
+      <a-tab-pane key="ia" tab="Asistente IA">
+        <div class="tab-content">
+        <a-row :gutter="[16, 16]" class="resumen-grid">
+          <a-col v-for="tarjeta in tarjetasIA" :key="tarjeta.titulo" :xs="24" :sm="12" :lg="8" :xl="6">
+            <a-tooltip :title="tarjeta.detalle" placement="top">
+              <a-card class="resumen-card" :body-style="{ padding: '18px' }">
+                <a-statistic :title="tarjeta.titulo" :value="tarjeta.valor" :suffix="tarjeta.suffix">
+                  <template #prefix>
+                    <span class="resumen-icono" :style="{ color: tarjeta.color, backgroundColor: `${tarjeta.color}14` }">
+                      <component :is="tarjeta.icono" />
+                    </span>
+                  </template>
+                </a-statistic>
+              </a-card>
+            </a-tooltip>
+          </a-col>
+        </a-row>
+
+        <GraficosIADashboard :dashboard="resumenIA" :loading="loadingIA" />
+
+        <TablasIADashboard
+          :top-usuarios="resumenIA.topUsuarios"
+          :loading="loadingIA"
         />
         </div>
       </a-tab-pane>

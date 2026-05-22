@@ -22,6 +22,10 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
+  topCuadrillas: {
+    type: Array,
+    default: () => []
+  },
   loading: Boolean
 })
 
@@ -62,6 +66,13 @@ const columnasPorServicio = [
   { title: 'Devueltas', dataIndex: 'devueltas', width: 110, align: 'right' },
   { title: 'Cerradas sin dev.', dataIndex: 'cerradasSinDevolucion', width: 150, align: 'right' }
 ]
+
+const columnasTopCuadrillas = [
+  { title: 'Cuadrilla', dataIndex: 'codigoCuadrilla', width: 120 },
+  { title: 'Jefe de cuadrilla', dataIndex: 'jefeCuadrillaNombreCompleto', ellipsis: true },
+  { title: 'Servicio', dataIndex: 'servicio', ellipsis: true },
+  { title: 'Total', dataIndex: 'totalSolicitudes', width: 90, align: 'right' }
+]
 </script>
 
 <template>
@@ -97,6 +108,26 @@ const columnasPorServicio = [
           :pagination="false"
           :scroll="{ x: 640 }"
         />
+      </a-card>
+    </a-col>
+
+    <a-col v-if="props.modo === 'solicitudes'" :xs="24">
+      <a-card class="tabla-card" title="Ranking de cuadrillas por solicitudes">
+        <a-table
+          :columns="columnasTopCuadrillas"
+          :data-source="props.topCuadrillas"
+          :loading="loading"
+          row-key="codigoCuadrilla"
+          size="small"
+          :pagination="false"
+          :scroll="{ x: 760 }"
+        >
+          <template #bodyCell="{ column, record }">
+            <template v-if="column.dataIndex === 'servicio'">
+              {{ record.servicioCodigo || '-' }} - {{ record.servicioNombre || '-' }}
+            </template>
+          </template>
+        </a-table>
       </a-card>
     </a-col>
 

@@ -46,7 +46,8 @@ const resumenSolicitudes = computed(() => solicitudDashboard.value || {
   cerradasSinDevolucion: 0,
   porEstado: {},
   porServicio: [],
-  pendientesCierre: []
+  pendientesCierre: [],
+  topCuadrillas: []
 })
 
 const resumenMovimientos = computed(() => movimientoDashboard.value || {
@@ -190,7 +191,8 @@ const cargarDashboard = async () => {
 
   try {
     const params = {
-      ...getFiltrosFecha()
+      ...getFiltrosFecha(),
+      incluirRankingCuadrillas: true
     }
 
     const { data } = await solicitudItemsService.getDashboard(params)
@@ -309,6 +311,7 @@ cargarDatos()
         <TablasItemsMovidos
           :pendientes-cierre="resumenSolicitudes.pendientesCierre"
           :por-servicio="resumenSolicitudes.porServicio"
+          :top-cuadrillas="resumenSolicitudes.topCuadrillas"
           :loading="loading"
           modo="solicitudes"
         />

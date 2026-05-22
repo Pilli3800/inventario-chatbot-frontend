@@ -5,13 +5,14 @@ import axios from 'axios'
 const API_URL = 'http://localhost:8080/api/ia/chat'
 
 export const chatbotService = {
-  async sendMessage(message) {
+  async sendMessage(message, contextoPantalla) {
     const authStore = useAuthStore()
     const sessionId = localStorage.getItem('sessionId')
 
     const response = await axios.post(API_URL, {
       sessionId: sessionId || null,
-      message
+      message,
+      contextoPantalla
     }, {
       headers: {
         Authorization: authStore.token,

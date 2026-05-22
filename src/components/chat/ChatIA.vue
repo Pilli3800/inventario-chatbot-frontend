@@ -1,8 +1,10 @@
 <script setup>
 import { ref, nextTick, onMounted, h } from 'vue'
+import { useRoute } from 'vue-router'
 import { message, Modal } from 'ant-design-vue'
 import 'animate.css'
 import { chatbotService } from '@/services/chatbot.service'
+import { buildScreenContext } from '@/utils/screen-context.util'
 import { marked } from 'marked'
 import {
   SendOutlined,
@@ -20,6 +22,8 @@ const props = defineProps({
     default: false
   }
 })
+
+const route = useRoute()
 
 /* Configuracion de Markdown(libreria) */
 marked.setOptions({ breaks: true })
@@ -162,7 +166,8 @@ const sendMessage = async () => {
   await scrollToBottom()
 
   try {
-    const { data } = await chatbotService.sendMessage(userMessage)
+    const contextoPantalla = buildScreenContext(route)
+    const { data } = await chatbotService.sendMessage(userMessage, contextoPantalla)
     const content = data?.content
 
     syncSession()

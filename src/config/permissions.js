@@ -42,7 +42,7 @@ export const PERMISSIONS = {
 
   ROLE_JEFE_CUADRILLA: {
     create: true,
-    createMovimiento: true,
+    createMovimiento: false,
     createSolicitud: true,
     manageSolicitudes: false,
     edit: false,

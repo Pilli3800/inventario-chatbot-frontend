@@ -37,6 +37,16 @@ export const movimientosService = {
     })
   },
 
+  async getDashboard(params) {
+    const authStore = useAuthStore()
+    return axios.get(`${API_HISTORICO_URL}/dashboard`, {
+      params,
+      headers: {
+        Authorization: authStore.token
+      }
+    })
+  },
+
   /* Items con mayor cantidad de movimientos */
   async getItemsMasMovidos(params) {
     const authStore = useAuthStore()

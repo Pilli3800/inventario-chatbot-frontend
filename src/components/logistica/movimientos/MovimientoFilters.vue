@@ -52,7 +52,6 @@ const tiposPermitidos = computed(() => {
       'ENTRADA',
       'SALIDA',
       'SALIDA_CUADRILLA',
-      'DEVOLUCION',
       'TRANSFERENCIA',
       'TRANSFERENCIA_SERVICIO',
       'RETORNO_A_SEDE'
@@ -60,7 +59,7 @@ const tiposPermitidos = computed(() => {
   }
 
   if (authStore.hasRole('ROLE_JEFE_CUADRILLA')) {
-    return ['DEVOLUCION']
+    return []
   }
 
   return []

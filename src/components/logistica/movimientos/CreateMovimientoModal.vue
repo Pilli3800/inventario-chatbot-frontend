@@ -98,15 +98,6 @@ const TIPO_CONFIG = {
     visibleFields: ['codigoCuadrilla'],
     requiredFields: ['codigoCuadrilla']
   },
-  DEVOLUCION: {
-    alert: {
-      message: 'Flujo: Cuadrilla -> Servicio',
-      description: 'Registra devolucion de items desde cuadrilla hacia inventario del servicio.',
-      type: 'warning'
-    },
-    visibleFields: ['codigoCuadrilla'],
-    requiredFields: ['codigoCuadrilla']
-  },
   RETORNO_A_SEDE: {
     alert: {
       message: 'Flujo: Servicio -> Sede',
@@ -144,7 +135,7 @@ const tiposPermitidos = computed(() => {
     return ['ENTRADA', 'COMPRA', 'TRANSFERENCIA', 'TRANSFERENCIA_SERVICIO', 'RETORNO_A_SEDE']
   }
   if (isJefeCuadrilla.value) {
-    return ['DEVOLUCION']
+    return []
   }
   return []
 })
@@ -198,9 +189,6 @@ const buscarCuadrillas = async (texto = '') => {
   loadingCuadrillas.value = true
   try {
     const params = {
-      ...(form.value.tipoMovimiento === 'DEVOLUCION' && authStore.ident
-        ? { identUsuarioJefe: authStore.ident }
-        : {}),
       enabled: true,
       page: 0,
       size: 20

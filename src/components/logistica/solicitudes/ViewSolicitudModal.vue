@@ -4,6 +4,7 @@ import { ref, watch, computed } from 'vue'
 import { message } from 'ant-design-vue'
 import { solicitudItemsService } from '@/services/solicitud-items.service'
 import { valeSalidaService } from '@/services/vale-salida.service'
+import { comprobanteDevolucionService } from '@/services/comprobante-devolucion.service'
 import { formatDateTime } from '@/utils/date'
 
 const props = defineProps({
@@ -16,12 +17,19 @@ const emit = defineEmits(['close'])
 const loading = ref(false)
 const solicitud = ref(null)
 const valeSalida = ref(null)
+const comprobanteDevolucion = ref(null)
 const loadingValeSalida = ref(false)
 const loadingValePdf = ref(false)
 const valeSalidaError = ref('')
+const loadingComprobanteDevolucion = ref(false)
+const loadingComprobantePdf = ref(false)
+const comprobanteDevolucionError = ref('')
 const activeKeys = ref(['timeline'])
 
-const isSolicitudEntregada = computed(() => solicitud.value?.estado === 'ENTREGADO')
+const isValeSalidaDisponible = computed(() =>
+  ['ENTREGADO', 'DEVUELTA', 'CERRADA_SIN_DEVOLUCION'].includes(solicitud.value?.estado)
+)
+const isSolicitudDevuelta = computed(() => solicitud.value?.estado === 'DEVUELTA')
 
 const getErrorMessage = (err, fallback) => {
   const responseData = err?.response?.data?.content ?? err?.response?.data
@@ -44,6 +52,20 @@ const loadValeSalidaPorSolicitud = async (solicitudId) => {
   }
 }
 
+const loadComprobanteDevolucionPorSolicitud = async (solicitudId) => {
+  loadingComprobanteDevolucion.value = true
+  comprobanteDevolucionError.value = ''
+  try {
+    const { data } = await comprobanteDevolucionService.getBySolicitudId(solicitudId)
+    comprobanteDevolucion.value = data?.content ?? data
+  } catch (err) {
+    comprobanteDevolucion.value = null
+    comprobanteDevolucionError.value = getErrorMessage(err, 'No se pudo cargar el comprobante de devolucion')
+  } finally {
+    loadingComprobanteDevolucion.value = false
+  }
+}
+
 const loadSolicitud = async () => {
   if (!props.idSolicitud) return
 
@@ -56,8 +78,13 @@ const loadSolicitud = async () => {
 
     valeSalida.value = null
     valeSalidaError.value = ''
-    if (record?.estado === 'ENTREGADO') {
+    comprobanteDevolucion.value = null
+    comprobanteDevolucionError.value = ''
+    if (['ENTREGADO', 'DEVUELTA', 'CERRADA_SIN_DEVOLUCION'].includes(record?.estado)) {
       await loadValeSalidaPorSolicitud(id)
+    }
+    if (record?.estado === 'DEVUELTA') {
+      await loadComprobanteDevolucionPorSolicitud(id)
     }
   } finally {
     loading.value = false
@@ -94,15 +121,21 @@ const getRechazoLabel = (record) =>
 const getEntregaCuadrillaLabel = (record) =>
   buildUserLabel(record?.codigoCuadrilla, record?.nombreJefeCuadrilla)
 
+const getDevolucionLabel = (record) =>
+  buildUserLabel(record?.codigoUsuarioDevolucion, record?.nombreUsuarioDevolucion)
+
+const getCierreLabel = (record) =>
+  buildUserLabel(record?.codigoUsuarioCierre, record?.nombreUsuarioCierre)
+
 const getCodigoCuadrilla = (record) =>
   record?.codigoCuadrilla ||
   record?.cuadrilla?.codigoCuadrilla ||
   record?.cuadrillaCodigo
 
-const getSedeOrigen = (record) =>
-  record?.sedeOrigenCodigo ||
-  record?.sedeOrigen?.codigo ||
-  record?.sedeOrigen
+const getServicioOrigen = (record) =>
+  record?.servicioOrigenCodigo ||
+  record?.servicioOrigen?.codigo ||
+  record?.servicioOrigen
 
 const downloadBlobResponse = (response, fallbackName) => {
   const blob = response?.data instanceof Blob
@@ -144,6 +177,24 @@ const descargarValeSalidaPdf = async () => {
   }
 }
 
+const descargarComprobanteDevolucionPdf = async () => {
+  const comprobanteId = comprobanteDevolucion.value?.id
+  if (!comprobanteId) {
+    message.warning('No hay comprobante de devolucion disponible para descargar')
+    return
+  }
+
+  loadingComprobantePdf.value = true
+  try {
+    const response = await comprobanteDevolucionService.descargarPdf(comprobanteId)
+    downloadBlobResponse(response, `comprobante_devolucion_${comprobanteDevolucion.value?.numeroComprobante || comprobanteId}.pdf`)
+  } catch (err) {
+    message.error(getErrorMessage(err, 'No se pudo descargar el comprobante de devolucion'))
+  } finally {
+    loadingComprobantePdf.value = false
+  }
+}
+
 const detalleColumns = [
   { title: 'Codigo Item', dataIndex: 'codigoItem' },
   { title: 'Nombre', dataIndex: 'nombreItem' },
@@ -152,16 +203,22 @@ const detalleColumns = [
 
 const timelineItems = (record) => {
   const estado = record?.estado
-  const isApproved = ['APROBADA', 'ENTREGADO'].includes(estado)
+  const isApproved = ['APROBADA', 'ENTREGADO', 'DEVUELTA', 'CERRADA_SIN_DEVOLUCION'].includes(estado)
   const isRejected = estado === 'RECHAZADA'
-  const isDelivered = estado === 'ENTREGADO'
+  const isDelivered = ['ENTREGADO', 'DEVUELTA', 'CERRADA_SIN_DEVOLUCION'].includes(estado)
 
   const order = isRejected
     ? ['PENDIENTE', 'RECHAZADA']
+    : estado === 'DEVUELTA'
+      ? ['PENDIENTE', 'APROBADA', 'ENTREGADO', 'DEVUELTA']
+      : estado === 'CERRADA_SIN_DEVOLUCION'
+        ? ['PENDIENTE', 'APROBADA', 'ENTREGADO', 'CERRADA_SIN_DEVOLUCION']
     : ['PENDIENTE', 'APROBADA', 'ENTREGADO']
 
-  const maxKey = isDelivered
-    ? 'ENTREGADO'
+  const maxKey = estado === 'DEVUELTA' || estado === 'CERRADA_SIN_DEVOLUCION'
+    ? estado
+    : isDelivered
+      ? 'ENTREGADO'
     : isRejected
       ? 'RECHAZADA'
       : isApproved
@@ -174,7 +231,9 @@ const timelineItems = (record) => {
     PENDIENTE: '#1890ff',
     APROBADA: 'green',
     RECHAZADA: 'red',
-    ENTREGADO: '#1890ff'
+    ENTREGADO: '#1890ff',
+    DEVUELTA: 'purple',
+    CERRADA_SIN_DEVOLUCION: 'gray'
   }
 
   const colorFor = (key) => (reachedForLine(key) ? stateColor[key] : 'gray')
@@ -219,6 +278,26 @@ const itemsByKey = {
       timestamp: reachedForLine('ENTREGADO') ? record?.fechaEntrega : null,
       meta: reachedForLine('ENTREGADO') ? getEntregaCuadrillaLabel(record) : null,
       observacion: reachedForLine('ENTREGADO') ? record?.observacionesEntrega : null
+    },
+    DEVUELTA: {
+      key: 'DEVUELTA',
+      label: 'DEVUELTA',
+      color: colorFor('DEVUELTA'),
+      reached: reachedForLine('DEVUELTA'),
+      enabled: reachedForLine('DEVUELTA'),
+      timestamp: reachedForLine('DEVUELTA') ? record?.fechaDevolucion : null,
+      meta: reachedForLine('DEVUELTA') ? getDevolucionLabel(record) : null,
+      observacion: reachedForLine('DEVUELTA') ? record?.observacionesDevolucion : null
+    },
+    CERRADA_SIN_DEVOLUCION: {
+      key: 'CERRADA_SIN_DEVOLUCION',
+      label: 'CERRADA_SIN_DEVOLUCION',
+      color: colorFor('CERRADA_SIN_DEVOLUCION'),
+      reached: reachedForLine('CERRADA_SIN_DEVOLUCION'),
+      enabled: reachedForLine('CERRADA_SIN_DEVOLUCION'),
+      timestamp: reachedForLine('CERRADA_SIN_DEVOLUCION') ? record?.fechaCierre : null,
+      meta: reachedForLine('CERRADA_SIN_DEVOLUCION') ? getCierreLabel(record) : null,
+      observacion: reachedForLine('CERRADA_SIN_DEVOLUCION') ? record?.observacionesCierre : null
     }
   }
 
@@ -309,8 +388,8 @@ const handleClose = () => emit('close')
             <a-input :value="getCodigoCuadrilla(solicitud) || '—'" disabled />
           </a-form-item>
 
-          <a-form-item label="Sede Origen">
-            <a-input :value="getSedeOrigen(solicitud) || '—'" disabled />
+          <a-form-item label="Servicio Origen">
+            <a-input :value="getServicioOrigen(solicitud) || '—'" disabled />
           </a-form-item>
 
           <a-form-item label="Observaciones">
@@ -324,8 +403,36 @@ const handleClose = () => emit('close')
           <a-form-item label="Observaciones Entrega">
             <a-textarea :value="solicitud.observacionesEntrega || '—'" disabled auto-size />
           </a-form-item>
+
+          <template v-if="solicitud.fechaDevolucion || solicitud.codigoUsuarioDevolucion || solicitud.observacionesDevolucion">
+            <a-form-item label="Fecha Devolucion">
+              <a-input :value="solicitud.fechaDevolucion ? formatDateTime(solicitud.fechaDevolucion) : '-'" disabled />
+            </a-form-item>
+
+            <a-form-item label="Usuario Devolucion">
+              <a-input :value="getDevolucionLabel(solicitud) || '-'" disabled />
+            </a-form-item>
+
+            <a-form-item label="Observaciones Devolucion">
+              <a-textarea :value="solicitud.observacionesDevolucion || '-'" disabled auto-size />
+            </a-form-item>
+          </template>
+
+          <template v-if="solicitud.fechaCierre || solicitud.codigoUsuarioCierre || solicitud.observacionesCierre">
+            <a-form-item label="Fecha Cierre">
+              <a-input :value="solicitud.fechaCierre ? formatDateTime(solicitud.fechaCierre) : '-'" disabled />
+            </a-form-item>
+
+            <a-form-item label="Usuario Cierre">
+              <a-input :value="getCierreLabel(solicitud) || '-'" disabled />
+            </a-form-item>
+
+            <a-form-item label="Observaciones Cierre">
+              <a-textarea :value="solicitud.observacionesCierre || '-'" disabled auto-size />
+            </a-form-item>
+          </template>
         </a-collapse-panel>
-        <a-collapse-panel v-if="isSolicitudEntregada" key="vale-salida">
+        <a-collapse-panel v-if="isValeSalidaDisponible" key="vale-salida">
           <template #header>
             <span style="font-weight: 600;">4. Vale de salida</span>
           </template>
@@ -348,6 +455,32 @@ const handleClose = () => emit('close')
             </template>
 
             <a-alert v-else type="warning" show-icon :message="valeSalidaError || 'No hay vale de salida disponible.'" />
+          </a-spin>
+        </a-collapse-panel>
+        <a-collapse-panel v-if="isSolicitudDevuelta" key="comprobante-devolucion">
+          <template #header>
+            <span style="font-weight: 600;">5. Comprobante de devolucion</span>
+          </template>
+
+          <a-spin :spinning="loadingComprobanteDevolucion">
+            <template v-if="comprobanteDevolucion">
+              <a-form-item label="Numero de comprobante">
+                <a-input :value="comprobanteDevolucion.numeroComprobante || '-'" disabled />
+              </a-form-item>
+
+              <a-form-item label="Fecha de generacion">
+                <a-input :value="comprobanteDevolucion.fechaGeneracion ? formatDateTime(comprobanteDevolucion.fechaGeneracion) : '-'" disabled />
+              </a-form-item>
+
+              <a-form-item label="Acciones">
+                <a-button type="primary" :loading="loadingComprobantePdf" @click="descargarComprobanteDevolucionPdf">
+                  Descargar comprobante de devolucion (PDF)
+                </a-button>
+              </a-form-item>
+            </template>
+
+            <a-alert v-else type="warning" show-icon
+              :message="comprobanteDevolucionError || 'No hay comprobante de devolucion disponible.'" />
           </a-spin>
         </a-collapse-panel>
       </a-collapse>

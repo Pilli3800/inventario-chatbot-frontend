@@ -3,25 +3,29 @@ import { computed, reactive, ref } from 'vue'
 import dayjs from 'dayjs'
 import {
   BarChartOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  ExportOutlined,
   InboxOutlined,
+  ImportOutlined,
   ReloadOutlined,
-  RiseOutlined,
   SearchOutlined,
+  StopOutlined,
   SwapOutlined,
-  TransactionOutlined
+  TransactionOutlined,
+  UndoOutlined
 } from '@ant-design/icons-vue'
 import GraficosMovimientos from '@/components/dashboard/GraficosMovimientos.vue'
+import GraficosSolicitudes from '@/components/dashboard/GraficosSolicitudes.vue'
 import TablasItemsMovidos from '@/components/dashboard/TablasItemsMovidos.vue'
 import { movimientosService } from '@/services/movimientos.service'
-
-const TIPOS_ENTRADA = ['COMPRA', 'ENTRADA']
-const TIPOS_SALIDA = ['SALIDA', 'SALIDA_CUADRILLA']
-const TIPOS_DEVOLUCION = ['DEVOLUCION']
-const TIPOS_INTERNO = ['TRANSFERENCIA', 'TRANSFERENCIA_SERVICIO', 'RETORNO_A_SEDE']
+import { solicitudItemsService } from '@/services/solicitud-items.service'
 
 const loading = ref(false)
+const loadingMovimientos = ref(false)
 const loadingItems = ref(false)
-const movimientos = ref([])
+const solicitudDashboard = ref(null)
+const movimientoDashboard = ref(null)
 const itemsMasMovidos = ref([])
 const stockMovido = ref([])
 
@@ -30,91 +34,145 @@ const filtros = reactive({
   fechaFin: dayjs()
 })
 
-const getFechaMovimiento = (movimiento) =>
-  dayjs(movimiento.fechaMovimiento).format('DD/MM/YYYY')
-
-const getTipoResumen = (tipoMovimiento) => {
-  if (TIPOS_ENTRADA.includes(tipoMovimiento)) return 'entradas'
-  if (TIPOS_SALIDA.includes(tipoMovimiento)) return 'salidas'
-  if (TIPOS_DEVOLUCION.includes(tipoMovimiento)) return 'devoluciones'
-  if (TIPOS_INTERNO.includes(tipoMovimiento)) return 'internos'
-  return 'internos'
-}
-
-const resumen = computed(() => {
-  const totales = {
-    total: movimientos.value.length,
-    entradas: 0,
-    salidas: 0,
-    devoluciones: 0,
-    internos: 0
-  }
-
-  movimientos.value.forEach((movimiento) => {
-    const tipo = getTipoResumen(movimiento.tipoMovimiento)
-    totales[tipo] += 1
-  })
-
-  return totales
+const resumenSolicitudes = computed(() => solicitudDashboard.value || {
+  total: 0,
+  abiertas: 0,
+  finales: 0,
+  pendientes: 0,
+  aprobadas: 0,
+  rechazadas: 0,
+  entregadas: 0,
+  devueltas: 0,
+  cerradasSinDevolucion: 0,
+  porEstado: {},
+  porServicio: [],
+  pendientesCierre: []
 })
 
-const seriesPorFecha = computed(() => {
-  const agrupado = new Map()
-
-  movimientos.value.forEach((movimiento) => {
-    const tipo = getTipoResumen(movimiento.tipoMovimiento)
-
-    const fecha = getFechaMovimiento(movimiento)
-    const actual = agrupado.get(fecha) || {
-      fecha,
-      entradas: 0,
-      salidas: 0,
-      devoluciones: 0,
-      internos: 0
-    }
-
-    actual[tipo] += 1
-    agrupado.set(fecha, actual)
-  })
-
-  return Array.from(agrupado.values())
+const resumenMovimientos = computed(() => movimientoDashboard.value || {
+  total: 0,
+  compra: 0,
+  entrada: 0,
+  salida: 0,
+  salidaCuadrilla: 0,
+  devolucion: 0,
+  transferencia: 0,
+  transferenciaServicio: 0,
+  retornoASede: 0
 })
+
+const seriesMovimientosPorFecha = computed(() =>
+  resumenMovimientos.value.porFecha || []
+)
 
 const tarjetas = computed(() => [
   {
-    titulo: 'Movimientos',
-    valor: resumen.value.total,
-    detalle: 'Incluye compras, entradas, salidas, salidas a cuadrilla, devoluciones y movimientos internos.',
+    titulo: 'Solicitudes',
+    valor: resumenSolicitudes.value.total,
+    detalle: 'Total de solicitudes en el periodo filtrado.',
     color: '#0f172a',
     icono: BarChartOutlined
   },
   {
-    titulo: 'Entradas',
-    valor: resumen.value.entradas,
-    detalle: 'Incluye COMPRA y ENTRADA.',
-    color: '#16a34a',
+    titulo: 'Abiertas',
+    valor: resumenSolicitudes.value.abiertas,
+    detalle: 'PENDIENTE, APROBADA y ENTREGADO.',
+    color: '#2563eb',
+    icono: ClockCircleOutlined
+  },
+  {
+    titulo: 'Entregadas',
+    valor: resumenSolicitudes.value.entregadas,
+    detalle: 'Solicitudes entregadas pendientes de devolucion o cierre.',
+    color: '#f59e0b',
     icono: InboxOutlined
   },
   {
-    titulo: 'Salidas',
-    valor: resumen.value.salidas,
-    detalle: 'Incluye SALIDA y SALIDA_CUADRILLA.',
-    color: '#dc2626',
-    icono: RiseOutlined
+    titulo: 'Devueltas',
+    valor: resumenSolicitudes.value.devueltas,
+    detalle: 'Solicitudes con devolucion registrada y comprobante generado.',
+    color: '#7c3aed',
+    icono: UndoOutlined
   },
   {
-    titulo: 'Devoluciones',
-    valor: resumen.value.devoluciones,
-    detalle: 'Incluye DEVOLUCION.',
+    titulo: 'Cerradas sin dev.',
+    valor: resumenSolicitudes.value.cerradasSinDevolucion,
+    detalle: 'Solicitudes cerradas sin devolucion de materiales.',
+    color: '#64748b',
+    icono: CheckCircleOutlined
+  },
+  {
+    titulo: 'Rechazadas',
+    valor: resumenSolicitudes.value.rechazadas,
+    detalle: 'Solicitudes rechazadas.',
+    color: '#dc2626',
+    icono: StopOutlined
+  }
+])
+
+const tarjetasMovimientos = computed(() => [
+  {
+    titulo: 'Movimientos',
+    valor: resumenMovimientos.value.total,
+    detalle: 'Total de movimientos historicos en el periodo filtrado.',
+    color: '#0f172a',
+    icono: BarChartOutlined
+  },
+  {
+    titulo: 'Compra',
+    valor: resumenMovimientos.value.compra,
+    detalle: 'Movimientos tipo COMPRA.',
+    color: '#16a34a',
+    icono: ImportOutlined
+  },
+  {
+    titulo: 'Entrada',
+    valor: resumenMovimientos.value.entrada,
+    detalle: 'Movimientos tipo ENTRADA.',
+    color: '#22c55e',
+    icono: InboxOutlined
+  },
+  {
+    titulo: 'Salida',
+    valor: resumenMovimientos.value.salida,
+    detalle: 'Movimientos tipo SALIDA.',
+    color: '#dc2626',
+    icono: ExportOutlined
+  },
+  {
+    titulo: 'Salida cuadrilla',
+    valor: resumenMovimientos.value.salidaCuadrilla,
+    detalle: 'Movimientos tipo SALIDA_CUADRILLA.',
+    color: '#f97316',
+    icono: ExportOutlined
+  },
+  {
+    titulo: 'Devolucion',
+    valor: resumenMovimientos.value.devolucion,
+    detalle: 'Movimientos historicos tipo DEVOLUCION.',
     color: '#2563eb',
+    icono: UndoOutlined
+  },
+  {
+    titulo: 'Transferencia',
+    valor: resumenMovimientos.value.transferencia,
+    detalle: 'Movimientos tipo TRANSFERENCIA.',
+    color: '#7c3aed',
     icono: SwapOutlined
   },
   {
-    titulo: 'Internos',
-    valor: resumen.value.internos,
-    detalle: 'Incluye TRANSFERENCIA, TRANSFERENCIA_SERVICIO y RETORNO_A_SEDE.',
-    color: '#7c3aed',
+    titulo: 'Transf. servicio',
+    valor: resumenMovimientos.value.transferenciaServicio,
+    detalle: 'Movimientos tipo TRANSFERENCIA_SERVICIO.',
+    color: '#a855f7',
     icono: TransactionOutlined
+  },
+  {
+    titulo: 'Retorno a sede',
+    valor: resumenMovimientos.value.retornoASede,
+    detalle: 'Movimientos tipo RETORNO_A_SEDE.',
+    color: '#64748b',
+    icono: CheckCircleOutlined
   }
 ])
 
@@ -132,16 +190,29 @@ const cargarDashboard = async () => {
 
   try {
     const params = {
-      ...getFiltrosFecha(),
-      page: 0,
-      size: 1000,
-      sort: 'fechaMovimiento,asc'
+      ...getFiltrosFecha()
     }
 
-    const { data } = await movimientosService.search(params)
-    movimientos.value = data.content || []
+    const { data } = await solicitudItemsService.getDashboard(params)
+    solicitudDashboard.value = data?.data ?? data?.content ?? data
   } finally {
     loading.value = false
+  }
+}
+
+const cargarMovimientos = async () => {
+  loadingMovimientos.value = true
+
+  try {
+    const params = {
+      ...getFiltrosFecha(),
+      porFechas: true
+    }
+
+    const { data } = await movimientosService.getDashboard(params)
+    movimientoDashboard.value = data?.data ?? data?.content ?? data
+  } finally {
+    loadingMovimientos.value = false
   }
 }
 
@@ -173,6 +244,7 @@ const cargarItemsMovidos = async () => {
 
 const cargarDatos = () => {
   cargarDashboard()
+  cargarMovimientos()
   cargarItemsMovidos()
 }
 
@@ -191,7 +263,7 @@ cargarDatos()
       <a-row :gutter="[16, 16]" align="middle" justify="space-between">
         <a-col :xs="24" :lg="12">
           <h2>Dashboard</h2>
-          <p>Resumen visual de movimientos del inventario</p>
+          <p>Trazabilidad de solicitudes, devoluciones e inventario</p>
         </a-col>
 
         <a-col :xs="24" :lg="12" class="filtros-col">
@@ -199,7 +271,7 @@ cargarDatos()
             <a-space class="filtros-space" wrap>
               <a-date-picker v-model:value="filtros.fechaInicio" class="filtro-fecha" placeholder="Desde" />
               <a-date-picker v-model:value="filtros.fechaFin" class="filtro-fecha" placeholder="Hasta" />
-              <a-button type="primary" :loading="loading || loadingItems" @click="cargarDatos">
+              <a-button type="primary" :loading="loading || loadingMovimientos || loadingItems" @click="cargarDatos">
                 <SearchOutlined />
                 Buscar
               </a-button>
@@ -213,29 +285,69 @@ cargarDatos()
       </a-row>
     </a-card>
 
-    <a-row :gutter="[16, 16]" class="resumen-grid">
-      <a-col v-for="tarjeta in tarjetas" :key="tarjeta.titulo" :xs="24" :sm="12" :lg="8" :xl="4">
-        <a-tooltip :title="tarjeta.detalle" placement="top">
-          <a-card class="resumen-card" :body-style="{ padding: '18px' }">
-            <a-statistic :title="tarjeta.titulo" :value="tarjeta.valor">
-              <template #prefix>
-                <span class="resumen-icono" :style="{ color: tarjeta.color, backgroundColor: `${tarjeta.color}14` }">
-                  <component :is="tarjeta.icono" />
-                </span>
-              </template>
-            </a-statistic>
-          </a-card>
-        </a-tooltip>
-      </a-col>
-    </a-row>
+    <a-tabs>
+      <a-tab-pane key="solicitudes" tab="Solicitudes">
+        <div class="tab-content">
+        <a-row :gutter="[16, 16]" class="resumen-grid">
+          <a-col v-for="tarjeta in tarjetas" :key="tarjeta.titulo" :xs="24" :sm="12" :lg="8" :xl="4">
+            <a-tooltip :title="tarjeta.detalle" placement="top">
+              <a-card class="resumen-card" :body-style="{ padding: '18px' }">
+                <a-statistic :title="tarjeta.titulo" :value="tarjeta.valor">
+                  <template #prefix>
+                    <span class="resumen-icono" :style="{ color: tarjeta.color, backgroundColor: `${tarjeta.color}14` }">
+                      <component :is="tarjeta.icono" />
+                    </span>
+                  </template>
+                </a-statistic>
+              </a-card>
+            </a-tooltip>
+          </a-col>
+        </a-row>
 
-    <GraficosMovimientos :resumen="resumen" :series-por-fecha="seriesPorFecha" :loading="loading" />
+        <GraficosSolicitudes :dashboard="resumenSolicitudes" :loading="loading" />
 
-    <TablasItemsMovidos
-      :items-mas-movidos="itemsMasMovidos"
-      :stock-movido="stockMovido"
-      :loading="loadingItems"
-    />
+        <TablasItemsMovidos
+          :pendientes-cierre="resumenSolicitudes.pendientesCierre"
+          :por-servicio="resumenSolicitudes.porServicio"
+          :loading="loading"
+          modo="solicitudes"
+        />
+        </div>
+      </a-tab-pane>
+
+      <a-tab-pane key="movimientos" tab="Movimientos">
+        <div class="tab-content">
+        <a-row :gutter="[16, 16]" class="resumen-grid">
+          <a-col v-for="tarjeta in tarjetasMovimientos" :key="tarjeta.titulo" :xs="24" :sm="12" :lg="8" :xl="4">
+            <a-tooltip :title="tarjeta.detalle" placement="top">
+              <a-card class="resumen-card" :body-style="{ padding: '18px' }">
+                <a-statistic :title="tarjeta.titulo" :value="tarjeta.valor">
+                  <template #prefix>
+                    <span class="resumen-icono" :style="{ color: tarjeta.color, backgroundColor: `${tarjeta.color}14` }">
+                      <component :is="tarjeta.icono" />
+                    </span>
+                  </template>
+                </a-statistic>
+              </a-card>
+            </a-tooltip>
+          </a-col>
+        </a-row>
+
+        <GraficosMovimientos
+          :dashboard="resumenMovimientos"
+          :series-por-fecha="seriesMovimientosPorFecha"
+          :loading="loadingMovimientos"
+        />
+
+        <TablasItemsMovidos
+          :items-mas-movidos="itemsMasMovidos"
+          :stock-movido="stockMovido"
+          :loading="loadingItems"
+          modo="movimientos"
+        />
+        </div>
+      </a-tab-pane>
+    </a-tabs>
   </div>
 </template>
 
@@ -278,6 +390,13 @@ cargarDatos()
 
 .resumen-grid {
   margin-top: 2px;
+}
+
+.tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 2px;
 }
 
 .resumen-card {

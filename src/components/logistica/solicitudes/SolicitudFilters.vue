@@ -2,7 +2,7 @@
 <script setup>
 import { reactive, ref, onMounted, computed } from 'vue'
 import dayjs from 'dayjs'
-import { sedeService } from '@/services/sede.service'
+import { servicioService } from '@/services/servicio.service'
 import { userService } from '@/services/user.service'
 import { cuadrillaService } from '@/services/cuadrilla.service'
 import { useAuthStore } from '@/stores/auth.store'
@@ -15,23 +15,29 @@ const isJefeCuadrilla = computed(() =>
 
 const filters = reactive({
   estado: undefined,
-  sedeOrigenCodigo: undefined,
+  servicioOrigenCodigo: undefined,
   codigoCuadrilla: undefined,
   identUsuario: undefined,
   fechaInicio: undefined,
   fechaFin: undefined
 })
 
-const sedes = ref([])
-const loadingSedes = ref(false)
+const servicios = ref([])
+const loadingServicios = ref(false)
 
-const loadSedes = async () => {
-  loadingSedes.value = true
+const buscarServicios = async (texto = '') => {
+  loadingServicios.value = true
   try {
-    const { data } = await sedeService.getActivas()
-    sedes.value = data.content
+    const params = {
+      codigo: texto || '',
+      enabled: true,
+      page: 0,
+      size: 1000
+    }
+    const { data } = await servicioService.search(params)
+    servicios.value = data.content
   } finally {
-    loadingSedes.value = false
+    loadingServicios.value = false
   }
 }
 
@@ -99,7 +105,7 @@ const onSearch = () => {
 
   emit('search', {
     estado: filters.estado,
-    sedeOrigenCodigo: filters.sedeOrigenCodigo,
+    servicioOrigenCodigo: filters.servicioOrigenCodigo,
     codigoCuadrilla: filters.codigoCuadrilla,
     identUsuario: identUsuarioParam,
     fechaDesde: filters.fechaInicio
@@ -113,7 +119,7 @@ const onSearch = () => {
 
 const onReset = () => {
   filters.estado = undefined
-  filters.sedeOrigenCodigo = undefined
+  filters.servicioOrigenCodigo = undefined
   filters.codigoCuadrilla = undefined
   filters.identUsuario = undefined
   filters.fechaInicio = undefined
@@ -121,7 +127,7 @@ const onReset = () => {
   onSearch()
 }
 
-onMounted(loadSedes)
+onMounted(() => buscarServicios(''))
 onMounted(loadCuadrillasJefe)
 onMounted(() => buscarUsuarios(''))
 onMounted(() => buscarCuadrillas(''))
@@ -138,15 +144,17 @@ onMounted(() => buscarCuadrillas(''))
               <a-select-option value="APROBADA">APROBADA</a-select-option>
               <a-select-option value="RECHAZADA">RECHAZADA</a-select-option>
               <a-select-option value="ENTREGADO">ENTREGADO</a-select-option>
+              <a-select-option value="DEVUELTA">DEVUELTA</a-select-option>
+              <a-select-option value="CERRADA_SIN_DEVOLUCION">CERRADA_SIN_DEVOLUCION</a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
 
         <a-col :md="6">
-          <a-form-item label="Sede Origen">
-            <a-select v-model:value="filters.sedeOrigenCodigo" allow-clear placeholder="Seleccione sede"
-              :loading="loadingSedes">
-              <a-select-option v-for="s in sedes" :key="s.codigo" :value="s.codigo">
+          <a-form-item label="Servicio Origen">
+            <a-select v-model:value="filters.servicioOrigenCodigo" show-search allow-clear placeholder="Buscar servicio"
+              :filter-option="false" :loading="loadingServicios" @search="buscarServicios">
+              <a-select-option v-for="s in servicios" :key="s.codigo" :value="s.codigo">
                 {{ s.codigo }} - {{ s.nombre }}
               </a-select-option>
             </a-select>

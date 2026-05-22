@@ -20,6 +20,14 @@ export const solicitudItemsService = {
     })
   },
 
+  async getDashboard(params) {
+    const authStore = useAuthStore()
+    return axios.get(`${LOGISTICA_URL}/dashboard`, {
+      params,
+      headers: { Authorization: authStore.token }
+    })
+  },
+
   async create(payload) {
     const authStore = useAuthStore()
     return axios.post(API_URL, payload, {
@@ -44,6 +52,20 @@ export const solicitudItemsService = {
   async entregar(id, payload) {
     const authStore = useAuthStore()
     return axios.patch(`${LOGISTICA_URL}/${id}/entregar`, payload, {
+      headers: { Authorization: authStore.token }
+    })
+  },
+
+  async devolver(id, payload) {
+    const authStore = useAuthStore()
+    return axios.patch(`${LOGISTICA_URL}/${id}/devolver`, payload, {
+      headers: { Authorization: authStore.token }
+    })
+  },
+
+  async cerrarSinDevolucion(id, payload) {
+    const authStore = useAuthStore()
+    return axios.patch(`${LOGISTICA_URL}/${id}/cerrar-sin-devolucion`, payload, {
       headers: { Authorization: authStore.token }
     })
   }

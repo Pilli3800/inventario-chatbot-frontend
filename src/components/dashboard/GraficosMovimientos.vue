@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
-import { BarChart, LineChart } from 'echarts/charts'
+import { LineChart, PieChart } from 'echarts/charts'
 import {
   GridComponent,
   LegendComponent,
@@ -11,7 +11,7 @@ import {
 import VChart from 'vue-echarts'
 
 const props = defineProps({
-  resumen: {
+  dashboard: {
     type: Object,
     required: true
   },
@@ -24,106 +24,48 @@ const props = defineProps({
 
 use([
   CanvasRenderer,
-  BarChart,
   LineChart,
+  PieChart,
   GridComponent,
   LegendComponent,
   TooltipComponent
 ])
 
-const colores = {
-  entradas: '#16a34a',
-  salidas: '#dc2626',
-  devoluciones: '#2563eb',
-  internos: '#7c3aed'
-}
+const tipos = [
+  { key: 'compra', label: 'Compra', color: '#16a34a' },
+  { key: 'entrada', label: 'Entrada', color: '#22c55e' },
+  { key: 'salida', label: 'Salida', color: '#dc2626' },
+  { key: 'salidaCuadrilla', label: 'Salida cuadrilla', color: '#f97316' },
+  { key: 'devolucion', label: 'Devolucion', color: '#2563eb' },
+  { key: 'transferencia', label: 'Transferencia', color: '#7c3aed' },
+  { key: 'transferenciaServicio', label: 'Transf. servicio', color: '#a855f7' },
+  { key: 'retornoASede', label: 'Retorno a sede', color: '#64748b' }
+]
 
 const fechas = computed(() =>
   props.seriesPorFecha.map(item => item.fecha)
 )
 
-const entradasPorFecha = computed(() =>
-  props.seriesPorFecha.map(item => item.entradas)
+const pieData = computed(() =>
+  tipos.map(tipo => ({
+    name: tipo.label,
+    value: props.dashboard?.[tipo.key] || 0,
+    itemStyle: { color: tipo.color }
+  }))
 )
-
-const salidasPorFecha = computed(() =>
-  props.seriesPorFecha.map(item => item.salidas)
-)
-
-const devolucionesPorFecha = computed(() =>
-  props.seriesPorFecha.map(item => item.devoluciones)
-)
-
-const internosPorFecha = computed(() =>
-  props.seriesPorFecha.map(item => item.internos)
-)
-
-const opcionBarras = computed(() => ({
-  color: [colores.entradas, colores.salidas, colores.devoluciones, colores.internos],
-  tooltip: {
-    trigger: 'axis',
-    axisPointer: {
-      type: 'shadow'
-    }
-  },
-  grid: {
-    top: 24,
-    right: 16,
-    bottom: 32,
-    left: 48
-  },
-  xAxis: {
-    type: 'category',
-    data: ['Entradas', 'Salidas', 'Devoluciones', 'Internos'],
-    axisTick: {
-      alignWithLabel: true
-    }
-  },
-  yAxis: {
-    type: 'value',
-    minInterval: 1
-  },
-  series: [
-    {
-      name: 'Movimientos',
-      type: 'bar',
-      barWidth: 42,
-      data: [
-        {
-          value: props.resumen.entradas,
-          itemStyle: { color: colores.entradas }
-        },
-        {
-          value: props.resumen.salidas,
-          itemStyle: { color: colores.salidas }
-        },
-        {
-          value: props.resumen.devoluciones,
-          itemStyle: { color: colores.devoluciones }
-        },
-        {
-          value: props.resumen.internos,
-          itemStyle: { color: colores.internos }
-        }
-      ],
-      itemStyle: {
-        borderRadius: [6, 6, 0, 0]
-      }
-    }
-  ]
-}))
 
 const opcionLineas = computed(() => ({
-  color: [colores.entradas, colores.salidas, colores.devoluciones, colores.internos],
+  color: tipos.map(tipo => tipo.color),
   tooltip: {
     trigger: 'axis'
   },
   legend: {
     top: 0,
-    data: ['Entradas', 'Salidas', 'Devoluciones', 'Internos']
+    type: 'scroll',
+    data: tipos.map(tipo => tipo.label)
   },
   grid: {
-    top: 48,
+    top: 56,
     right: 24,
     bottom: 32,
     left: 48
@@ -137,30 +79,36 @@ const opcionLineas = computed(() => ({
     type: 'value',
     minInterval: 1
   },
+  series: tipos.map(tipo => ({
+    name: tipo.label,
+    type: 'line',
+    smooth: true,
+    data: props.seriesPorFecha.map(item => item[tipo.key] || 0)
+  }))
+}))
+
+const opcionTorta = computed(() => ({
+  color: tipos.map(tipo => tipo.color),
+  tooltip: {
+    trigger: 'item'
+  },
+  legend: {
+    orient: 'vertical',
+    right: 8,
+    top: 'middle',
+    type: 'scroll'
+  },
   series: [
     {
-      name: 'Entradas',
-      type: 'line',
-      smooth: true,
-      data: entradasPorFecha.value
-    },
-    {
-      name: 'Salidas',
-      type: 'line',
-      smooth: true,
-      data: salidasPorFecha.value
-    },
-    {
-      name: 'Devoluciones',
-      type: 'line',
-      smooth: true,
-      data: devolucionesPorFecha.value
-    },
-    {
-      name: 'Internos',
-      type: 'line',
-      smooth: true,
-      data: internosPorFecha.value
+      name: 'Movimientos',
+      type: 'pie',
+      radius: ['42%', '68%'],
+      center: ['38%', '50%'],
+      avoidLabelOverlap: true,
+      label: {
+        formatter: '{b}: {c}'
+      },
+      data: pieData.value
     }
   ]
 }))
@@ -168,22 +116,22 @@ const opcionLineas = computed(() => ({
 
 <template>
   <a-row :gutter="[16, 16]">
-    <a-col :xs="24" :lg="9">
-      <a-card class="grafico-card" title="Movimientos por tipo">
+    <a-col :xs="24" :lg="15">
+      <a-card class="grafico-card" title="Evolucion de movimientos">
         <v-chart
           class="grafico"
-          :option="opcionBarras"
+          :option="opcionLineas"
           :loading="loading"
           autoresize
         />
       </a-card>
     </a-col>
 
-    <a-col :xs="24" :lg="15">
-      <a-card class="grafico-card" title="Evolucion por fecha">
+    <a-col :xs="24" :lg="9">
+      <a-card class="grafico-card" title="Distribucion por tipo">
         <v-chart
           class="grafico"
-          :option="opcionLineas"
+          :option="opcionTorta"
           :loading="loading"
           autoresize
         />

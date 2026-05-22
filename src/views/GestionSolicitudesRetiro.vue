@@ -3,6 +3,7 @@
 import { ref, watch, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { EllipsisOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
 import { useTableData } from '@/composables/useTableData'
 import { usePermissions } from '@/composables/usePermissions'
 import { useAuthStore } from '@/stores/auth.store'
@@ -14,8 +15,11 @@ import ViewSolicitudModal from '@/components/logistica/solicitudes/ViewSolicitud
 import AprobarSolicitudModal from '@/components/logistica/solicitudes/AprobarSolicitudModal.vue'
 import RechazarSolicitudModal from '@/components/logistica/solicitudes/RechazarSolicitudModal.vue'
 import EntregarSolicitudModal from '@/components/logistica/solicitudes/EntregarSolicitudModal.vue'
+import DevolverSolicitudModal from '@/components/logistica/solicitudes/DevolverSolicitudModal.vue'
+import CerrarSinDevolucionSolicitudModal from '@/components/logistica/solicitudes/CerrarSinDevolucionSolicitudModal.vue'
 
 import { solicitudItemsService } from '@/services/solicitud-items.service'
+import { comprobanteDevolucionService } from '@/services/comprobante-devolucion.service'
 
 const router = useRouter()
 const route = useRoute()
@@ -24,23 +28,38 @@ const authStore = useAuthStore()
 const isJefeCuadrilla = computed(() =>
   authStore.hasRole('ROLE_JEFE_CUADRILLA') || authStore.hasRole('JEFE_CUADRILLA')
 )
+const isLogistica = computed(() =>
+  authStore.hasRole('ROLE_LOGISTICA') || authStore.hasRole('LOGISTICA')
+)
 
 const createOpen = ref(false)
 const viewOpen = ref(false)
 const approveOpen = ref(false)
 const rejectOpen = ref(false)
 const deliverOpen = ref(false)
+const returnOpen = ref(false)
+const closeWithoutReturnOpen = ref(false)
 
 const selectedId = ref(null)
+const dashboardStats = ref({
+  total: 0,
+  pendientes: 0,
+  aprobadas: 0,
+  rechazadas: 0,
+  entregadas: 0,
+  devueltas: 0,
+  cerradasSinDevolucion: 0
+})
 
 const {
   data: solicitudes,
   loading,
   pagination,
   sorter,
+  filters: activeFilters,
   load: loadSolicitudes,
   onTableChange,
-  onSearch
+  onSearch: onTableSearch
 } = useTableData({
   service: (params) => {
     const nextParams = { ...params }
@@ -68,19 +87,25 @@ const paginationConfig = computed(() => ({
   }
 }))
 
-const totalSolicitudes = computed(() => solicitudes.value.length)
-const totalPendientes = computed(() =>
-  solicitudes.value.filter(s => s.estado === 'PENDIENTE').length
-)
-const totalAprobadas = computed(() =>
-  solicitudes.value.filter(s => s.estado === 'APROBADA').length
-)
-const totalRechazadas = computed(() =>
-  solicitudes.value.filter(s => s.estado === 'RECHAZADA').length
-)
-const totalEntregadas = computed(() =>
-  solicitudes.value.filter(s => s.estado === 'ENTREGADO').length
-)
+const loadDashboardStats = async (filters = activeFilters.value) => {
+  const params = { ...filters }
+  if (isJefeCuadrilla.value && authStore.ident) {
+    params.identUsuario = authStore.ident
+  }
+
+  const { data } = await solicitudItemsService.getDashboard(params)
+  dashboardStats.value = data?.data ?? data?.content ?? data
+}
+
+const refreshSolicitudes = () => {
+  loadSolicitudes()
+  loadDashboardStats()
+}
+
+const onSearch = (filters) => {
+  onTableSearch(filters)
+  loadDashboardStats(filters)
+}
 
 const openView = (record) => {
   router.push({
@@ -118,7 +143,62 @@ const openEntregar = (record) => {
   deliverOpen.value = true
 }
 
-loadSolicitudes()
+const openDevolver = (record) => {
+  selectedId.value = record.id
+  returnOpen.value = true
+}
+
+const openCerrarSinDevolucion = (record) => {
+  selectedId.value = record.id
+  closeWithoutReturnOpen.value = true
+}
+
+const getErrorMessage = (err, fallback) => {
+  const responseData = err?.response?.data?.content ?? err?.response?.data
+  if (Array.isArray(responseData)) return responseData[0] || fallback
+  if (typeof responseData === 'string') return responseData || fallback
+  return fallback
+}
+
+const downloadBlobResponse = (response, fallbackName) => {
+  const blob = response?.data instanceof Blob
+    ? response.data
+    : new Blob([response.data], { type: 'application/pdf' })
+
+  const url = globalThis.URL.createObjectURL(blob)
+  let filename = fallbackName
+  const disposition = response.headers?.['content-disposition']
+  if (disposition) {
+    const match = disposition.match(/filename="?(.+)"?/)
+    if (match?.[1]) filename = match[1]
+  }
+
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  globalThis.URL.revokeObjectURL(url)
+}
+
+const descargarComprobanteDevolucion = async (record) => {
+  try {
+    const { data } = await comprobanteDevolucionService.getBySolicitudId(record.id)
+    const comprobante = data?.content ?? data
+    if (!comprobante?.id) {
+      message.warning('No hay comprobante de devolucion disponible')
+      return
+    }
+
+    const response = await comprobanteDevolucionService.descargarPdf(comprobante.id)
+    downloadBlobResponse(response, `comprobante_devolucion_${comprobante.numeroComprobante || comprobante.id}.pdf`)
+  } catch (err) {
+    message.error(getErrorMessage(err, 'No se pudo descargar el comprobante de devolucion'))
+  }
+}
+
+refreshSolicitudes()
 </script>
 
 <template>
@@ -130,27 +210,37 @@ loadSolicitudes()
         <a-row :gutter="[16, 16]">
           <a-col :xs="24" :sm="12" :md="8" :lg="4">
             <a-card size="small">
-              <a-statistic title="📄 Total" :value="totalSolicitudes" />
+              <a-statistic title="Total" :value="dashboardStats.total" />
             </a-card>
           </a-col>
           <a-col :xs="24" :sm="12" :md="8" :lg="4">
             <a-card size="small">
-              <a-statistic title="🕒 Pendientes" :value="totalPendientes" />
+              <a-statistic title="Pendientes" :value="dashboardStats.pendientes" />
             </a-card>
           </a-col>
           <a-col :xs="24" :sm="12" :md="8" :lg="4">
             <a-card size="small">
-              <a-statistic title="✅ Aprobadas" :value="totalAprobadas" />
+              <a-statistic title="Aprobadas" :value="dashboardStats.aprobadas" />
             </a-card>
           </a-col>
           <a-col :xs="24" :sm="12" :md="8" :lg="4">
             <a-card size="small">
-              <a-statistic title="❌ Rechazadas" :value="totalRechazadas" />
+              <a-statistic title="Rechazadas" :value="dashboardStats.rechazadas" />
             </a-card>
           </a-col>
           <a-col :xs="24" :sm="12" :md="8" :lg="4">
             <a-card size="small">
-              <a-statistic title="📦 Entregadas" :value="totalEntregadas" />
+              <a-statistic title="Entregadas" :value="dashboardStats.entregadas" />
+            </a-card>
+          </a-col>
+          <a-col :xs="24" :sm="12" :md="8" :lg="4">
+            <a-card size="small">
+              <a-statistic title="Devueltas" :value="dashboardStats.devueltas" />
+            </a-card>
+          </a-col>
+          <a-col :xs="24" :sm="12" :md="8" :lg="4">
+            <a-card size="small">
+              <a-statistic title="Cerradas sin dev." :value="dashboardStats.cerradasSinDevolucion" />
             </a-card>
           </a-col>
         </a-row>
@@ -164,16 +254,22 @@ loadSolicitudes()
     </a-space>
 
     <CreateSolicitudModal v-if="canCreateSolicitud" :open="createOpen" @close="createOpen = false"
-      @success="loadSolicitudes()" />
+      @success="refreshSolicitudes()" />
 
     <AprobarSolicitudModal :open="approveOpen" :idSolicitud="selectedId" @close="approveOpen = false"
-      @success="loadSolicitudes()" />
+      @success="refreshSolicitudes()" />
 
     <RechazarSolicitudModal :open="rejectOpen" :idSolicitud="selectedId" @close="rejectOpen = false"
-      @success="loadSolicitudes()" />
+      @success="refreshSolicitudes()" />
 
     <EntregarSolicitudModal :open="deliverOpen" :idSolicitud="selectedId" @close="deliverOpen = false"
-      @success="loadSolicitudes()" />
+      @success="refreshSolicitudes()" />
+
+    <DevolverSolicitudModal :open="returnOpen" :idSolicitud="selectedId" @close="returnOpen = false"
+      @success="refreshSolicitudes()" />
+
+    <CerrarSinDevolucionSolicitudModal :open="closeWithoutReturnOpen" :idSolicitud="selectedId"
+      @close="closeWithoutReturnOpen = false" @success="refreshSolicitudes()" />
 
     <ViewSolicitudModal :open="viewOpen" :idSolicitud="selectedId"
       @close="router.push({ name: 'gestion-solicitudes-retiro' })" />
@@ -205,6 +301,18 @@ loadSolicitudes()
                 </a-menu-item>
                 <a-menu-item v-if="canManageSolicitudes && record.estado === 'APROBADA'" @click="openEntregar(record)">
                   Marcar como Entregado
+                </a-menu-item>
+                <a-menu-item v-if="canManageSolicitudes && isLogistica && record.estado === 'ENTREGADO'"
+                  @click="openDevolver(record)">
+                  Devolver
+                </a-menu-item>
+                <a-menu-item v-if="canManageSolicitudes && isLogistica && record.estado === 'ENTREGADO'"
+                  @click="openCerrarSinDevolucion(record)">
+                  Cerrar sin devolucion
+                </a-menu-item>
+                <a-menu-item v-if="canView && isLogistica && record.estado === 'DEVUELTA'"
+                  @click="descargarComprobanteDevolucion(record)">
+                  Descargar comprobante devolucion
                 </a-menu-item>
               </a-menu>
             </template>

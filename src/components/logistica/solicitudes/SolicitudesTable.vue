@@ -36,7 +36,7 @@ const columns = computed(() => [
   { title: 'Estado', dataIndex: 'estado', width: 120 },
   { title: 'Solicitante', dataIndex: 'solicitante', width: 160 },
   { title: 'Cuadrilla', dataIndex: 'codigoCuadrilla', width: 140 },
-  { title: 'Sede Origen', dataIndex: 'sedeOrigen', width: 100 },
+  { title: 'Servicio Origen', dataIndex: 'servicioOrigen', width: 120 },
   { title: 'Observaciones', dataIndex: 'observaciones', width: 260 },
   {
     title: ' ',
@@ -84,10 +84,10 @@ const getJefeCuadrillaNombre = (record) =>
   record.cuadrilla?.jefeCuadrillaNombresyApellidos ||
   record.jefeCuadrillaNombresyApellidos
 
-const getSedeOrigen = (record) =>
-  record.sedeOrigenCodigo ||
-  record.sedeOrigen?.codigo ||
-  record.sedeOrigen
+const getServicioOrigen = (record) =>
+  record.servicioOrigenCodigo ||
+  record.servicioOrigen?.codigo ||
+  record.servicioOrigen
 </script>
 
 <template>
@@ -103,7 +103,9 @@ const getSedeOrigen = (record) =>
           PENDIENTE: 'orange',
           APROBADA: 'green',
           RECHAZADA: 'red',
-          ENTREGADO: 'blue'
+          ENTREGADO: 'blue',
+          DEVUELTA: 'purple',
+          CERRADA_SIN_DEVOLUCION: 'default'
         }[record.estado]">
           {{ record.estado }}
         </a-tag>
@@ -133,9 +135,9 @@ const getSedeOrigen = (record) =>
         </div>
       </template>
 
-      <template v-else-if="column.dataIndex === 'sedeOrigen'">
-        <a-tag v-if="getSedeOrigen(record)" color="red">
-          {{ getSedeOrigen(record) }}
+      <template v-else-if="column.dataIndex === 'servicioOrigen'">
+        <a-tag v-if="getServicioOrigen(record)" color="blue">
+          {{ getServicioOrigen(record) }}
         </a-tag>
         <span v-else>—</span>
       </template>

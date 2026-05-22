@@ -6,7 +6,7 @@ import { message } from 'ant-design-vue'
 import { solicitudItemsService } from '@/services/solicitud-items.service'
 import { cuadrillaService } from '@/services/cuadrilla.service'
 import { itemService } from '@/services/item.service'
-import { sedeService } from '@/services/sede.service'
+import { servicioService } from '@/services/servicio.service'
 import { useAuthStore } from '@/stores/auth.store'
 
 const props = defineProps({
@@ -21,7 +21,7 @@ const isJefeCuadrilla = computed(() =>
 
 const form = ref({
   codigoCuadrilla: undefined,
-  sedeOrigenCodigo: undefined,
+  servicioOrigenCodigo: undefined,
   observaciones: '',
   detalles: []
 })
@@ -29,22 +29,32 @@ const form = ref({
 const resetForm = () => {
   form.value = {
     codigoCuadrilla: undefined,
-    sedeOrigenCodigo: undefined,
+    servicioOrigenCodigo: undefined,
     observaciones: '',
     detalles: [{ codigoItem: undefined, cantidad: 1 }]
   }
 }
 
-const sedes = ref([])
-const loadingSedes = ref(false)
+const servicios = ref([])
+const loadingServicios = ref(false)
 
-const loadSedes = async () => {
-  loadingSedes.value = true
+const buscarServicios = async (texto = '') => {
+  loadingServicios.value = true
   try {
-    const { data } = await sedeService.getActivas()
-    sedes.value = data.content
+    const params = {
+      enabled: true,
+      page: 0,
+      size: 20
+    }
+
+    if (texto?.trim()) {
+      params.codigo = texto.trim()
+    }
+
+    const { data } = await servicioService.search(params)
+    servicios.value = data.content
   } finally {
-    loadingSedes.value = false
+    loadingServicios.value = false
   }
 }
 
@@ -94,6 +104,12 @@ const loadCuadrillasJefe = async () => {
 const items = ref([])
 const loadingItems = ref(false)
 
+const selectedCuadrilla = computed(() =>
+  cuadrillas.value.find(c => c.codigoCuadrilla === form.value.codigoCuadrilla)
+)
+
+const serviceLockedByCuadrilla = computed(() => !!selectedCuadrilla.value?.codigoServicio)
+
 const buscarItems = async (texto = '') => {
   loadingItems.value = true
   try {
@@ -131,7 +147,7 @@ const hasDuplicateItems = computed(() => {
 
 const canSubmit = computed(() => {
   if (!form.value.codigoCuadrilla) return false
-  if (!form.value.sedeOrigenCodigo) return false
+  if (!form.value.servicioOrigenCodigo) return false
   if (!form.value.detalles.length) return false
   if (hasDuplicateItems.value) return false
 
@@ -143,11 +159,23 @@ const canSubmit = computed(() => {
 watch(() => props.open, (open) => {
   if (open) {
     resetForm()
-    sedes.value = []
+    servicios.value = []
     cuadrillas.value = []
     buscarItems()
-    loadSedes()
+    buscarServicios()
     loadCuadrillasJefe()
+  }
+})
+
+watch(selectedCuadrilla, (cuadrilla) => {
+  if (cuadrilla?.codigoServicio) {
+    form.value.servicioOrigenCodigo = cuadrilla.codigoServicio
+    if (!servicios.value.some(s => s.codigo === cuadrilla.codigoServicio)) {
+      servicios.value = [...servicios.value, {
+        codigo: cuadrilla.codigoServicio,
+        nombre: cuadrilla.nombreServicio
+      }]
+    }
   }
 })
 
@@ -158,7 +186,12 @@ const submit = async () => {
   }
 
   try {
-    await solicitudItemsService.create(form.value)
+    await solicitudItemsService.create({
+      codigoCuadrilla: form.value.codigoCuadrilla,
+      servicioOrigenCodigo: form.value.servicioOrigenCodigo,
+      observaciones: form.value.observaciones,
+      detalles: form.value.detalles
+    })
     message.success('Solicitud creada correctamente')
     emit('success')
     emit('close')
@@ -178,10 +211,11 @@ const submit = async () => {
   <a-modal title="Nueva Solicitud de Items" :open="open" @cancel="$emit('close')" @ok="submit"
     :ok-button-props="{ disabled: !canSubmit }" destroyOnClose>
     <a-form layout="vertical">
-      <a-form-item label="Sede Origen" required>
-        <a-select v-model:value="form.sedeOrigenCodigo" allow-clear placeholder="Seleccione sede"
-          :loading="loadingSedes">
-          <a-select-option v-for="s in sedes" :key="s.codigo" :value="s.codigo">
+      <a-form-item label="Servicio Origen" required>
+        <a-select v-model:value="form.servicioOrigenCodigo" show-search allow-clear placeholder="Buscar servicio"
+          :filter-option="false" :loading="loadingServicios" :disabled="serviceLockedByCuadrilla"
+          @search="buscarServicios" @focus="!servicios.length && buscarServicios()">
+          <a-select-option v-for="s in servicios" :key="s.codigo" :value="s.codigo">
             {{ s.codigo }} - {{ s.nombre }}
           </a-select-option>
         </a-select>

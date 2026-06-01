@@ -63,6 +63,81 @@ export const screenContexts = {
       'Cambiar pestana'
     ]
   },
+  'dashboard-consumo-anomalias': {
+    titulo: 'Dashboard - Consumo - Anomalias',
+    modulo: 'Consumo',
+    elementosVisibles: [
+      'Selector Anomalias',
+      'Selector Evolucion',
+      'Selector Proyeccion',
+      'Selector Alertas',
+      'Formulario de anomalias de consumo',
+      'Leyenda de criterio de anomalia con Z Score y score ML',
+      'Tabla de resultados'
+    ],
+    accionesDisponibles: [
+      'Detectar anomalias',
+      'Cambiar pestana'
+    ]
+  },
+  'dashboard-consumo-evolucion': {
+    titulo: 'Dashboard - Consumo - Evolucion',
+    modulo: 'Consumo',
+    elementosVisibles: [
+      'Selector Anomalias',
+      'Selector Evolucion',
+      'Selector Proyeccion',
+      'Selector Alertas',
+      'Formulario de evolucion de consumo',
+      'Leyenda de consumo diario, tendencia, Z Score y evento destacado',
+      'Grafico de evolucion',
+      'Resumen de dias evaluados, consumo total, eventos y max Z Score',
+      'Tabla de evolucion'
+    ],
+    accionesDisponibles: [
+      'Buscar cuadrilla',
+      'Buscar item',
+      'Ver evolucion',
+      'Cambiar pestana'
+    ]
+  },
+  'dashboard-consumo-proyeccion': {
+    titulo: 'Dashboard - Consumo - Proyeccion',
+    modulo: 'Consumo',
+    elementosVisibles: [
+      'Selector Anomalias',
+      'Selector Evolucion',
+      'Selector Proyeccion',
+      'Selector Alertas',
+      'Formulario de proyeccion de consumo',
+      'Grafico de proyeccion',
+      'Resumen de periodos, consumo proyectado y promedio proyectado',
+      'Tabla de proyeccion'
+    ],
+    accionesDisponibles: [
+      'Buscar item',
+      'Proyectar consumo',
+      'Cambiar pestana'
+    ]
+  },
+  'dashboard-consumo-alertas': {
+    titulo: 'Dashboard - Consumo - Alertas',
+    modulo: 'Consumo',
+    elementosVisibles: [
+      'Selector Anomalias',
+      'Selector Evolucion',
+      'Selector Proyeccion',
+      'Selector Alertas',
+      'Filtros de alertas por tipo, referencia, codigo de referencia y fechas',
+      'Resumen de alertas por tipo y referencias faltantes',
+      'Tabla de alertas'
+    ],
+    accionesDisponibles: [
+      'Buscar alertas',
+      'Limpiar filtros de alertas',
+      'Cambiar pestana'
+    ]
+  },
   'gestion-usuarios': {
     titulo: 'Gestion de Usuarios',
     modulo: 'Usuarios',

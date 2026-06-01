@@ -12,6 +12,14 @@ export const conteoFisicoService = {
     })
   },
 
+  async getDashboard(params) {
+    const authStore = useAuthStore()
+    return axios.get(`${API_URL}/dashboard`, {
+      params,
+      headers: { Authorization: authStore.token }
+    })
+  },
+
   async getById(id) {
     const authStore = useAuthStore()
     return axios.get(`${API_URL}/${id}`, {

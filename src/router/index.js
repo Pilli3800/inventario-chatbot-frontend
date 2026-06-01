@@ -54,6 +54,45 @@ const routes = [
           roles: ['ROLE_ADMINISTRACION', 'ROLE_LOGISTICA', 'ROLE_GERENCIA']
         }
       },
+      {
+        path: 'dashboard/consumo',
+        redirect: '/dashboard/consumo/anomalias',
+        meta: {
+          roles: ['ROLE_ADMINISTRACION', 'ROLE_LOGISTICA', 'ROLE_GERENCIA']
+        }
+      },
+      {
+        path: 'dashboard/consumo/anomalias',
+        name: 'dashboard-consumo-anomalias',
+        component: DashboardView,
+        meta: {
+          roles: ['ROLE_ADMINISTRACION', 'ROLE_LOGISTICA', 'ROLE_GERENCIA']
+        }
+      },
+      {
+        path: 'dashboard/consumo/evolucion',
+        name: 'dashboard-consumo-evolucion',
+        component: DashboardView,
+        meta: {
+          roles: ['ROLE_ADMINISTRACION', 'ROLE_LOGISTICA', 'ROLE_GERENCIA']
+        }
+      },
+      {
+        path: 'dashboard/consumo/proyeccion',
+        name: 'dashboard-consumo-proyeccion',
+        component: DashboardView,
+        meta: {
+          roles: ['ROLE_ADMINISTRACION', 'ROLE_LOGISTICA', 'ROLE_GERENCIA']
+        }
+      },
+      {
+        path: 'dashboard/consumo/alertas',
+        name: 'dashboard-consumo-alertas',
+        component: DashboardView,
+        meta: {
+          roles: ['ROLE_ADMINISTRACION', 'ROLE_LOGISTICA', 'ROLE_GERENCIA']
+        }
+      },
       ...adminRoutes,
       ...logisticaRoutes,
       ...solicitudesRoutes,

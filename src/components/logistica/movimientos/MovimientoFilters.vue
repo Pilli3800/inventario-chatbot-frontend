@@ -54,7 +54,8 @@ const tiposPermitidos = computed(() => {
       'SALIDA_CUADRILLA',
       'TRANSFERENCIA',
       'TRANSFERENCIA_SERVICIO',
-      'RETORNO_A_SEDE'
+      'RETORNO_A_SEDE',
+      'AJUSTE'
     ]
   }
 

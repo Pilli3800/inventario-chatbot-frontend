@@ -39,7 +39,8 @@ const tipos = [
   { key: 'devolucion', label: 'Devolucion', color: '#2563eb' },
   { key: 'transferencia', label: 'Transferencia', color: '#7c3aed' },
   { key: 'transferenciaServicio', label: 'Transf. servicio', color: '#a855f7' },
-  { key: 'retornoASede', label: 'Retorno a sede', color: '#64748b' }
+  { key: 'retornoASede', label: 'Retorno a sede', color: '#64748b' },
+  { key: 'ajuste', label: 'Ajuste', color: '#ca8a04' }
 ]
 
 const fechas = computed(() =>

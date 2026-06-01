@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue'
-import { itemService } from '@/services/item.service'
+import { getItemImageUrl, itemService } from '@/services/item.service'
 
 const props = defineProps({
   open: Boolean,
@@ -17,6 +17,7 @@ const item = ref({
   tipo: '',
   descripcion: '',
   observaciones: '',
+  imagenUrl: null,
   enabled: false
 })
 
@@ -24,19 +25,22 @@ const loadItem = async () => {
   if (!props.codigoItem) return
   loading.value = true
 
-  const { data } = await itemService.get(props.codigoItem)
-  const content = data.content
+  try {
+    const { data } = await itemService.get(props.codigoItem)
+    const content = data.content
 
-  item.value = {
-    codigoItem: content.codigoItem,
-    nombre: content.nombre,
-    tipo: content.tipo,
-    descripcion: content.descripcion || '',
-    observaciones: content.observaciones || '',
-    enabled: content.enabled
+    item.value = {
+      codigoItem: content.codigoItem,
+      nombre: content.nombre,
+      tipo: content.tipo,
+      descripcion: content.descripcion || '',
+      observaciones: content.observaciones || '',
+      imagenUrl: content.imagenUrl || null,
+      enabled: content.enabled
+    }
+  } finally {
+    loading.value = false
   }
-
-  loading.value = false
 }
 
 watch(
@@ -53,10 +57,26 @@ const handleClose = () => emit('close')
 </script>
 
 <template>
-  <a-modal :open="open" title="Detalle del Item" ok-text="Cerrar" :cancelButtonProps="{ style: { display: 'none' } }"
-    @ok="handleClose" @cancel="handleClose">
+  <a-modal
+    :open="open"
+    title="Detalle del Item"
+    ok-text="Cerrar"
+    :cancelButtonProps="{ style: { display: 'none' } }"
+    @ok="handleClose"
+    @cancel="handleClose"
+  >
     <a-form layout="vertical" :loading="loading">
-      <a-form-item label="Código">
+      <a-form-item label="Imagen">
+        <a-image
+          v-if="item.imagenUrl"
+          :src="getItemImageUrl(item.imagenUrl)"
+          :width="180"
+          class="item-image"
+        />
+        <a-empty v-else description="Sin imagen" :image="false" />
+      </a-form-item>
+
+      <a-form-item label="Codigo">
         <a-input :value="item.codigoItem" disabled />
       </a-form-item>
 
@@ -68,7 +88,7 @@ const handleClose = () => emit('close')
         <a-input :value="item.tipo" disabled />
       </a-form-item>
 
-      <a-form-item label="Descripción">
+      <a-form-item label="Descripcion">
         <a-textarea :value="item.descripcion" disabled />
       </a-form-item>
 
@@ -82,3 +102,12 @@ const handleClose = () => emit('close')
     </a-form>
   </a-modal>
 </template>
+
+<style scoped>
+.item-image {
+  max-height: 180px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+</style>

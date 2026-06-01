@@ -2,7 +2,7 @@
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
 import dayjs from 'dayjs'
-import { EllipsisOutlined } from '@ant-design/icons-vue'
+import { EllipsisOutlined, PercentageOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { useRouter, useRoute } from 'vue-router'
 import { userService } from '@/services/user.service'
@@ -32,7 +32,9 @@ const sedes = ref([])
 const servicios = ref([])
 const loadingUsuarios = ref(false)
 const loadingUbicaciones = ref(false)
+const loadingDashboard = ref(false)
 const downloading = ref(false)
+const dashboard = ref(null)
 
 const {
   data: reportes,
@@ -57,6 +59,17 @@ const paginationConfig = computed(() => ({
   showQuickJumper: true,
   showSizeChanger: true
 }))
+
+const resumenDashboard = computed(() => dashboard.value || {
+  totalConteos: 0,
+  totalItemsContados: 0,
+  itemsEvaluados: 0,
+  itemsConDiscrepancia: 0,
+  stockSistemaTotal: 0,
+  stockFisicoTotal: 0,
+  diferenciaAbsolutaTotal: 0,
+  porcentajeDiscrepancia: 0
+})
 
 const columns = computed(() => [
   { title: 'ID', dataIndex: 'id', width: 90 },
@@ -125,8 +138,22 @@ const buildFilters = () => ({
   codigoUbicacion: filtersForm.codigoUbicacion
 })
 
+const loadDashboard = async (filters = buildFilters()) => {
+  loadingDashboard.value = true
+  try {
+    const { data } = await conteoFisicoService.getDashboard(filters)
+    dashboard.value = data?.data ?? data?.content ?? data
+  } catch {
+    dashboard.value = null
+  } finally {
+    loadingDashboard.value = false
+  }
+}
+
 const searchReportes = () => {
-  onSearch(buildFilters())
+  const filters = buildFilters()
+  onSearch(filters)
+  loadDashboard(filters)
 }
 
 const resetFilters = () => {
@@ -218,6 +245,7 @@ watch(
 loadUbicaciones()
 buscarUsuarios('')
 loadReportes()
+loadDashboard()
 </script>
 
 <template>
@@ -290,9 +318,36 @@ loadReportes()
           </a-col>
         </a-row>
       </a-form>
-    </a-card>
+	    </a-card>
 
-    <a-table
+	    <a-row :gutter="[16, 16]" style="margin-bottom: 16px;">
+	      <a-col :xs="24" :sm="12" :lg="8">
+	        <a-tooltip
+	          title="Porcentaje de discrepancia entre inventario fisico y registrado. Se calcula dividiendo la suma de diferencias absolutas entre el stock total del sistema y multiplicando por 100. Los items con stock sistema igual a 0 se excluyen para evitar division entre cero."
+	          placement="top"
+	        >
+	          <a-card class="dashboard-card" :loading="loadingDashboard" :body-style="{ padding: '18px' }">
+	            <a-statistic
+	              title="Discrepancia de inventario (%)"
+	              :value="resumenDashboard.porcentajeDiscrepancia ?? 0"
+	              :precision="2"
+	              suffix="%"
+	            >
+	              <template #prefix>
+	                <span class="dashboard-icon">
+	                  <PercentageOutlined />
+	                </span>
+	              </template>
+	            </a-statistic>
+	            <div class="dashboard-secondary">
+	              {{ resumenDashboard.itemsConDiscrepancia ?? 0 }} items con discrepancia
+	            </div>
+	          </a-card>
+	        </a-tooltip>
+	      </a-col>
+	    </a-row>
+
+	    <a-table
       :columns="columns"
       :data-source="reportes"
       :loading="loading"
@@ -362,5 +417,30 @@ loadReportes()
   overflow: hidden;
   text-overflow: ellipsis;
   display: inline-block;
+}
+
+.dashboard-card {
+  height: 100%;
+  border: 0;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+}
+
+.dashboard-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-right: 4px;
+  border-radius: 8px;
+  color: #dc2626;
+  background-color: #dc262614;
+  font-size: 18px;
+}
+
+.dashboard-secondary {
+  margin-top: 8px;
+  color: #64748b;
+  font-size: 13px;
 }
 </style>

@@ -1,7 +1,14 @@
 import axios from 'axios'
 import { useAuthStore } from '@/stores/auth.store'
 
-const API_URL = 'http://localhost:8080/api/logistica/items'
+export const API_BASE_URL = 'http://localhost:8080'
+const API_URL = `${API_BASE_URL}/api/logistica/items`
+
+export const getItemImageUrl = (imagenUrl) => {
+  if (!imagenUrl) return null
+  if (/^https?:\/\//i.test(imagenUrl)) return imagenUrl
+  return `${API_BASE_URL}${imagenUrl}`
+}
 
 export const itemService = {
   async search(params) {
@@ -29,6 +36,26 @@ export const itemService = {
   async update(codigoItem, payload) {
     const authStore = useAuthStore()
     return axios.put(`${API_URL}/${codigoItem}`, payload, {
+      headers: { Authorization: authStore.token }
+    })
+  },
+
+  async uploadImage(codigoItem, file) {
+    const authStore = useAuthStore()
+    const formData = new FormData()
+    formData.append('file', file)
+
+    return axios.put(`${API_URL}/${codigoItem}/imagen`, formData, {
+      headers: {
+        Authorization: authStore.token,
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+  },
+
+  async deleteImage(codigoItem) {
+    const authStore = useAuthStore()
+    return axios.delete(`${API_URL}/${codigoItem}/imagen`, {
       headers: { Authorization: authStore.token }
     })
   },

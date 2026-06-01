@@ -1,9 +1,11 @@
 <script setup>
-import { ref, nextTick, onMounted, h } from 'vue'
+import { ref, nextTick, onMounted, h, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { storeToRefs } from 'pinia'
 import { message, Modal } from 'ant-design-vue'
 import 'animate.css'
 import { chatbotService } from '@/services/chatbot.service'
+import { useChatStore } from '@/stores/chat.store'
 import { buildScreenContext } from '@/utils/screen-context.util'
 import { marked } from 'marked'
 import {
@@ -24,6 +26,8 @@ const props = defineProps({
 })
 
 const route = useRoute()
+const chatStore = useChatStore()
+const { messages, hasSession, loading, typing } = storeToRefs(chatStore)
 
 /* Configuracion de Markdown(libreria) */
 marked.setOptions({ breaks: true })
@@ -40,51 +44,29 @@ const INITIAL_MESSAGE = 'Hola \uD83D\uDC4B Soy tu asistente de inventario. \u00B
 
 /* Estado */
 const inputKey = ref(0)
-const messageId = ref(0)
-const createMessage = (role, content) => ({
-  id: ++messageId.value,
-  role,
-  content
-})
-
-const messages = ref([
-  createMessage('assistant', INITIAL_MESSAGE)
-])
-
 const inputMessage = ref('')
-const loading = ref(false)
-const typing = ref(false)
 const cooldownActive = ref(false)
 const cooldownTimer = ref(null)
 const cooldownInterval = ref(null)
 const cooldownSecondsLeft = ref(0)
 const chatContainer = ref(null)
 const welcomeOpen = ref(props.showWelcome)
-const hasSession = ref(!!localStorage.getItem('sessionId'))
 
 const syncSession = () => {
-  hasSession.value = !!localStorage.getItem('sessionId')
-}
-
-const buildInitialMessages = () => ([
-  createMessage('assistant', INITIAL_MESSAGE)
-])
-
-const resetMessages = () => {
-  messages.value = buildInitialMessages()
+  chatStore.syncSession()
 }
 
 const loadHistorial = async () => {
   try {
+    if (messages.value.length > 1) return
+
     const response = await chatbotService.getHistorial()
 
     syncSession()
 
     if (!response?.data?.content?.messages?.length) return
 
-    messages.value = response.data.content.messages.map(item =>
-      createMessage(item.role, item.message)
-    )
+    chatStore.setMessages(response.data.content.messages)
     welcomeOpen.value = false
     await scrollToBottom()
   } catch (e) {
@@ -106,7 +88,7 @@ const clearChat = () => {
 
         chatbotService.clearSession()
         syncSession()
-        resetMessages()
+        chatStore.reset(INITIAL_MESSAGE)
         welcomeOpen.value = props.showWelcome
         await scrollToBottom()
 
@@ -148,21 +130,19 @@ const sendMessage = async () => {
   const userMessage = inputMessage.value
 
   // Mensaje del usuario
-  messages.value.push(createMessage('user', userMessage))
+  chatStore.pushMessage('user', userMessage)
 
   inputMessage.value = ''
   inputKey.value++
-  loading.value = true
-  typing.value = true
+  chatStore.setLoading(true)
+  chatStore.setTyping(true)
 
   await scrollToBottom()
 
-  const thinkingMessage = createMessage(
+  const thinkingMessage = chatStore.pushMessage(
     'assistant',
     THINKING_TEXTS[Math.floor(Math.random() * THINKING_TEXTS.length)]
   )
-
-  messages.value.push(thinkingMessage)
   await scrollToBottom()
 
   try {
@@ -181,8 +161,8 @@ const sendMessage = async () => {
     thinkingMessage.content =
       '\u274C Ocurri\u00F3 un error al procesar tu mensaje.'
   } finally {
-    loading.value = false
-    typing.value = false
+    chatStore.setLoading(false)
+    chatStore.setTyping(false)
     await scrollToBottom()
 
     startCooldown()
@@ -198,9 +178,17 @@ const scrollToBottom = async () => {
 }
 
 onMounted(() => {
+  chatStore.ensureInitial(INITIAL_MESSAGE)
   syncSession()
   loadHistorial()
 })
+
+watch(
+  () => messages.value.map(item => `${item.id}:${item.content}`).join('|'),
+  () => {
+    scrollToBottom()
+  }
+)
 </script>
 
 <template>

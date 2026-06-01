@@ -15,6 +15,7 @@ const emit = defineEmits(['change'])
 const TIPOS_ENTRADA = ['COMPRA', 'ENTRADA']
 const TIPOS_SALIDA = ['SALIDA', 'SALIDA_CUADRILLA']
 const TIPOS_INTERNOS = ['TRANSFERENCIA', 'TRANSFERENCIA_SERVICIO', 'RETORNO_A_SEDE']
+const TIPOS_AJUSTE = ['AJUSTE']
 
 const columns = computed(() => [
   {
@@ -66,6 +67,7 @@ const getTipoColor = (tipo) => {
   if (TIPOS_ENTRADA.includes(tipo)) return 'green'
   if (TIPOS_SALIDA.includes(tipo)) return 'volcano'
   if (TIPOS_INTERNOS.includes(tipo)) return 'blue'
+  if (TIPOS_AJUSTE.includes(tipo)) return 'gold'
   return 'default'
 }
 

@@ -106,6 +106,15 @@ const TIPO_CONFIG = {
     },
     visibleFields: ['codigoServicio', 'sedeDestinoCodigo'],
     requiredFields: ['codigoServicio', 'sedeDestinoCodigo']
+  },
+  AJUSTE: {
+    alert: {
+      message: 'Ajuste administrativo de stock',
+      description: 'Permite sumar o restar stock en una sede o en un servicio. Requiere observaciones.',
+      type: 'warning'
+    },
+    visibleFields: ['sedeDestinoCodigo', 'codigoServicio'],
+    requiredFields: []
   }
 }
 
@@ -132,7 +141,7 @@ const isJefeCuadrilla = computed(() => authStore.hasRole('ROLE_JEFE_CUADRILLA'))
 const tiposPermitidos = computed(() => {
   if (!authStore.isAuthenticated) return []
   if (isLogistica.value) {
-    return ['ENTRADA', 'COMPRA', 'TRANSFERENCIA', 'TRANSFERENCIA_SERVICIO', 'RETORNO_A_SEDE']
+    return ['ENTRADA', 'COMPRA', 'TRANSFERENCIA', 'TRANSFERENCIA_SERVICIO', 'RETORNO_A_SEDE', 'AJUSTE']
   }
   if (isJefeCuadrilla.value) {
     return []
@@ -143,6 +152,7 @@ const tiposPermitidos = computed(() => {
 const tipoConfig = computed(() => TIPO_CONFIG[form.value.tipoMovimiento] || null)
 const tipoMovimientoInfo = computed(() => tipoConfig.value?.alert || null)
 const compraSections = computed(() => tipoConfig.value?.sections || [])
+const isAjuste = computed(() => form.value.tipoMovimiento === 'AJUSTE')
 
 const hasField = (field) => tipoConfig.value?.visibleFields?.includes(field) || false
 const isRequiredField = (field) => tipoConfig.value?.requiredFields?.includes(field) || false
@@ -279,7 +289,17 @@ const onFacturaExistenteChange = (numeroFactura) => {
 const canSubmit = computed(() => {
   if (!form.value.tipoMovimiento) return false
   if (!form.value.codigoItem) return false
-  if (!form.value.cantidad || form.value.cantidad <= 0) return false
+  if (form.value.cantidad === undefined || form.value.cantidad === null) return false
+  if (isAjuste.value) {
+    if (form.value.cantidad === 0) return false
+    if (!String(form.value.observaciones || '').trim()) return false
+
+    const hasSedeDestino = !!form.value.sedeDestinoCodigo
+    const hasServicio = !!form.value.codigoServicio
+    if (hasSedeDestino === hasServicio) return false
+  } else if (form.value.cantidad <= 0) {
+    return false
+  }
 
   const required = tipoConfig.value?.requiredFields || []
   for (const field of required) {
@@ -366,6 +386,18 @@ watch(() => form.value.codigoProveedor, () => {
   form.value.fechaEmisionFactura = undefined
   if (facturaModo.value === 'existente') {
     loadFacturasCompra()
+  }
+})
+
+watch(() => form.value.sedeDestinoCodigo, (sedeDestinoCodigo) => {
+  if (isAjuste.value && sedeDestinoCodigo) {
+    form.value.codigoServicio = undefined
+  }
+})
+
+watch(() => form.value.codigoServicio, (codigoServicio) => {
+  if (isAjuste.value && codigoServicio) {
+    form.value.sedeDestinoCodigo = undefined
   }
 })
 
@@ -535,7 +567,7 @@ const submit = async () => {
         </a-form-item>
 
         <a-form-item label="Cantidad" required>
-          <a-input-number v-model:value="form.cantidad" :min="1" style="width: 100%" />
+          <a-input-number v-model:value="form.cantidad" :min="isAjuste ? undefined : 1" style="width: 100%" />
         </a-form-item>
 
         <a-form-item v-if="hasField('sedeOrigenCodigo')" label="Sede Origen"
@@ -591,7 +623,7 @@ const submit = async () => {
           </a-select>
         </a-form-item>
 
-        <a-form-item label="Observaciones">
+        <a-form-item label="Observaciones" :required="isAjuste">
           <a-textarea v-model:value="form.observaciones" />
         </a-form-item>
       </template>

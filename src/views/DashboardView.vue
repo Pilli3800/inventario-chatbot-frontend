@@ -17,6 +17,7 @@ import {
   SwapOutlined,
   TransactionOutlined,
   UndoOutlined,
+  ToolOutlined,
   UserOutlined
 } from '@ant-design/icons-vue'
 import GraficosIADashboard from '@/components/dashboard/GraficosIADashboard.vue'
@@ -24,6 +25,7 @@ import GraficosMovimientos from '@/components/dashboard/GraficosMovimientos.vue'
 import GraficosSolicitudes from '@/components/dashboard/GraficosSolicitudes.vue'
 import TablasItemsMovidos from '@/components/dashboard/TablasItemsMovidos.vue'
 import TablasIADashboard from '@/components/dashboard/TablasIADashboard.vue'
+import ConsumoMlPanel from '@/components/dashboard/consumo-ml/ConsumoMlPanel.vue'
 import { movimientosService } from '@/services/movimientos.service'
 import { solicitudItemsService } from '@/services/solicitud-items.service'
 import { chatbotService } from '@/services/chatbot.service'
@@ -49,12 +51,14 @@ const filtros = reactive({
 const tabRoutes = {
   solicitudes: '/dashboard/solicitudes',
   movimientos: '/dashboard/movimientos',
-  ia: '/dashboard/asistente-ia'
+  ia: '/dashboard/asistente-ia',
+  consumo: '/dashboard/consumo'
 }
 
 const activeTab = computed(() => {
   if (route.path === tabRoutes.movimientos) return 'movimientos'
   if (route.path === tabRoutes.ia) return 'ia'
+  if (route.path.startsWith(tabRoutes.consumo)) return 'consumo'
   return 'solicitudes'
 })
 
@@ -90,7 +94,10 @@ const resumenMovimientos = computed(() => movimientoDashboard.value || {
   devolucion: 0,
   transferencia: 0,
   transferenciaServicio: 0,
-  retornoASede: 0
+  retornoASede: 0,
+  ajuste: 0,
+  movimientosTrazables: 0,
+  nivelTrazabilidad: 0
 })
 
 const resumenIA = computed(() => iaDashboard.value || {
@@ -101,6 +108,7 @@ const resumenIA = computed(() => iaDashboard.value || {
   usuariosQueUsaronIA: 0,
   totalUsuariosActivos: 0,
   porcentajeUsuariosQueUsaronIA: 0,
+  promedioTiempoRespuestaSegundos: 0,
   promedioConsultasPorSesion: 0,
   consultasHoy: 0,
   consultasUltimos7Dias: 0,
@@ -167,6 +175,16 @@ const tarjetasMovimientos = computed(() => [
     icono: BarChartOutlined
   },
   {
+    titulo: 'Nivel de trazabilidad',
+    valor: resumenMovimientos.value.nivelTrazabilidad ?? 0,
+    detalle: 'Porcentaje de movimientos trazables sobre el total de movimientos.',
+    textoSecundario: `${resumenMovimientos.value.movimientosTrazables ?? 0} movimientos trazables`,
+    color: '#0ea5e9',
+    icono: CheckCircleOutlined,
+    precision: 2,
+    suffix: '%'
+  },
+  {
     titulo: 'Compra',
     valor: resumenMovimientos.value.compra,
     detalle: 'Movimientos tipo COMPRA.',
@@ -221,6 +239,13 @@ const tarjetasMovimientos = computed(() => [
     detalle: 'Movimientos tipo RETORNO_A_SEDE.',
     color: '#64748b',
     icono: CheckCircleOutlined
+  },
+  {
+    titulo: 'Ajuste',
+    valor: resumenMovimientos.value.ajuste,
+    detalle: 'Movimientos tipo AJUSTE.',
+    color: '#ca8a04',
+    icono: ToolOutlined
   }
 ])
 
@@ -252,6 +277,15 @@ const tarjetasIA = computed(() => [
     detalle: 'Sesiones distintas usadas.',
     color: '#2563eb',
     icono: RobotOutlined
+  },
+  {
+    titulo: 'Tiempo promedio de respuesta',
+    valor: resumenIA.value.promedioTiempoRespuestaSegundos,
+    detalle: 'Tiempo promedio que tarda el chatbot en responder una consulta, expresado en segundos.',
+    color: '#0ea5e9',
+    icono: ClockCircleOutlined,
+    precision: 2,
+    suffix: 's'
   },
   {
     titulo: 'Usuarios IA',
@@ -387,7 +421,7 @@ cargarDatos()
           <p>Trazabilidad de solicitudes, devoluciones e inventario</p>
         </a-col>
 
-        <a-col :xs="24" :lg="12" class="filtros-col">
+        <a-col v-if="activeTab !== 'consumo'" :xs="24" :lg="12" class="filtros-col">
           <a-card size="small" class="filtros-card" :body-style="{ padding: 0 }">
             <a-space class="filtros-space" wrap>
               <a-date-picker v-model:value="filtros.fechaInicio" class="filtro-fecha" placeholder="Desde" />
@@ -443,13 +477,21 @@ cargarDatos()
           <a-col v-for="tarjeta in tarjetasMovimientos" :key="tarjeta.titulo" :xs="24" :sm="12" :lg="8" :xl="4">
             <a-tooltip :title="tarjeta.detalle" placement="top">
               <a-card class="resumen-card" :body-style="{ padding: '18px' }">
-                <a-statistic :title="tarjeta.titulo" :value="tarjeta.valor">
+                <a-statistic
+                  :title="tarjeta.titulo"
+                  :value="tarjeta.valor"
+                  :precision="tarjeta.precision"
+                  :suffix="tarjeta.suffix"
+                >
                   <template #prefix>
                     <span class="resumen-icono" :style="{ color: tarjeta.color, backgroundColor: `${tarjeta.color}14` }">
                       <component :is="tarjeta.icono" />
                     </span>
                   </template>
                 </a-statistic>
+                <div v-if="tarjeta.textoSecundario" class="resumen-secundario">
+                  {{ tarjeta.textoSecundario }}
+                </div>
               </a-card>
             </a-tooltip>
           </a-col>
@@ -476,7 +518,12 @@ cargarDatos()
           <a-col v-for="tarjeta in tarjetasIA" :key="tarjeta.titulo" :xs="24" :sm="12" :lg="8" :xl="6">
             <a-tooltip :title="tarjeta.detalle" placement="top">
               <a-card class="resumen-card" :body-style="{ padding: '18px' }">
-                <a-statistic :title="tarjeta.titulo" :value="tarjeta.valor" :suffix="tarjeta.suffix">
+                <a-statistic
+                  :title="tarjeta.titulo"
+                  :value="tarjeta.valor"
+                  :precision="tarjeta.precision"
+                  :suffix="tarjeta.suffix"
+                >
                   <template #prefix>
                     <span class="resumen-icono" :style="{ color: tarjeta.color, backgroundColor: `${tarjeta.color}14` }">
                       <component :is="tarjeta.icono" />
@@ -494,6 +541,12 @@ cargarDatos()
           :top-usuarios="resumenIA.topUsuarios"
           :loading="loadingIA"
         />
+        </div>
+      </a-tab-pane>
+
+      <a-tab-pane key="consumo" tab="Consumo">
+        <div class="tab-content">
+          <ConsumoMlPanel />
         </div>
       </a-tab-pane>
     </a-tabs>
@@ -563,6 +616,12 @@ cargarDatos()
   margin-right: 4px;
   border-radius: 8px;
   font-size: 18px;
+}
+
+.resumen-secundario {
+  margin-top: 8px;
+  color: #64748b;
+  font-size: 13px;
 }
 
 @media (max-width: 991px) {

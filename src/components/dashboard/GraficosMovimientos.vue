@@ -36,7 +36,7 @@ const tipos = [
   { key: 'entrada', label: 'Entrada', color: '#22c55e' },
   { key: 'salida', label: 'Salida', color: '#dc2626' },
   { key: 'salidaCuadrilla', label: 'Salida cuadrilla', color: '#f97316' },
-  { key: 'devolucion', label: 'Devolucion', color: '#2563eb' },
+  { key: 'devolucion', label: 'Devolución', color: '#2563eb' },
   { key: 'transferencia', label: 'Transferencia', color: '#7c3aed' },
   { key: 'transferenciaServicio', label: 'Transf. servicio', color: '#a855f7' },
   { key: 'retornoASede', label: 'Retorno a sede', color: '#64748b' },
@@ -118,7 +118,7 @@ const opcionTorta = computed(() => ({
 <template>
   <a-row :gutter="[16, 16]">
     <a-col :xs="24" :lg="15">
-      <a-card class="grafico-card" title="Evolucion de movimientos">
+      <a-card class="grafico-card" title="Evolución de movimientos">
         <v-chart
           class="grafico"
           :option="opcionLineas"

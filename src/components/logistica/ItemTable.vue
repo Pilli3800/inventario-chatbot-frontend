@@ -11,7 +11,7 @@ const emit = defineEmits(['change'])
 
 const columns = [
   { title: 'Imagen', dataIndex: 'imagenUrl', width: 88 },
-  { title: 'Codigo', dataIndex: 'codigoItem', sorter: true },
+  { title: 'Código', dataIndex: 'codigoItem', sorter: true },
   { title: 'Nombre', dataIndex: 'nombre', sorter: true },
   { title: 'Tipo', dataIndex: 'tipo' },
   { title: 'Estado', dataIndex: 'enabled' },
@@ -32,7 +32,7 @@ const handleChange = (pagination, filters, sorter) => {
     row-key="codigoItem"
     :pagination="{
       ...pagination,
-      showTotal: (total, range) => `${range[0]}-${range[1]} de ${total} items`,
+      showTotal: (total, range) => `${range[0]}-${range[1]} de ${total} ítems`,
     }"
     @change="handleChange"
   >

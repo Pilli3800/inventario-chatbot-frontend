@@ -460,7 +460,7 @@ const submit = async () => {
   <a-modal title="Registrar Movimiento" :open="open" @cancel="$emit('close')" @ok="submit"
     :ok-button-props="{ disabled: !canSubmit }" destroyOnClose>
     <a-form layout="vertical">
-      <a-form-item label="Tipo de Movimiento" required>
+      <a-form-item label="Tipo de movimiento" required>
         <a-select v-model:value="form.tipoMovimiento" allow-clear>
           <a-select-option v-for="t in tiposPermitidos" :key="t" :value="t">
             {{ t }}
@@ -474,8 +474,8 @@ const submit = async () => {
       <template v-if="compraSections.length">
         <a-collapse :default-active-key="['movimiento', 'factura']" style="margin-bottom: 8px;">
           <a-collapse-panel key="movimiento" :header="compraSections[0].label">
-            <a-form-item label="Item" required>
-              <a-select v-model:value="form.codigoItem" show-search placeholder="Selecciona item"
+            <a-form-item label="Ítem" required>
+              <a-select v-model:value="form.codigoItem" show-search placeholder="Selecciona ítem"
                 :filter-option="filterSelectOption" :loading="loadingItems" allow-clear
                 :dropdown-style="{ maxHeight: '280px', overflow: 'auto' }">
                 <a-select-option v-for="item in items" :key="item.codigoItem" :value="item.codigoItem"
@@ -489,7 +489,7 @@ const submit = async () => {
               <a-input-number v-model:value="form.cantidad" :min="1" style="width: 100%" />
             </a-form-item>
 
-            <a-form-item label="Sede Destino" :required="isRequiredField('sedeDestinoCodigo')">
+            <a-form-item label="Sede destino" :required="isRequiredField('sedeDestinoCodigo')">
               <a-select v-model:value="form.sedeDestinoCodigo" allow-clear :loading="loadingSedes">
                 <a-select-option v-for="s in sedes" :key="s.codigo" :value="s.codigo">
                   {{ s.codigo }} - {{ s.nombre }}
@@ -521,7 +521,7 @@ const submit = async () => {
               </a-select>
             </a-form-item>
 
-            <a-form-item v-if="facturaModo === 'existente'" label="Numero de Factura" required>
+            <a-form-item v-if="facturaModo === 'existente'" label="Número de factura" required>
               <a-select v-model:value="form.numeroFactura" show-search allow-clear
                 placeholder="Buscar factura existente" :filter-option="filterSelectOption" :loading="loadingFacturasCompra"
                 :disabled="!form.codigoProveedor" @change="onFacturaExistenteChange"
@@ -535,18 +535,18 @@ const submit = async () => {
 
             <a-row v-else :gutter="12">
               <a-col :span="12">
-                <a-form-item label="Serie de Factura" required>
+                <a-form-item label="Serie de factura" required>
                   <a-input v-model:value="form.serieFactura" />
                 </a-form-item>
               </a-col>
               <a-col :span="12">
-                <a-form-item label="Correlativo de Factura" required>
+                <a-form-item label="Correlativo de factura" required>
                   <a-input v-model:value="form.correlativoFactura" />
                 </a-form-item>
               </a-col>
             </a-row>
 
-            <a-form-item label="Fecha de Emision de Factura">
+            <a-form-item label="Fecha de emisión de factura">
               <a-date-picker v-model:value="form.fechaEmisionFactura" style="width: 100%"
                 placeholder="Selecciona fecha" :disabled="facturaModo === 'existente'" />
             </a-form-item>
@@ -555,8 +555,8 @@ const submit = async () => {
       </template>
 
       <template v-else>
-        <a-form-item label="Item" required>
-          <a-select v-model:value="form.codigoItem" show-search placeholder="Selecciona item"
+        <a-form-item label="Ítem" required>
+          <a-select v-model:value="form.codigoItem" show-search placeholder="Selecciona ítem"
             :filter-option="filterSelectOption" :loading="loadingItems" allow-clear
             :dropdown-style="{ maxHeight: '280px', overflow: 'auto' }">
             <a-select-option v-for="item in items" :key="item.codigoItem" :value="item.codigoItem"
@@ -570,7 +570,7 @@ const submit = async () => {
           <a-input-number v-model:value="form.cantidad" :min="isAjuste ? undefined : 1" style="width: 100%" />
         </a-form-item>
 
-        <a-form-item v-if="hasField('sedeOrigenCodigo')" label="Sede Origen"
+        <a-form-item v-if="hasField('sedeOrigenCodigo')" label="Sede origen"
           :required="isRequiredField('sedeOrigenCodigo')">
           <a-select v-model:value="form.sedeOrigenCodigo" allow-clear :loading="loadingSedes">
             <a-select-option v-for="s in sedes" :key="s.codigo" :value="s.codigo">
@@ -579,7 +579,7 @@ const submit = async () => {
           </a-select>
         </a-form-item>
 
-        <a-form-item v-if="hasField('sedeDestinoCodigo')" label="Sede Destino"
+        <a-form-item v-if="hasField('sedeDestinoCodigo')" label="Sede destino"
           :required="isRequiredField('sedeDestinoCodigo')">
           <a-select v-model:value="form.sedeDestinoCodigo" allow-clear :loading="loadingSedes">
             <a-select-option v-for="s in sedes" :key="s.codigo" :value="s.codigo">
@@ -608,7 +608,7 @@ const submit = async () => {
           </a-select>
         </a-form-item>
 
-        <a-form-item v-if="hasField('numeroFactura')" label="Numero de Factura"
+        <a-form-item v-if="hasField('numeroFactura')" label="Número de factura"
           :required="isRequiredField('numeroFactura')">
           <a-input v-model:value="form.numeroFactura" />
         </a-form-item>

@@ -67,7 +67,7 @@ const isDisabled = computed(() => {
 const validateImage = (file) => {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
   if (!allowedTypes.includes(file.type)) {
-    message.error('Solo se permiten imagenes JPG, PNG o WEBP')
+    message.error('Solo se permiten imágenes JPG, PNG o WEBP')
     return false
   }
 
@@ -116,7 +116,7 @@ const deleteImage = async () => {
 
 const confirmDeleteImage = () => {
   Modal.confirm({
-    title: 'Eliminar imagen del item?',
+    title: '¿Eliminar imagen del ítem?',
     icon: createVNode(ExclamationCircleOutlined),
     okText: 'Eliminar',
     okType: 'danger',
@@ -148,7 +148,7 @@ const submit = async () => {
 
 const confirmEdit = () => {
   Modal.confirm({
-    title: 'Guardar cambios del item?',
+    title: '¿Guardar cambios del ítem?',
     icon: createVNode(ExclamationCircleOutlined),
     okText: 'Guardar',
     cancelText: 'Cancelar',
@@ -162,7 +162,7 @@ const handleCancel = () => emit('close')
 <template>
   <a-modal
     :open="open"
-    title="Editar Item"
+    title="Editar ítem"
     ok-text="Guardar"
     cancel-text="Cancelar"
     :okButtonProps="{ disabled: isDisabled }"
@@ -204,11 +204,11 @@ const handleCancel = () => emit('close')
             </a-button>
           </a-space>
 
-          <div class="image-help">JPG, PNG o WEBP. Maximo 2 MB.</div>
+          <div class="image-help">JPG, PNG o WEBP. Máximo 2 MB.</div>
         </div>
       </a-form-item>
 
-      <a-form-item label="Codigo">
+      <a-form-item label="Código">
         <a-input v-model:value="form.codigoItem" disabled />
       </a-form-item>
 
@@ -224,7 +224,7 @@ const handleCancel = () => emit('close')
         </a-select>
       </a-form-item>
 
-      <a-form-item label="Descripcion">
+      <a-form-item label="Descripción">
         <a-textarea v-model:value="form.descripcion" />
       </a-form-item>
 

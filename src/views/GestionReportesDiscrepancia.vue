@@ -81,9 +81,9 @@ const columns = computed(() => [
     sortOrder: sorter.value?.field === 'fechaConteo' ? sorter.value.order : null
   },
   { title: 'Tipo', dataIndex: 'tipoInventario', width: 110 },
-  { title: 'Ubicacion', dataIndex: 'ubicacion', width: 190 },
+  { title: 'Ubicación', dataIndex: 'ubicacion', width: 190 },
   { title: 'Usuario', dataIndex: 'usuario', width: 190 },
-  { title: 'Items', dataIndex: 'totalItems', width: 100, align: 'right' },
+  { title: 'Ítems', dataIndex: 'totalItems', width: 100, align: 'right' },
   { title: 'Discrepancias', dataIndex: 'itemsConDiscrepancia', width: 130, align: 'right' },
   { title: 'Observaciones', dataIndex: 'observaciones', width: 240 },
   { title: '', dataIndex: 'actions', fixed: 'right', width: 72, align: 'center' }
@@ -288,7 +288,7 @@ loadDashboard()
           </a-col>
 
           <a-col :md="5">
-            <a-form-item label="Ubicacion">
+            <a-form-item label="Ubicación">
               <a-select v-model:value="filtersForm.codigoUbicacion" show-search allow-clear placeholder="Seleccione"
                 :disabled="!filtersForm.tipoInventario" :loading="loadingUbicaciones"
                 :dropdown-style="{ maxHeight: '280px', overflow: 'auto' }">
@@ -323,7 +323,7 @@ loadDashboard()
 	    <a-row :gutter="[16, 16]" style="margin-bottom: 16px;">
 	      <a-col :xs="24" :sm="12" :lg="8">
 	        <a-tooltip
-	          title="Porcentaje de discrepancia entre inventario fisico y registrado. Se calcula dividiendo la suma de diferencias absolutas entre el stock total del sistema y multiplicando por 100. Los items con stock sistema igual a 0 se excluyen para evitar division entre cero."
+	          title="Porcentaje de discrepancia entre inventario físico y registrado. Se calcula dividiendo la suma de diferencias absolutas entre el stock total del sistema y multiplicando por 100. Los ítems con stock sistema igual a 0 se excluyen para evitar división entre cero."
 	          placement="top"
 	        >
 	          <a-card class="dashboard-card" :loading="loadingDashboard" :body-style="{ padding: '18px' }">
@@ -340,7 +340,7 @@ loadDashboard()
 	              </template>
 	            </a-statistic>
 	            <div class="dashboard-secondary">
-	              {{ resumenDashboard.itemsConDiscrepancia ?? 0 }} items con discrepancia
+	              {{ resumenDashboard.itemsConDiscrepancia ?? 0 }} ítems con discrepancia
 	            </div>
 	          </a-card>
 	        </a-tooltip>

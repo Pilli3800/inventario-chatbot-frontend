@@ -170,7 +170,7 @@ const tarjetasMovimientos = computed(() => [
   {
     titulo: 'Movimientos',
     valor: resumenMovimientos.value.total,
-    detalle: 'Total de movimientos historicos en el periodo filtrado.',
+    detalle: 'Total de movimientos históricos en el período filtrado.',
     color: '#0f172a',
     icono: BarChartOutlined
   },
@@ -213,9 +213,9 @@ const tarjetasMovimientos = computed(() => [
     icono: ExportOutlined
   },
   {
-    titulo: 'Devolucion',
+    titulo: 'Devolución',
     valor: resumenMovimientos.value.devolucion,
-    detalle: 'Movimientos historicos tipo DEVOLUCION.',
+    detalle: 'Movimientos históricos tipo DEVOLUCIÓN.',
     color: '#2563eb',
     icono: UndoOutlined
   },
@@ -303,9 +303,9 @@ const tarjetasIA = computed(() => [
     suffix: '%'
   },
   {
-    titulo: 'Prom. sesion',
+    titulo: 'Prom. sesión',
     valor: resumenIA.value.promedioConsultasPorSesion,
-    detalle: 'Promedio de consultas por sesion.',
+    detalle: 'Promedio de consultas por sesión.',
     color: '#64748b',
     icono: BarChartOutlined
   },

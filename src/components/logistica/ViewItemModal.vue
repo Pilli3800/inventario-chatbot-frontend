@@ -59,7 +59,7 @@ const handleClose = () => emit('close')
 <template>
   <a-modal
     :open="open"
-    title="Detalle del Item"
+    title="Detalle del ítem"
     ok-text="Cerrar"
     :cancelButtonProps="{ style: { display: 'none' } }"
     @ok="handleClose"
@@ -76,7 +76,7 @@ const handleClose = () => emit('close')
         <a-empty v-else description="Sin imagen" :image="false" />
       </a-form-item>
 
-      <a-form-item label="Codigo">
+      <a-form-item label="Código">
         <a-input :value="item.codigoItem" disabled />
       </a-form-item>
 
@@ -88,7 +88,7 @@ const handleClose = () => emit('close')
         <a-input :value="item.tipo" disabled />
       </a-form-item>
 
-      <a-form-item label="Descripcion">
+      <a-form-item label="Descripción">
         <a-textarea :value="item.descripcion" disabled />
       </a-form-item>
 

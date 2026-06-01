@@ -4,14 +4,14 @@ export const screenContexts = {
     modulo: 'General',
     elementosVisibles: [
       'Mensaje de bienvenida con el usuario actual',
-      'Texto: Iniciaste sesion correctamente',
-      'Seccion Configuracion',
+      'Texto: Iniciaste sesión correctamente',
+      'Sección Configuración',
       'Texto: Seguridad y preferencias de la cuenta',
-      'Boton Cambiar mi contrasena'
+      'Botón Cambiar mi contraseña'
     ],
     accionesDisponibles: [
-      'Abrir menu lateral',
-      'Cambiar mi contrasena',
+      'Abrir menú lateral',
+      'Cambiar mi contraseña',
       'Abrir asistente IA'
     ]
   },
@@ -21,7 +21,7 @@ export const screenContexts = {
     elementosVisibles: [
       'Filtros de fecha',
       'Resumen de solicitudes',
-      'Graficos de solicitudes',
+      'Gráficos de solicitudes',
       'Pendientes de cierre',
       'Solicitudes por servicio',
       'Top cuadrillas'
@@ -29,7 +29,7 @@ export const screenContexts = {
     accionesDisponibles: [
       'Buscar',
       'Limpiar',
-      'Cambiar pestana'
+      'Cambiar pestaña'
     ]
   },
   'dashboard-movimientos': {
@@ -38,14 +38,14 @@ export const screenContexts = {
     elementosVisibles: [
       'Filtros de fecha',
       'Resumen de movimientos',
-      'Graficos de movimientos',
-      'Items mas movidos',
+      'Gráficos de movimientos',
+      'Ítems más movidos',
       'Stock movido'
     ],
     accionesDisponibles: [
       'Buscar',
       'Limpiar',
-      'Cambiar pestana'
+      'Cambiar pestaña'
     ]
   },
   'dashboard-asistente-ia': {
@@ -54,92 +54,92 @@ export const screenContexts = {
     elementosVisibles: [
       'Filtros de fecha',
       'Resumen de uso del asistente IA',
-      'Graficos de consultas',
+      'Gráficos de consultas',
       'Top usuarios'
     ],
     accionesDisponibles: [
       'Buscar',
       'Limpiar',
-      'Cambiar pestana'
+      'Cambiar pestaña'
     ]
   },
   'dashboard-consumo-anomalias': {
-    titulo: 'Dashboard - Consumo - Anomalias',
+    titulo: 'Dashboard - Consumo - Anomalías',
     modulo: 'Consumo',
     elementosVisibles: [
-      'Selector Anomalias',
-      'Selector Evolucion',
-      'Selector Proyeccion',
+      'Selector Anomalías',
+      'Selector Evolución',
+      'Selector Proyección',
       'Selector Alertas',
-      'Formulario de anomalias de consumo',
-      'Leyenda de criterio de anomalia con Z Score y score ML',
+      'Formulario de anomalías de consumo',
+      'Leyenda de criterio de anomalía con Z Score y score ML',
       'Tabla de resultados'
     ],
     accionesDisponibles: [
-      'Detectar anomalias',
-      'Cambiar pestana'
+      'Detectar anomalías',
+      'Cambiar pestaña'
     ]
   },
   'dashboard-consumo-evolucion': {
-    titulo: 'Dashboard - Consumo - Evolucion',
+    titulo: 'Dashboard - Consumo - Evolución',
     modulo: 'Consumo',
     elementosVisibles: [
-      'Selector Anomalias',
-      'Selector Evolucion',
-      'Selector Proyeccion',
+      'Selector Anomalías',
+      'Selector Evolución',
+      'Selector Proyección',
       'Selector Alertas',
-      'Formulario de evolucion de consumo',
+      'Formulario de evolución de consumo',
       'Leyenda de consumo diario, tendencia, Z Score y evento destacado',
-      'Grafico de evolucion',
-      'Resumen de dias evaluados, consumo total, eventos y max Z Score',
-      'Tabla de evolucion'
+      'Gráfico de evolución',
+      'Resumen de días evaluados, consumo total, eventos y max Z Score',
+      'Tabla de evolución'
     ],
     accionesDisponibles: [
       'Buscar cuadrilla',
-      'Buscar item',
-      'Ver evolucion',
-      'Cambiar pestana'
+      'Buscar ítem',
+      'Ver evolución',
+      'Cambiar pestaña'
     ]
   },
   'dashboard-consumo-proyeccion': {
-    titulo: 'Dashboard - Consumo - Proyeccion',
+    titulo: 'Dashboard - Consumo - Proyección',
     modulo: 'Consumo',
     elementosVisibles: [
-      'Selector Anomalias',
-      'Selector Evolucion',
-      'Selector Proyeccion',
+      'Selector Anomalías',
+      'Selector Evolución',
+      'Selector Proyección',
       'Selector Alertas',
-      'Formulario de proyeccion de consumo',
-      'Grafico de proyeccion',
-      'Resumen de periodos, consumo proyectado y promedio proyectado',
-      'Tabla de proyeccion'
+      'Formulario de proyección de consumo',
+      'Gráfico de proyección',
+      'Resumen de períodos, consumo proyectado y promedio proyectado',
+      'Tabla de proyección'
     ],
     accionesDisponibles: [
-      'Buscar item',
+      'Buscar ítem',
       'Proyectar consumo',
-      'Cambiar pestana'
+      'Cambiar pestaña'
     ]
   },
   'dashboard-consumo-alertas': {
     titulo: 'Dashboard - Consumo - Alertas',
     modulo: 'Consumo',
     elementosVisibles: [
-      'Selector Anomalias',
-      'Selector Evolucion',
-      'Selector Proyeccion',
+      'Selector Anomalías',
+      'Selector Evolución',
+      'Selector Proyección',
       'Selector Alertas',
-      'Filtros de alertas por tipo, referencia, codigo de referencia y fechas',
+      'Filtros de alertas por tipo, referencia, código de referencia y fechas',
       'Resumen de alertas por tipo y referencias faltantes',
       'Tabla de alertas'
     ],
     accionesDisponibles: [
       'Buscar alertas',
       'Limpiar filtros de alertas',
-      'Cambiar pestana'
+      'Cambiar pestaña'
     ]
   },
   'gestion-usuarios': {
-    titulo: 'Gestion de Usuarios',
+    titulo: 'Gestión de Usuarios',
     modulo: 'Usuarios',
     elementosVisibles: [
       'Filtros de usuarios',
@@ -154,17 +154,17 @@ export const screenContexts = {
       { label: 'Crear usuario', permission: 'create' },
       { label: 'Ver usuario', permission: 'view' },
       { label: 'Editar usuario', permission: 'edit' },
-      { label: 'Restablecer contrasena', permission: 'edit' },
+      { label: 'Restablecer contraseña', permission: 'edit' },
       { label: 'Exportar Excel', permission: 'report' }
     ]
   },
   'gestion-sedes': {
-    titulo: 'Gestion de Sedes',
-    modulo: 'Administracion',
+    titulo: 'Gestión de Sedes',
+    modulo: 'Administración',
     elementosVisibles: [
       'Filtros de sedes',
       'Tabla de sedes',
-      'Codigo',
+      'Código',
       'Nombre',
       'Estado'
     ],
@@ -177,12 +177,12 @@ export const screenContexts = {
     ]
   },
   'gestion-cuadrillas': {
-    titulo: 'Gestion de Cuadrillas',
-    modulo: 'Administracion',
+    titulo: 'Gestión de Cuadrillas',
+    modulo: 'Administración',
     elementosVisibles: [
       'Filtros de cuadrillas',
       'Tabla de cuadrillas',
-      'Codigo',
+      'Código',
       'Nombre',
       'Usuario responsable',
       'Estado'
@@ -194,16 +194,16 @@ export const screenContexts = {
       { label: 'Ver cuadrilla', permission: 'view' },
       { label: 'Editar cuadrilla', permission: 'edit' },
       { label: 'Exportar Excel', permission: 'report' },
-      { label: 'Exportar con auditoria', permission: 'report' }
+      { label: 'Exportar con auditoría', permission: 'report' }
     ]
   },
   'gestion-servicios': {
-    titulo: 'Gestion de Servicios',
-    modulo: 'Administracion',
+    titulo: 'Gestión de Servicios',
+    modulo: 'Administración',
     elementosVisibles: [
       'Filtros de servicios',
       'Tabla de servicios',
-      'Codigo',
+      'Código',
       'Nombre',
       'Sede',
       'Estado'
@@ -215,18 +215,18 @@ export const screenContexts = {
       { label: 'Ver servicio', permission: 'view' },
       { label: 'Editar servicio', permission: 'edit' },
       { label: 'Exportar Excel', permission: 'report' },
-      { label: 'Exportar con auditoria', permission: 'report' }
+      { label: 'Exportar con auditoría', permission: 'report' }
     ]
   },
   'gestion-proveedores': {
-    titulo: 'Gestion de Proveedores',
-    modulo: 'Logistica',
+    titulo: 'Gestión de Proveedores',
+    modulo: 'Logística',
     elementosVisibles: [
       'Filtros de proveedores',
       'Tabla de proveedores',
       'RUC',
-      'Razon social',
-      'Telefono',
+      'Razón social',
+      'Teléfono',
       'Estado'
     ],
     accionesDisponibles: [
@@ -236,18 +236,18 @@ export const screenContexts = {
       { label: 'Ver proveedor', permission: 'view' },
       { label: 'Editar proveedor', permission: 'edit' },
       { label: 'Exportar Excel', permission: 'report' },
-      { label: 'Exportar con auditoria', permission: 'audit' }
+      { label: 'Exportar con auditoría', permission: 'audit' }
     ]
   },
   'gestion-facturas-compra': {
-    titulo: 'Gestion de Facturas',
-    modulo: 'Logistica',
+    titulo: 'Gestión de Facturas',
+    modulo: 'Logística',
     elementosVisibles: [
       'Filtros de facturas',
       'Resumen de facturas',
       'Tabla de facturas',
       'Proveedor',
-      'Numero de factura',
+      'Número de factura',
       'Fecha',
       'Observaciones'
     ],
@@ -259,12 +259,12 @@ export const screenContexts = {
     ]
   },
   'gestion-items': {
-    titulo: 'Gestion de Items',
+    titulo: 'Gestión de Ítems',
     modulo: 'Inventario',
     elementosVisibles: [
-      'Filtros de items',
-      'Tabla de items',
-      'Codigo item',
+      'Filtros de ítems',
+      'Tabla de ítems',
+      'Código de ítem',
       'Nombre',
       'Tipo',
       'Estado'
@@ -272,59 +272,59 @@ export const screenContexts = {
     accionesDisponibles: [
       'Buscar',
       'Limpiar',
-      { label: 'Crear item', permission: 'create' },
-      { label: 'Ver item', permission: 'view' },
-      { label: 'Editar item', permission: 'edit' },
+      { label: 'Crear ítem', permission: 'create' },
+      { label: 'Ver ítem', permission: 'view' },
+      { label: 'Editar ítem', permission: 'edit' },
       { label: 'Ver historial', permission: 'viewItemHistory' },
       { label: 'Exportar Excel', permission: 'report' },
-      { label: 'Exportar con auditoria', permission: 'audit' }
+      { label: 'Exportar con auditoría', permission: 'audit' }
     ]
   },
   'gestion-inventarios': {
-    titulo: 'Gestion de Inventario',
+    titulo: 'Gestión de Inventario',
     modulo: 'Inventario',
     elementosVisibles: [
       'Filtros de inventario',
       'Tabla de inventario por sede',
       'Sede',
-      'Item',
+      'Ítem',
       'Stock actual'
     ],
     accionesDisponibles: [
       'Buscar',
       'Limpiar',
-      { label: 'Asignar item a sede', permission: 'create' },
+      { label: 'Asignar ítem a sede', permission: 'create' },
       { label: 'Exportar Excel', permission: 'report' },
-      { label: 'Exportar con auditoria', permission: 'audit' }
+      { label: 'Exportar con auditoría', permission: 'audit' }
     ]
   },
   'gestion-inventario-servicio': {
-    titulo: 'Gestion de Inventario Servicio',
+    titulo: 'Gestión de Inventario Servicio',
     modulo: 'Inventario',
     elementosVisibles: [
       'Filtros de inventario servicio',
       'Tabla de inventario por servicio',
       'Servicio',
-      'Item',
+      'Ítem',
       'Stock actual'
     ],
     accionesDisponibles: [
       'Buscar',
       'Limpiar',
-      { label: 'Asignar item a servicio', permission: 'create' },
+      { label: 'Asignar ítem a servicio', permission: 'create' },
       { label: 'Ver historial', permission: 'viewItemHistory' }
     ]
   },
   'gestion-conteo-fisico': {
-    titulo: 'Conteo Fisico de Inventario',
+    titulo: 'Conteo Físico de Inventario',
     modulo: 'Inventario',
     elementosVisibles: [
       'Tipo inventario',
-      'Ubicacion',
+      'Ubicación',
       'Observaciones',
-      'Tabla de items',
+      'Tabla de ítems',
       'Stock sistema',
-      'Cantidad fisica',
+      'Cantidad física',
       'Diferencia'
     ],
     accionesDisponibles: [
@@ -340,7 +340,7 @@ export const screenContexts = {
       'Filtros de reportes',
       'Tabla de reportes',
       'Fecha de conteo',
-      'Ubicacion',
+      'Ubicación',
       'Usuario',
       'Observaciones'
     ],
@@ -353,7 +353,7 @@ export const screenContexts = {
     ]
   },
   'gestion-movimientos': {
-    titulo: 'Gestion de Movimientos',
+    titulo: 'Gestión de Movimientos',
     modulo: 'Movimientos',
     elementosVisibles: [
       'Filtros de movimientos',
@@ -383,7 +383,7 @@ export const screenContexts = {
       'Estado',
       'Servicio',
       'Cuadrilla',
-      'Items solicitados'
+      'Ítems solicitados'
     ],
     accionesDisponibles: [
       'Buscar',
@@ -393,9 +393,9 @@ export const screenContexts = {
       { label: 'Aprobar', permission: 'manageSolicitudes' },
       { label: 'Rechazar', permission: 'manageSolicitudes' },
       { label: 'Entregar', permission: 'manageSolicitudes' },
-      { label: 'Registrar devolucion', permission: 'manageSolicitudes' },
-      { label: 'Cerrar sin devolucion', permission: 'manageSolicitudes' },
-      { label: 'Descargar comprobante de devolucion', permission: 'view' }
+      { label: 'Registrar devolución', permission: 'manageSolicitudes' },
+      { label: 'Cerrar sin devolución', permission: 'manageSolicitudes' },
+      { label: 'Descargar comprobante de devolución', permission: 'view' }
     ]
   },
   'chat-ia': {
@@ -404,7 +404,7 @@ export const screenContexts = {
     elementosVisibles: [
       'Historial del chat',
       'Caja de mensaje',
-      'Boton enviar'
+      'Botón enviar'
     ],
     accionesDisponibles: [
       'Enviar mensaje',

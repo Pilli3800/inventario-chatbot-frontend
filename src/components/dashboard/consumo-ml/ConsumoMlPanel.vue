@@ -90,19 +90,19 @@ const alertasForm = reactive({
 })
 
 const panelOptions = [
-  { label: 'Anomalias', value: 'anomalias' },
-  { label: 'Evolucion', value: 'evolucion' },
-  { label: 'Proyeccion', value: 'proyeccion' },
+  { label: 'Anomalías', value: 'anomalias' },
+  { label: 'Evolución', value: 'evolucion' },
+  { label: 'Proyección', value: 'proyeccion' },
   { label: 'Alertas', value: 'alertas' }
 ]
 
 const alertaTipoOptions = [
-  { label: 'Consumo anomalo', value: 'CONSUMO_ANOMALO' },
+  { label: 'Consumo anómalo', value: 'CONSUMO_ANOMALO' },
   { label: 'Evento consumo', value: 'EVENTO_CONSUMO' }
 ]
 
 const referenciaTipoOptions = [
-  { label: 'Item', value: 'ITEM' },
+  { label: 'Ítem', value: 'ITEM' },
   { label: 'Cuadrilla', value: 'CUADRILLA' }
 ]
 
@@ -201,13 +201,13 @@ const buildColumns = (rows) => {
 
 const anomaliasColumns = [
   { title: 'Cuadrilla', dataIndex: 'cuadrillaCodigo', width: 120 },
-  { title: 'Item', dataIndex: 'itemCodigo', width: 120 },
-  { title: 'Nombre item', dataIndex: 'itemNombre', width: 230 },
+  { title: 'Ítem', dataIndex: 'itemCodigo', width: 120 },
+  { title: 'Nombre del ítem', dataIndex: 'itemNombre', width: 230 },
   { title: 'Consumo actual', dataIndex: 'consumoActual', width: 130, align: 'right' },
-  { title: 'Promedio historico', dataIndex: 'consumoPromedio', width: 150, align: 'right' },
-  { title: 'Variacion', dataIndex: 'zScore', width: 120, align: 'right' },
+  { title: 'Promedio histórico', dataIndex: 'consumoPromedio', width: 150, align: 'right' },
+  { title: 'Variación', dataIndex: 'zScore', width: 120, align: 'right' },
   { title: 'Estado', dataIndex: 'isAnomaly', width: 120 },
-  { title: 'Explicacion', dataIndex: 'explicacion', width: 420 }
+  { title: 'Explicación', dataIndex: 'explicacion', width: 420 }
 ]
 const evolucionColumns = [
   { title: 'Fecha', dataIndex: 'fecha', width: 120 },
@@ -215,19 +215,19 @@ const evolucionColumns = [
   { title: 'Tendencia', dataIndex: 'tendencia', width: 120, align: 'right' },
   { title: 'Z Score', dataIndex: 'zScore', width: 100, align: 'right' },
   { title: 'Evento', dataIndex: 'eventoDestacado', width: 120 },
-  { title: 'Explicacion', dataIndex: 'explicacion', width: 360 }
+  { title: 'Explicación', dataIndex: 'explicacion', width: 360 }
 ]
 const proyeccionColumns = [
   { title: 'Fecha', dataIndex: 'fecha', width: 130 },
   { title: 'Consumo estimado', dataIndex: 'consumoEstimado', width: 160, align: 'right' },
-  { title: 'Metodo', dataIndex: 'metodo', width: 220 },
-  { title: 'Explicacion', dataIndex: 'explicacion', width: 460 }
+  { title: 'Método', dataIndex: 'metodo', width: 220 },
+  { title: 'Explicación', dataIndex: 'explicacion', width: 460 }
 ]
 const alertasColumns = [
   { title: 'Fecha', dataIndex: 'fechaAlerta', width: 170 },
   { title: 'Tipo', dataIndex: 'tipo', width: 170 },
   { title: 'Referencia', dataIndex: 'referenciaCodigo', width: 190 },
-  { title: 'Descripcion', dataIndex: 'descripcion', width: 420 }
+  { title: 'Descripción', dataIndex: 'descripcion', width: 420 }
 ]
 
 const getTableColumns = (rows, preferredColumns) => {
@@ -245,7 +245,7 @@ const resolvedEvolucionColumns = computed(() =>
   getTableColumns(evolucion.value, evolucionColumns)
 )
 
-const booleanTag = (value, trueText = 'Si', falseText = 'No') => ({
+const booleanTag = (value, trueText = 'Sí', falseText = 'No') => ({
   color: value ? 'orange' : 'green',
   text: value ? trueText : falseText
 })
@@ -386,17 +386,17 @@ const buscarCuadrillas = async (texto) => {
 
 const consultarAnomalias = async () => {
   if (!anomaliasForm.dias) {
-    message.warning('Ingrese dias a analizar')
+    message.warning('Ingrese días a analizar')
     return
   }
 
   if (anomaliasForm.dias < 1 || anomaliasForm.dias > 30) {
-    message.warning('Dias debe estar entre 1 y 30')
+    message.warning('Días debe estar entre 1 y 30')
     return
   }
 
   if (anomaliasForm.periodosHistorial < 2 || anomaliasForm.periodosHistorial > 12) {
-    message.warning('Periodos historial debe estar entre 2 y 12')
+    message.warning('Períodos de historial debe estar entre 2 y 12')
     return
   }
 
@@ -405,7 +405,7 @@ const consultarAnomalias = async () => {
     const { data } = await consumoMlService.getAnomalias({ ...anomaliasForm })
     anomaliasResponse.value = data?.content ?? data
   } catch (err) {
-    message.error(getErrorMessage(err, 'No se pudo consultar anomalias'))
+    message.error(getErrorMessage(err, 'No se pudo consultar anomalías'))
   } finally {
     loadingAnomalias.value = false
   }
@@ -413,12 +413,12 @@ const consultarAnomalias = async () => {
 
 const consultarEvolucion = async () => {
   if (!evolucionForm.cuadrillaCodigo || !evolucionForm.itemCodigo || !evolucionForm.dias) {
-    message.warning('Seleccione cuadrilla, item y dias')
+    message.warning('Seleccione cuadrilla, ítem y días')
     return
   }
 
   if (evolucionForm.dias < 7 || evolucionForm.dias > 120) {
-    message.warning('Dias debe estar entre 7 y 120')
+    message.warning('Días debe estar entre 7 y 120')
     return
   }
 
@@ -427,7 +427,7 @@ const consultarEvolucion = async () => {
     const { data } = await consumoMlService.getEvolucion({ ...evolucionForm })
     evolucionResponse.value = data?.content ?? data
   } catch (err) {
-    message.error(getErrorMessage(err, 'No se pudo consultar evolucion'))
+    message.error(getErrorMessage(err, 'No se pudo consultar evolución'))
   } finally {
     loadingEvolucion.value = false
   }
@@ -435,17 +435,17 @@ const consultarEvolucion = async () => {
 
 const consultarProyeccion = async () => {
   if (!proyeccionForm.itemCodigo || !proyeccionForm.diasHist || !proyeccionForm.diasFuturo) {
-    message.warning('Seleccione item, dias historicos y dias futuro')
+    message.warning('Seleccione ítem, días históricos y días futuros')
     return
   }
 
   if (proyeccionForm.diasHist < 15 || proyeccionForm.diasHist > 180) {
-    message.warning('Dias historicos debe estar entre 15 y 180')
+    message.warning('Días históricos debe estar entre 15 y 180')
     return
   }
 
   if (proyeccionForm.diasFuturo < 1 || proyeccionForm.diasFuturo > 60) {
-    message.warning('Dias futuro debe estar entre 1 y 60')
+    message.warning('Días futuros debe estar entre 1 y 60')
     return
   }
 
@@ -454,7 +454,7 @@ const consultarProyeccion = async () => {
     const { data } = await consumoMlService.getProyeccion({ ...proyeccionForm })
     proyeccionResponse.value = data?.content ?? data
   } catch (err) {
-    message.error(getErrorMessage(err, 'No se pudo consultar proyeccion'))
+    message.error(getErrorMessage(err, 'No se pudo consultar proyección'))
   } finally {
     loadingProyeccion.value = false
   }
@@ -507,11 +507,11 @@ const limpiarAlertas = () => {
       <a-segmented :value="activePanel" :options="panelOptions" @change="onPanelChange" />
     </a-card>
 
-    <a-card v-if="activePanel === 'anomalias'" title="Anomalias de consumo">
+    <a-card v-if="activePanel === 'anomalias'" title="Anomalías de consumo">
       <a-form layout="vertical">
         <a-row :gutter="16">
           <a-col :xs="24" :md="6">
-            <a-form-item label="Dias a analizar" required>
+            <a-form-item label="Días a analizar" required>
               <a-input-number
                 v-model:value="anomaliasForm.dias"
                 :min="1"
@@ -523,7 +523,7 @@ const limpiarAlertas = () => {
             </a-form-item>
           </a-col>
           <a-col :xs="24" :md="6">
-            <a-form-item label="Periodos historial">
+            <a-form-item label="Períodos de historial">
               <a-input-number
                 v-model:value="anomaliasForm.periodosHistorial"
                 :min="2"
@@ -541,7 +541,7 @@ const limpiarAlertas = () => {
           </a-col>
           <a-col :xs="24" :md="6" class="form-actions">
             <a-button type="primary" :loading="loadingAnomalias" @click="consultarAnomalias">
-              Detectar anomalias
+              Detectar anomalías
             </a-button>
           </a-col>
         </a-row>
@@ -555,11 +555,11 @@ const limpiarAlertas = () => {
         </a-col>
         <a-col :xs="12" :md="6">
           <a-card size="small">
-            <a-statistic title="Anomalias" :value="anomaliasResumen.anomalias" :value-style="{ color: '#dc2626' }" />
+            <a-statistic title="Anomalías" :value="anomaliasResumen.anomalias" :value-style="{ color: '#dc2626' }" />
           </a-card>
         </a-col>
         <a-col :xs="12" :md="6">
-          <a-tooltip title="Muestra que tan inusual es el caso mas extremo detectado. Mientras mas alto sea el valor, mas se aleja del consumo historico esperado.">
+          <a-tooltip title="Muestra qué tan inusual es el caso más extremo detectado. Mientras más alto sea el valor, más se aleja del consumo histórico esperado.">
             <a-card size="small">
               <a-statistic title="Max score" :value="anomaliasResumen.maxScore" :precision="2" />
             </a-card>
@@ -576,8 +576,8 @@ const limpiarAlertas = () => {
         type="info"
         show-icon
         class="legend-alert"
-        message="Criterio de anomalia"
-        description="Compara consumo actual contra periodos historicos por cuadrilla e item. La variacion es el Z Score: desde 2.0 se considera consumo anomalo. El score ordena los casos mas alejados del patron historico."
+        message="Criterio de anomalía"
+        description="Compara consumo actual contra períodos históricos por cuadrilla e ítem. La variación es el Z Score: desde 2.0 se considera consumo anómalo. El score ordena los casos más alejados del patrón histórico."
       />
 
       <a-table
@@ -595,8 +595,8 @@ const limpiarAlertas = () => {
             {{ formatNumber(record[column.dataIndex]) }}
           </template>
           <template v-else-if="column.dataIndex === 'isAnomaly'">
-            <a-tag :color="booleanTag(record.isAnomaly, 'Anomalia', 'Normal').color">
-              {{ booleanTag(record.isAnomaly, 'Anomalia', 'Normal').text }}
+            <a-tag :color="booleanTag(record.isAnomaly, 'Anomalía', 'Normal').color">
+              {{ booleanTag(record.isAnomaly, 'Anomalía', 'Normal').text }}
             </a-tag>
           </template>
           <template v-else-if="column.dataIndex === 'itemNombre'">
@@ -616,7 +616,7 @@ const limpiarAlertas = () => {
       </a-table>
     </a-card>
 
-    <a-card v-if="activePanel === 'evolucion'" title="Evolucion de consumo">
+    <a-card v-if="activePanel === 'evolucion'" title="Evolución de consumo">
       <a-form layout="vertical">
         <a-row :gutter="16">
           <a-col :xs="24" :md="6">
@@ -643,12 +643,12 @@ const limpiarAlertas = () => {
             </a-form-item>
           </a-col>
           <a-col :xs="24" :md="6">
-            <a-form-item label="Item" required>
+            <a-form-item label="Ítem" required>
               <a-select
                 v-model:value="evolucionForm.itemCodigo"
                 show-search
                 allow-clear
-                placeholder="Buscar item"
+                placeholder="Buscar ítem"
                 :filter-option="false"
                 :loading="loadingItems"
                 :dropdown-style="{ maxHeight: '280px', overflow: 'auto' }"
@@ -662,7 +662,7 @@ const limpiarAlertas = () => {
             </a-form-item>
           </a-col>
           <a-col :xs="24" :md="4">
-            <a-form-item label="Dias" required>
+            <a-form-item label="Días" required>
               <a-input-number
                 v-model:value="evolucionForm.dias"
                 :min="7"
@@ -680,7 +680,7 @@ const limpiarAlertas = () => {
           </a-col>
           <a-col :xs="24" :md="4" class="form-actions">
             <a-button type="primary" :loading="loadingEvolucion" @click="consultarEvolucion">
-              Ver evolucion
+              Ver evolución
             </a-button>
           </a-col>
         </a-row>
@@ -690,8 +690,8 @@ const limpiarAlertas = () => {
         type="info"
         show-icon
         class="legend-alert"
-        message="Criterio de evolucion"
-        description="Consumo diario es SALIDA menos DEVOLUCION. Tendencia es el promedio movil de 7 dias. Evento destacado aparece cuando abs(Z Score) >= 2.0 y el consumo diario es mayor a 0."
+        message="Criterio de evolución"
+        description="Consumo diario es SALIDA menos DEVOLUCIÓN. Tendencia es el promedio móvil de 7 días. Evento destacado aparece cuando abs(Z Score) >= 2.0 y el consumo diario es mayor a 0."
       />
 
       <a-row :gutter="[16, 16]">
@@ -702,7 +702,7 @@ const limpiarAlertas = () => {
           <a-row :gutter="[12, 12]" class="decision-grid">
             <a-col :xs="12" :sm="6" :lg="12">
               <a-card size="small">
-                <a-statistic title="Dias evaluados" :value="evolucionResumen.dias" />
+                <a-statistic title="Días evaluados" :value="evolucionResumen.dias" />
               </a-card>
             </a-col>
             <a-col :xs="12" :sm="6" :lg="12">
@@ -761,16 +761,16 @@ const limpiarAlertas = () => {
       </a-row>
     </a-card>
 
-    <a-card v-if="activePanel === 'proyeccion'" title="Proyeccion de consumo">
+    <a-card v-if="activePanel === 'proyeccion'" title="Proyección de consumo">
       <a-form layout="vertical">
         <a-row :gutter="16">
           <a-col :xs="24" :md="8">
-            <a-form-item label="Item" required>
+            <a-form-item label="Ítem" required>
               <a-select
                 v-model:value="proyeccionForm.itemCodigo"
                 show-search
                 allow-clear
-                placeholder="Buscar item"
+                placeholder="Buscar ítem"
                 :filter-option="false"
                 :loading="loadingItems"
                 :dropdown-style="{ maxHeight: '280px', overflow: 'auto' }"
@@ -784,7 +784,7 @@ const limpiarAlertas = () => {
             </a-form-item>
           </a-col>
           <a-col :xs="24" :md="5">
-            <a-form-item label="Dias historicos" required>
+            <a-form-item label="Días históricos" required>
               <a-input-number
                 v-model:value="proyeccionForm.diasHist"
                 :min="15"
@@ -796,7 +796,7 @@ const limpiarAlertas = () => {
             </a-form-item>
           </a-col>
           <a-col :xs="24" :md="5">
-            <a-form-item label="Dias futuro" required>
+            <a-form-item label="Días futuros" required>
               <a-input-number
                 v-model:value="proyeccionForm.diasFuturo"
                 :min="1"
@@ -820,7 +820,7 @@ const limpiarAlertas = () => {
         :type="proyeccion.length ? 'info' : 'warning'"
         show-icon
         class="legend-alert"
-        message="Resultado de proyeccion"
+        message="Resultado de proyección"
         :description="proyeccionContent.explicacionGeneral"
       />
 
@@ -829,8 +829,8 @@ const limpiarAlertas = () => {
         type="info"
         show-icon
         class="legend-alert"
-        message="Lectura de variacion"
-        description="La desviacion diaria indica que tan irregular fue el consumo historico: si es alta frente al promedio, el consumo no fue uniforme."
+        message="Lectura de variación"
+        description="La desviación diaria indica qué tan irregular fue el consumo histórico: si es alta frente al promedio, el consumo no fue uniforme."
       />
 
       <a-row :gutter="[16, 16]">
@@ -840,30 +840,30 @@ const limpiarAlertas = () => {
         <a-col :xs="24" :lg="10">
           <a-row :gutter="[12, 12]" class="decision-grid">
             <a-col :xs="12">
-              <a-tooltip title="Cantidad de dias futuros devueltos en content.resultados. Normalmente coincide con Dias futuro.">
+              <a-tooltip title="Cantidad de días futuros devueltos en content.resultados. Normalmente coincide con Días futuros.">
                 <a-card size="small">
-                  <a-statistic title="Periodos" :value="proyeccionResumen.periodos" />
+                  <a-statistic title="Períodos" :value="proyeccionResumen.periodos" />
                 </a-card>
               </a-tooltip>
             </a-col>
             <a-col :xs="12">
-              <a-tooltip title="Suma de consumoEstimado en todos los periodos proyectados. Representa el total estimado para los dias futuros.">
+              <a-tooltip title="Suma de consumoEstimado en todos los períodos proyectados. Representa el total estimado para los días futuros.">
                 <a-card size="small">
                   <a-statistic title="Consumo proyectado" :value="proyeccionResumen.consumoTotal" />
                 </a-card>
               </a-tooltip>
             </a-col>
             <a-col :xs="12">
-              <a-tooltip title="consumoPromedioDiario viene del resumen del backend y representa el consumo promedio por dia calculado con el historial.">
+              <a-tooltip title="consumoPromedioDiario viene del resumen del backend y representa el consumo promedio por día calculado con el historial.">
                 <a-card size="small">
                   <a-statistic title="Promedio diario" :value="proyeccionResumen.promedioDiario" :precision="2" />
                 </a-card>
               </a-tooltip>
             </a-col>
             <a-col :xs="12">
-              <a-tooltip title="desviacionStdDiaria mide que tanto varia el consumo diario respecto al promedio. Si es alta, el consumo diario es irregular; si es baja, el consumo es mas estable.">
+              <a-tooltip title="desviacionStdDiaria mide qué tanto varía el consumo diario respecto al promedio. Si es alta, el consumo diario es irregular; si es baja, el consumo es más estable.">
                 <a-card size="small">
-                  <a-statistic title="Desviacion diaria" :value="proyeccionResumen.desviacionDiaria" :precision="2" />
+                  <a-statistic title="Desviación diaria" :value="proyeccionResumen.desviacionDiaria" :precision="2" />
                 </a-card>
               </a-tooltip>
             </a-col>
@@ -922,7 +922,7 @@ const limpiarAlertas = () => {
             </a-form-item>
           </a-col>
           <a-col :xs="24" :md="4">
-            <a-form-item label="Codigo referencia">
+            <a-form-item label="Código de referencia">
               <a-input
                 v-model:value="alertasForm.referenciaCodigo"
                 allow-clear
@@ -941,7 +941,7 @@ const limpiarAlertas = () => {
             </a-form-item>
           </a-col>
           <a-col :xs="24" :md="3">
-            <a-form-item label="Limite">
+            <a-form-item label="Límite">
               <a-input-number
                 v-model:value="alertasForm.limit"
                 :precision="0"
@@ -973,7 +973,7 @@ const limpiarAlertas = () => {
         </a-col>
         <a-col :xs="12" :md="6">
           <a-card size="small">
-            <a-statistic title="Consumo anomalo" :value="alertasResumen.consumoAnomalo" :value-style="{ color: '#dc2626' }" />
+            <a-statistic title="Consumo anómalo" :value="alertasResumen.consumoAnomalo" :value-style="{ color: '#dc2626' }" />
           </a-card>
         </a-col>
         <a-col :xs="12" :md="6">

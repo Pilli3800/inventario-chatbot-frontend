@@ -1,7 +1,8 @@
 import axios from 'axios'
+import { apiUrl } from '@/config/api.config'
 import { useAuthStore } from '@/stores/auth.store'
 
-const API_URL = 'http://localhost:8080/api/admin/users'
+const API_URL = apiUrl('/api/admin/users')
 
 export const adminUserService = {
   async activar(identUsuario) {
@@ -34,14 +35,14 @@ export const adminUserService = {
 
   async getRoles() {
     const authStore = useAuthStore()
-    return axios.get('http://localhost:8080/api/admin/roles', {
+    return axios.get(apiUrl('/api/admin/roles'), {
       headers: { Authorization: authStore.token }
     })
   },
 
   async create(payload) {
     const authStore = useAuthStore()
-    return axios.post('http://localhost:8080/api/admin/users', payload, {
+    return axios.post(apiUrl('/api/admin/users'), payload, {
       headers: { Authorization: authStore.token }
     })
   },

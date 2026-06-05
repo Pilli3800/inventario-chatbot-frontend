@@ -15,6 +15,7 @@ const item = ref({
   codigoItem: '',
   nombre: '',
   tipo: '',
+  stockMinimo: null,
   descripcion: '',
   observaciones: '',
   imagenUrl: null,
@@ -33,6 +34,7 @@ const loadItem = async () => {
       codigoItem: content.codigoItem,
       nombre: content.nombre,
       tipo: content.tipo,
+      stockMinimo: content.stockMinimo,
       descripcion: content.descripcion || '',
       observaciones: content.observaciones || '',
       imagenUrl: content.imagenUrl || null,
@@ -86,6 +88,10 @@ const handleClose = () => emit('close')
 
       <a-form-item label="Tipo">
         <a-input :value="item.tipo" disabled />
+      </a-form-item>
+
+      <a-form-item label="Stock mínimo">
+        <a-input-number :value="item.stockMinimo" disabled style="width: 100%" />
       </a-form-item>
 
       <a-form-item label="Descripción">

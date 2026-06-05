@@ -1,7 +1,8 @@
 import axios from 'axios'
+import { apiUrl } from '@/config/api.config'
 import { useAuthStore } from '@/stores/auth.store'
 
-const API_URL = 'http://localhost:8080/api/admin/cuadrillas'
+const API_URL = apiUrl('/api/admin/cuadrillas')
 
 export const adminCuadrillaService = {
   async create(payload) {

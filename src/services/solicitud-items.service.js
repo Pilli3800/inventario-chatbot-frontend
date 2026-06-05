@@ -1,8 +1,9 @@
 import axios from 'axios'
+import { apiUrl } from '@/config/api.config'
 import { useAuthStore } from '@/stores/auth.store'
 
-const API_URL = 'http://localhost:8080/api/solicitud-items'
-const LOGISTICA_URL = 'http://localhost:8080/api/solicitud-items'
+const API_URL = apiUrl('/api/solicitud-items')
+const LOGISTICA_URL = apiUrl('/api/solicitud-items')
 
 export const solicitudItemsService = {
   async search(params) {

@@ -40,7 +40,7 @@ renderer.link = ({ href, title, tokens }) => {
 
 /* Configuracion */
 const COOLDOWN_SECONDS = 3
-const INITIAL_MESSAGE = 'Hola \uD83D\uDC4B Soy tu asistente de inventario. \u00BFEn qu\u00E9 puedo ayudarte?'
+const INITIAL_MESSAGE = '¡Hola! 🤖👋 Estoy aquí para ayudarte con el inventario. ¿Cómo empezamos?'
 
 /* Estado */
 const inputKey = ref(0)
@@ -267,7 +267,8 @@ watch(
         ? 'El asistente est\u00E1 respondiendo...'
         : (cooldownActive
           ? `Espera ${cooldownSecondsLeft}s para enviar otro mensaje...`
-          : 'Ej: dime 5 items activos')" @pressEnter="sendMessage" :disabled="loading || cooldownActive" allow-clear />
+          : 'Ej: lista items críticos de la sede S2')" @pressEnter="sendMessage" :disabled="loading || cooldownActive"
+        allow-clear />
       <a-tooltip :title="cooldownActive ? `Espera ${cooldownSecondsLeft}s para volver a enviar` : 'Enviar mensaje'">
         <a-button type="primary" :loading="loading" :disabled="!inputMessage.trim() || cooldownActive"
           @click="sendMessage">
@@ -277,15 +278,16 @@ watch(
     </div>
 
     <!-- Modal de Bienvenida -->
-    <a-modal v-model:open="welcomeOpen" title="&#128075; Bienvenido al Asistente Inteligente" :footer="null" centered>
-      <a-space direction="vertical" size="middle" style="width: 100%">
-        <a-alert type="info" show-icon message="&#128269; Buscar items por nombre, código o estado" />
-        <a-alert type="info" show-icon message="&#128230; Consultar inventarios disponibles" />
-        <a-alert type="info" show-icon message="&#128202; Revisar movimientos recientes" />
-        <a-alert type="info" show-icon message="&#10067; Resolver dudas sobre el sistema" />
+    <a-modal v-model:open="welcomeOpen" title="&#128075; Asistente de inventario" :footer="null" centered
+      class="chat-welcome-modal">
+      <a-space direction="vertical" size="small" style="width: 100%">
+        <a-alert type="info" show-icon message="Busca items por nombre, código, tipo o inicial." />
+        <a-alert type="info" show-icon message="Consulta stock e items críticos por sede o servicio." />
+        <a-alert type="info" show-icon message="Revisa movimientos, historial y consumo." />
+        <a-alert type="warning" show-icon message="Solo consulta: no crea, modifica, aprueba ni elimina." />
       </a-space>
 
-      <a-divider />
+      <a-divider style="margin: 14px 0" />
 
       <a-button type="primary" block @click="welcomeOpen = false">
         Empezar
@@ -351,5 +353,36 @@ watch(
 
 .typing-fade {
   animation-direction: alternate;
+}
+
+.chat-welcome-modal {
+  width: min(420px, calc(100vw - 24px)) !important;
+}
+
+.chat-welcome-modal .ant-modal-content {
+  padding: 16px;
+}
+
+.chat-welcome-modal .ant-modal-header {
+  margin-bottom: 10px;
+}
+
+.chat-welcome-modal .ant-modal-title {
+  font-size: 16px;
+}
+
+.chat-welcome-modal .ant-alert {
+  padding: 8px 12px;
+}
+
+.chat-welcome-modal .ant-alert-message {
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+@media (max-width: 480px) {
+  .chat-welcome-modal .ant-modal-content {
+    padding: 14px;
+  }
 }
 </style>

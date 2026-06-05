@@ -1,8 +1,9 @@
 // chatbot.service.js
 import { useAuthStore } from '@/stores/auth.store'
 import axios from 'axios'
+import { apiUrl } from '@/config/api.config'
 
-const API_URL = 'http://localhost:8080/api/ia/chat'
+const API_URL = apiUrl('/api/ia/chat')
 
 export const chatbotService = {
   async sendMessage(message, contextoPantalla) {

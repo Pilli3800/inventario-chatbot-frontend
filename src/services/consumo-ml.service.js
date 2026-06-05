@@ -1,7 +1,8 @@
 import axios from 'axios'
+import { apiUrl } from '@/config/api.config'
 import { useAuthStore } from '@/stores/auth.store'
 
-const API_URL = 'http://localhost:8080/api/consumo/ml'
+const API_URL = apiUrl('/api/consumo/ml')
 
 const getHeaders = () => {
   const authStore = useAuthStore()

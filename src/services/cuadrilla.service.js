@@ -1,7 +1,8 @@
 import axios from 'axios'
+import { apiUrl } from '@/config/api.config'
 import { useAuthStore } from '@/stores/auth.store'
 
-const API_URL = 'http://localhost:8080/api/cuadrillas'
+const API_URL = apiUrl('/api/cuadrillas')
 
 export const cuadrillaService = {
   async search(params) {

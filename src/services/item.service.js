@@ -1,7 +1,7 @@
 import axios from 'axios'
+import { API_BASE_URL } from '@/config/api.config'
 import { useAuthStore } from '@/stores/auth.store'
 
-export const API_BASE_URL = 'http://localhost:8080'
 const API_URL = `${API_BASE_URL}/api/logistica/items`
 
 export const getItemImageUrl = (imagenUrl) => {

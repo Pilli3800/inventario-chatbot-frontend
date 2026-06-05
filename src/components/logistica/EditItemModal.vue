@@ -19,6 +19,7 @@ const form = ref({
   codigoItem: '',
   nombre: '',
   tipo: '',
+  stockMinimo: null,
   descripcion: '',
   observaciones: '',
   imagenUrl: null,
@@ -39,6 +40,7 @@ const loadItem = async () => {
       codigoItem: item.codigoItem,
       nombre: item.nombre,
       tipo: item.tipo,
+      stockMinimo: item.stockMinimo,
       descripcion: item.descripcion || '',
       observaciones: item.observaciones || '',
       imagenUrl: item.imagenUrl || null,
@@ -60,8 +62,10 @@ watch(
   { immediate: true }
 )
 
+const isValidStockMinimo = () => Number.isInteger(form.value.stockMinimo) && form.value.stockMinimo > 0
+
 const isDisabled = computed(() => {
-  return !form.value.nombre.trim() || !form.value.tipo
+  return !form.value.nombre.trim() || !form.value.tipo || !isValidStockMinimo()
 })
 
 const validateImage = (file) => {
@@ -129,10 +133,16 @@ const submit = async () => {
   try {
     errorMsg.value = null
 
+    if (!isValidStockMinimo()) {
+      message.error('El stock mínimo debe ser un entero mayor que 0')
+      return
+    }
+
     await itemService.update(props.codigoItem, {
       nombre: form.value.nombre,
       descripcion: form.value.descripcion,
       tipo: form.value.tipo,
+      stockMinimo: form.value.stockMinimo,
       enabled: form.value.enabled,
       observaciones: form.value.observaciones
     })
@@ -222,6 +232,10 @@ const handleCancel = () => emit('close')
           <a-select-option value="HERRAMIENTA">HERRAMIENTA</a-select-option>
           <a-select-option value="EQUIPO">EQUIPO</a-select-option>
         </a-select>
+      </a-form-item>
+
+      <a-form-item label="Stock mínimo">
+        <a-input-number v-model:value="form.stockMinimo" :min="1" :precision="0" style="width: 100%" />
       </a-form-item>
 
       <a-form-item label="Descripción">

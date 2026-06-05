@@ -1,7 +1,8 @@
 import axios from 'axios'
+import { apiUrl } from '@/config/api.config'
 import { useAuthStore } from '@/stores/auth.store'
 
-const API_URL = 'http://localhost:8080/api/logistica/inventarios-servicio'
+const API_URL = apiUrl('/api/logistica/inventarios-servicio')
 
 export const inventarioServicioService = {
   async search(params) {

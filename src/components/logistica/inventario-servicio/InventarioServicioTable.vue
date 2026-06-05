@@ -38,6 +38,7 @@ const columns = computed(() => [
         ? props.sorter.order
         : null
   },
+  { title: 'Reabastecer', dataIndex: 'stockCritico', width: 120 },
   { title: '', dataIndex: 'actions', fixed: 'right', width: 60 }
 ])
 
@@ -54,7 +55,7 @@ const getStock = (record) => record.stockActual ?? record.stock ?? 0
     :data-source="data"
     :loading="loading"
     :pagination="pagination"
-    :scroll="{ x: 940 }"
+    :scroll="{ x: 1060 }"
     row-key="id"
     @change="handleChange"
   >
@@ -68,6 +69,12 @@ const getStock = (record) => record.stockActual ?? record.stock ?? 0
       <template v-else-if="column.dataIndex === 'stockActual'">
         <a-tag :color="getStock(record) > 0 ? 'blue' : 'default'">
           {{ getStock(record) }}
+        </a-tag>
+      </template>
+
+      <template v-else-if="column.dataIndex === 'stockCritico'">
+        <a-tag :color="record.stockCritico ? 'red' : 'green'">
+          {{ record.stockCritico ? 'Sí' : 'No' }}
         </a-tag>
       </template>
     </template>

@@ -1,9 +1,12 @@
 <!-- ChangePasswordModal.vue -->
 <script setup>
-import { ref, computed, watch, createVNode } from 'vue'
-import { Modal, message } from 'ant-design-vue'
-import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
+import { ref, computed, watch } from 'vue'
+import { message } from 'ant-design-vue'
 import { authService } from '@/services/auth.service'
+
+const props = defineProps({
+  open: Boolean
+})
 
 const emit = defineEmits(['close', 'success'])
 
@@ -11,6 +14,7 @@ const actualPassword = ref('')
 const confirmActualPassword = ref('')
 const nuevaPassword = ref('')
 const errorMsg = ref(null)
+const loading = ref(false)
 
 /* =========================
    VALIDACIONES
@@ -83,6 +87,7 @@ const handleChangePassword = async () => {
 
   try {
     errorMsg.value = null
+    loading.value = true
 
     await authService.changePassword({
       actualPassword: actualPassword.value,
@@ -98,20 +103,9 @@ const handleChangePassword = async () => {
 
     errorMsg.value =
       err.response?.data?.content || 'Error al cambiar la contraseña'
+  } finally {
+    loading.value = false
   }
-}
-
-const confirmChange = () => {
-  Modal.confirm({
-    title: '¿Deseas cambiar tu contraseña?',
-    icon: createVNode(ExclamationCircleOutlined),
-    content: 'Deberás usar la nueva contraseña a partir de ahora',
-    okText: 'Sí, cambiar',
-    cancelText: 'Cancelar',
-    async onOk() {
-      await handleChangePassword()
-    }
-  })
 }
 
 const handleCancel = () => {
@@ -128,8 +122,9 @@ const resetForm = () => {
 </script>
 
 <template>
-  <a-modal title="Cambiar contraseña" ok-text="Cambiar" cancel-text="Cancelar" :okButtonProps="{ disabled: isDisabled }"
-    @ok="confirmChange" @cancel="handleCancel" :zIndex="1300">
+  <a-modal :open="props.open" title="Cambiar contraseña" ok-text="Cambiar" cancel-text="Cancelar"
+    :okButtonProps="{ disabled: isDisabled }" :confirm-loading="loading"
+    @ok="handleChangePassword" @cancel="handleCancel" :zIndex="1300">
     <a-form layout="vertical">
 
       <a-alert type="info" show-icon

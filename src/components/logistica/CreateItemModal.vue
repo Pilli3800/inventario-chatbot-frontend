@@ -19,11 +19,19 @@ const form = ref({
   codigoItem: '',
   nombre: '',
   tipo: '',
+  stockMinimo: null,
   descripcion: '',
   observaciones: '',
 })
 
 /* Validaciones */
+const validateStockMinimo = async (_rule, value) => {
+  if (!Number.isInteger(value) || value <= 0) {
+    return Promise.reject('El stock mínimo debe ser un entero mayor que 0')
+  }
+  return Promise.resolve()
+}
+
 const rules = {
   codigoItem: [
     { required: true, message: 'El código es obligatorio' }
@@ -33,6 +41,10 @@ const rules = {
   ],
   tipo: [
     { required: true, message: 'El tipo es obligatorio' }
+  ],
+  stockMinimo: [
+    { required: true, message: 'El stock mínimo es obligatorio' },
+    { validator: validateStockMinimo }
   ]
 }
 
@@ -50,6 +62,7 @@ const resetForm = () => {
     codigoItem: '',
     nombre: '',
     tipo: '',
+    stockMinimo: null,
     descripcion: '',
     observaciones: ''
   }
@@ -110,6 +123,10 @@ const handleCancel = () => emit('close')
           <a-select-option value="HERRAMIENTA">HERRAMIENTA</a-select-option>
           <a-select-option value="EQUIPO">EQUIPO</a-select-option>
         </a-select>
+      </a-form-item>
+
+      <a-form-item label="Stock mínimo" name="stockMinimo">
+        <a-input-number v-model:value="form.stockMinimo" :min="1" :precision="0" style="width: 100%" />
       </a-form-item>
 
       <a-form-item label="Descripción">

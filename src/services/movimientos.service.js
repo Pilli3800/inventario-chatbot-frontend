@@ -1,8 +1,9 @@
 import axios from 'axios'
+import { apiUrl } from '@/config/api.config'
 import { useAuthStore } from '@/stores/auth.store'
 
-const API_INVENTARIO_URL = 'http://localhost:8080/api/movimientos'
-const API_HISTORICO_URL  = 'http://localhost:8080/api/movimientos/historico'
+const API_INVENTARIO_URL = apiUrl('/api/movimientos')
+const API_HISTORICO_URL  = apiUrl('/api/movimientos/historico')
 
 export const movimientosService = {
 

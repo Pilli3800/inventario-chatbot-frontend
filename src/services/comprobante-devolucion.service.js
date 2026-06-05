@@ -1,7 +1,8 @@
 import axios from 'axios'
+import { apiUrl } from '@/config/api.config'
 import { useAuthStore } from '@/stores/auth.store'
 
-const API_URL = 'http://localhost:8080/api/comprobantes-devolucion'
+const API_URL = apiUrl('/api/comprobantes-devolucion')
 
 export const comprobanteDevolucionService = {
   async getById(id) {

@@ -14,6 +14,7 @@ const columns = [
   { title: 'Código', dataIndex: 'codigoItem', sorter: true },
   { title: 'Nombre', dataIndex: 'nombre', sorter: true },
   { title: 'Tipo', dataIndex: 'tipo' },
+  { title: 'Stock mínimo', dataIndex: 'stockMinimo', align: 'right' },
   { title: 'Estado', dataIndex: 'enabled' },
   { title: '', dataIndex: 'actions', fixed: 'right', width: 1 }
 ]
